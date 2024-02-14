@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  experiment:
+  ossqa:
     image: ossqa
     build:
       context: .
