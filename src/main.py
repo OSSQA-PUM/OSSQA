@@ -7,8 +7,9 @@ import numpy as np # Notice that numpy may not be is not installed on your local
 #but it will be installed in the docker container since it is declared in the requirements.txt file
 
 
-"""Example code to test docker container"""
+
 def do_something():
+    """Example code to test docker container."""
     print("Goodbye World!")
     print("Hello World!")
     print(os.path.dirname(os.path.abspath(__file__)))
@@ -17,8 +18,9 @@ def do_something():
 
     print(a)
 
-"""Main function of the program"""
+
 def main():
+    """Main function of the program"""
     do_something()
 
 if __name__ == "__main__":
