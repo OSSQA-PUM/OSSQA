@@ -1,9 +1,12 @@
 import os
-import numpy as np
+import numpy as np # Notice that numpy may not be is not installed on your local machine, 
+#but it will be installed in the docker container since it is declared in the requirements.txt file
 
+
+# Example code to test docker container
 def do_something():
-    print("Goodbye Wolrd!")
-    print("Hello Wolrd!")
+    print("Goodbye World!")
+    print("Hello World!")
     print(os.path.dirname(os.path.abspath(__file__)))
 
     a = np.arange(15).reshape(3, 5)
