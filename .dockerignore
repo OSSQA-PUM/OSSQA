@@ -23,6 +23,5 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
-**/git_token.txt
 LICENSE
 README.md

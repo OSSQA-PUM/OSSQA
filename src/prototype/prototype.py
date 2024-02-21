@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 from typing import Optional, List, Tuple
 import subprocess
 import json
@@ -15,12 +16,12 @@ def analyze_dependency_score(git_url: str, git_auth_token: Optional[str] = "") -
         A list of tuples containing the name, score, and URL of each dependency check.
     """
     # Load the Git authentication token from a file if not provided
-    if git_auth_token == "":
-        git_auth_token = open('src\prototype\git_token.txt', 'r').readline()
+    #if git_auth_token == "":
+    #    git_auth_token = open('git_token.txt', 'r').readline()
     
     # Execute the Scorecard tool in a Docker container, passing the necessary environment variables
     output = subprocess.check_output(
-        f'docker run -e GITHUB_AUTH_TOKEN={git_auth_token} gcr.io/openssf/scorecard:stable --repo={git_url} --show-details --format json', 
+        f'scorecard --repo={git_url} --show-details --format json', 
         shell=True
     )
     
@@ -28,6 +29,9 @@ def analyze_dependency_score(git_url: str, git_auth_token: Optional[str] = "") -
     output = output.decode("utf-8")
     output = output.replace("failed to get console mode for stdout: The handle is invalid.", "")
     output = output.replace("\n", "")
+
+    #print(output)
+
     json_output = json.loads(output) 
 
     dependency_scores = []
@@ -53,12 +57,20 @@ def analyze_multiple_dependency_scores(git_urls: List[str], git_auth_token: Opti
     dependency_scores = []
     analyze_amount = len(git_urls)
     analyzed = 0
+
+    """def analyze_repository(url):
+        return analyze_dependency_score(url, git_auth_token)
+
+    with Pool() as pool:
+        dependency_scores = pool.map(analyze_repository, git_urls)"""
+    
     
     # Analyze each repository in the provided list
     for url in git_urls:
         dependency_scores.append(analyze_dependency_score(url, git_auth_token))
         analyzed += 1
         print(f"Analyzed: {analyzed}/{analyze_amount}")
+    
     
     return dependency_scores
 
@@ -113,7 +125,7 @@ def prototype():
     Executes the prototype analysis, aggregating dependency scores from multiple repositories.
     """
     # Open and process the SBOM file
-    SBOM = open('src/prototype/example-SBOM.json')
+    SBOM = open('example-SBOM.json')
     component_urls = get_dependency_urls(SBOM)
     dependency_scores = analyze_multiple_dependency_scores(component_urls)
     summary = calculate_sbom_scores(dependency_scores)
