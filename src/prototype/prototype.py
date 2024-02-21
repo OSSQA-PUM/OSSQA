@@ -2,7 +2,7 @@ from typing import Optional, List, Tuple
 import subprocess
 import json
 
-def analyze_dependency(git_url: str, git_auth_token: str = "") -> List[Tuple[str, int, str]]:
+def analyze_dependency_score(git_url: str, git_auth_token: Optional[str] = "") -> List[Tuple[str, int, str]]:
     """
     Analyzes the dependencies of a given Git repository using the OpenSSF Scorecard tool.
     
@@ -38,7 +38,7 @@ def analyze_dependency(git_url: str, git_auth_token: str = "") -> List[Tuple[str
     
     return dependency_scores
 
-def analyze_dependencies(git_urls: List[str], git_auth_token: str = "") -> List[List[Tuple[str, int, str]]]:
+def analyze_multiple_dependency_scores(git_urls: List[str], git_auth_token: Optional[str] = "") -> List[List[Tuple[str, int, str]]]:
     """
     Analyzes the dependencies of multiple Git repositories concurrently using the OpenSSF Scorecard.
     
@@ -56,7 +56,7 @@ def analyze_dependencies(git_urls: List[str], git_auth_token: str = "") -> List[
     
     # Analyze each repository in the provided list
     for url in git_urls:
-        dependency_scores.append(analyze_dependency(url, git_auth_token))
+        dependency_scores.append(analyze_dependency_score(url, git_auth_token))
         analyzed += 1
         print(f"Analyzed: {analyzed}/{analyze_amount}")
     
@@ -115,7 +115,7 @@ def prototype():
     # Open and process the SBOM file
     SBOM = open('src/prototype/example-SBOM.json')
     component_urls = get_dependency_urls(SBOM)
-    dependency_scores = analyze_dependencies(component_urls)
+    dependency_scores = analyze_multiple_dependency_scores(component_urls)
     summary = calculate_sbom_scores(dependency_scores)
 
     # Print a summary of the analysis
