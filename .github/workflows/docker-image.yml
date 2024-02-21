@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+  # Branch 18 used for testing
+  # TODO: Delete when testing is complete. It should not be here.
+    branches: [ "main", "18-research-and-apply-github-actions" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker-compose build
+#    - name: Run python tests.
+#      run: docker-compose py-test
