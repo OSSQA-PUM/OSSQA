@@ -10,6 +10,12 @@ COPY requirements.txt .
 # Copy the contents of the local src directory into the /app directory in the Docker image
 COPY /src /app
 
+# Copy the scorecard binary into the /usr/local/bin directory in the Docker image
+COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
+
+# Make the scorecard binary executable
+RUN chmod +x /usr/local/bin/scorecard
+
 # Create a virtual environment in the /app/venv directory
 RUN python -m venv /app/venv
 
