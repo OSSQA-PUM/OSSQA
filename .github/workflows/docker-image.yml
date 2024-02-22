@@ -4,7 +4,7 @@ on:
   push:
   # Branch 18 used for testing
   # TODO: Delete when testing is complete. It should not be here.
-    branches: [ "main", "18-research-and-apply-github-actions" ]
+    branches: [ "dev"]
   pull_request:
     branches: [ "main" ]
 
