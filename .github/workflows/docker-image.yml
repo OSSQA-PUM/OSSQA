@@ -26,8 +26,8 @@ jobs:
         # Feel free to rename this variable, but make sure to update it everywhere. You should paste your entire file in your secrets
         TEST_ENV_FILE : ${{secrets.YOUR_SECRET_NAME}}
     - name: Build the Docker image
-      run: docker-compose build ossqa-prototype 
+      run: docker compose build ossqa-prototype 
     - name: Run tests
-      run: docker-compose -e GITHUB_AUTH_TOKEN=${{secrets.AUTH_TOKEN}} run ossqa-prototype
+      run: docker compose run ossqa-prototype
 #    - name: Run python tests.
 #      run: docker-compose py-test
