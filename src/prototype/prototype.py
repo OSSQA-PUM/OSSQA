@@ -17,9 +17,6 @@ def analyze_dependency_score(git_url: str) -> List[Tuple[str, int, str]]:
     Returns:
         A list of tuples containing the name, score, and URL of each dependency check.
     """
-    # Load the Git authentication token from a file if not provided
-    #if git_auth_token == "":
-    #    git_auth_token = open('git_token.txt', 'r').readline()
     
     # Execute the Scorecard tool in a Docker container, passing the necessary environment variables
     output = subprocess.check_output(
@@ -31,8 +28,6 @@ def analyze_dependency_score(git_url: str) -> List[Tuple[str, int, str]]:
     output = output.decode("utf-8")
     output = output.replace("failed to get console mode for stdout: The handle is invalid.", "")
     output = output.replace("\n", "")
-
-    #print(output)
 
     json_output = json.loads(output) 
 

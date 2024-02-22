@@ -2,10 +2,6 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install Python and pip
-#RUN apk add --update --no-cache python3 py3-pip && \
-#    ln -sf python3 /usr/bin/python
-
 # Setup virtual environment
 RUN python3 -m venv /app/venv
 
@@ -19,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
-RUN chmod +x /usr/local/bin/scorecard
+#RUN chmod +x /usr/local/bin/scorecard
 
 # Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
