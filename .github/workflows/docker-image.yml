@@ -17,8 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker compose build ossqa-prototype 
+      run: docker-compose build ossqa-prototype 
     - name: Run tests
-      run: docker compose -e GITHUB_AUTH_TOKEN= ${{secrets.AUTH_TOKEN}} run ossqa-prototype
+      run: docker-compose -e GITHUB_AUTH_TOKEN=${{secrets.AUTH_TOKEN}} run ossqa-prototype
 #    - name: Run python tests.
 #      run: docker-compose py-test
