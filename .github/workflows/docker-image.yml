@@ -15,7 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout
     - uses: actions/checkout@v3
+    - name: Echo secrets
+      run: |
+        echo $TEST_ENV_FILE >> ./.env
+        cat ./.env
+      shell: bash
+      env:
+        # Feel free to rename this variable, but make sure to update it everywhere. You should paste your entire file in your secrets
+        TEST_ENV_FILE : ${{secrets.YOUR_SECRET_NAME}}
     - name: Build the Docker image
       run: docker-compose build ossqa-prototype 
     - name: Run tests
