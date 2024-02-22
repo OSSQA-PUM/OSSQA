@@ -1,23 +1,32 @@
-# For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.12
+# Use an official Python runtime as a parent image
+FROM python:3.11-alpine
 
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE=1
+# Set the working directory in the container to /app
+WORKDIR /app
 
-# Turns off buffering for easier container logging
-ENV PYTHONUNBUFFERED=1
-
-# Install pip requirements
+# Copy the requirements file into the Docker image
 COPY requirements.txt .
+
+# Copy the contents of the local src directory into the /app directory in the Docker image
+COPY /src /app
+
+# Create a virtual environment in the /app/venv directory
+RUN python -m venv /app/venv
+
+# Add the virtual environment binaries to the PATH for subsequent commands
+ENV PATH="/app/venv/bin:$PATH"
+
+# Install the Python packages listed in requirements.txt
 RUN python -m pip install -r requirements.txt
 
-WORKDIR /app
-COPY . /app
+# Prevent Python from writing .pyc files to disc (useful in development)
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Creates a non-root user with an explicit UID and adds permission to access the /app folder
-# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
-USER appuser
+# Prevent Python from buffering stdout and stderr (useful in development)
+ENV PYTHONUNBUFFERED=1
 
-# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["python", "src/main.py"]
+# Pass the GitHub authentication token from the host environment to the Docker environment
+ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
+
+# Run main.py when the container is launched
+CMD ["python", "main.py"]
