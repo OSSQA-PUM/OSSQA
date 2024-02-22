@@ -1,9 +1,11 @@
 from multiprocessing import Pool
-from typing import Optional, List, Tuple
+from typing import List, Tuple
 import subprocess
 import json
 
-def analyze_dependency_score(git_url: str, git_auth_token: Optional[str] = "") -> List[Tuple[str, int, str]]:
+import tqdm
+
+def analyze_dependency_score(git_url: str) -> List[Tuple[str, int, str]]:
     """
     Analyzes the dependencies of a given Git repository using the OpenSSF Scorecard tool.
     
@@ -42,7 +44,7 @@ def analyze_dependency_score(git_url: str, git_auth_token: Optional[str] = "") -
     
     return dependency_scores
 
-def analyze_multiple_dependency_scores(git_urls: List[str], git_auth_token: Optional[str] = "") -> List[List[Tuple[str, int, str]]]:
+def analyze_multiple_dependency_scores(git_urls: List[str]) -> List[List[Tuple[str, int, str]]]:
     """
     Analyzes the dependencies of multiple Git repositories concurrently using the OpenSSF Scorecard.
     
@@ -58,18 +60,11 @@ def analyze_multiple_dependency_scores(git_urls: List[str], git_auth_token: Opti
     analyze_amount = len(git_urls)
     analyzed = 0
 
-    """def analyze_repository(url):
-        return analyze_dependency_score(url, git_auth_token)
-
-    with Pool() as pool:
-        dependency_scores = pool.map(analyze_repository, git_urls)"""
-    
-    
-    # Analyze each repository in the provided list
-    for url in git_urls:
-        dependency_scores.append(analyze_dependency_score(url, git_auth_token))
-        analyzed += 1
-        print(f"Analyzed: {analyzed}/{analyze_amount}")
+    with Pool() as pool, tqdm.tqdm(total=analyze_amount) as pbar:
+        for scores in pool.imap_unordered(analyze_dependency_score, git_urls):
+            dependency_scores.append(scores)
+            analyzed += 1
+            pbar.update(1)
     
     
     return dependency_scores
