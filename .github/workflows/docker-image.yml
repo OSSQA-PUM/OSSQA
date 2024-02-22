@@ -25,6 +25,12 @@ jobs:
       env:
         # Feel free to rename this variable, but make sure to update it everywhere. You should paste your entire file in your secrets
         TEST_ENV_FILE : ${{secrets.AUTH_TOKEN}}
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: TEST_ENV_FILE
+        path: ./.env
+
     - name: Build the Docker image
       run: docker compose build ossqa-prototype 
     - name: Run tests
