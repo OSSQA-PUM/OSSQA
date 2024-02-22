@@ -1,10 +1,10 @@
-FROM alpine
+FROM python:3.11-alpine
 
 WORKDIR /app
 
 # Install Python and pip
-RUN apk add --update --no-cache python3 py3-pip && \
-    ln -sf python3 /usr/bin/python
+#RUN apk add --update --no-cache python3 py3-pip && \
+#    ln -sf python3 /usr/bin/python
 
 # Setup virtual environment
 RUN python3 -m venv /app/venv
@@ -16,7 +16,6 @@ ENV PATH="/app/venv/bin:$PATH"
 COPY ./src/prototype /app
 COPY requirements.txt .
 
-# Install Python dependencies in the virtual environment
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
