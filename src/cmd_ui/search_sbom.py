@@ -8,18 +8,24 @@ import subprocess
 
 parser = argparse.ArgumentParser()
 
-
 questions = [
-    {"type": "input",
-     "name" : "first_name",
-     "message" : "What is yo name"
-     
+    {"type": "list",
+     "name" : "choice",
+     "message" : "What do you want to do?",
+     "choices" : ["Search SBOM", "Edit token"]
      }
 ]
 
-answers = prompt(questions)
-print_json(answers)
+def edit_token():
+    
 
+answers = prompt(questions)
+print(answers)
+
+if answers["choice"] == "Edit token": 
+    edit_token()
+elif answers["choice"] == "Search SBOM": 
+    print("tjo")
 
 
 """
