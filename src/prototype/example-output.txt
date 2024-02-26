@@ -1,0 +1,33 @@
+CMD:
+    URLs extracted: 9 out of 9
+    Analyzed: 1/9
+    Analyzed: 2/9
+    Failed to resolve version of org.antlr:antlr4: property "project.version" could not be found for ":antlr4-maven-plugin"
+    Failed to resolve version of org.antlr:antlr4: property "project.version" could not be found for ":antlr4-runtime-testsuite"
+    Failed to resolve version of org.antlr:antlr4-runtime: property "project.version" could not be found for ":antlr4-runtime-testsuite"
+    Failed to resolve version of org.antlr:antlr4-runtime: property "project.version" could not be found for ":antlr4"
+    Failed to resolve version of org.antlr:antlr4-runtime-testsuite: property "project.version" could not be found for ":antlr4-tool-testsuite"
+    Failed to resolve version of org.antlr:antlr4: property "project.version" could not be found for ":antlr4-tool-testsuite"
+    Analyzed: 3/9
+    Analyzed: 4/9
+    Analyzed: 5/9
+    Analyzed: 6/9
+    Analyzed: 7/9
+    Analyzed: 8/9
+    Analyzed: 9/9
+    Binary-Artifacts, Score: 9, cause: github.com/antlr/antlr4
+    Branch-Protection, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    CI-Tests, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    CII-Best-Practices, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    Code-Review, Score: 0, cause: github.com/chzyer/logex
+    Contributors, Score: 3, cause: github.com/andybalholm/cascadia
+    Dangerous-Workflow, Score: -1, cause: github.com/allan-simon/go-singleinstance
+    Dependency-Update-Tool, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    Fuzzing, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    License, Score: 10, cause: github.com/allan-simon/go-singleinstance
+    Maintained, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    Packaging, Score: -1, cause: github.com/allan-simon/go-singleinstance
+    SAST, Score: 0, cause: github.com/allan-simon/go-singleinstance
+    Signed-Releases, Score: -1, cause: github.com/allan-simon/go-singleinstance
+    Token-Permissions, Score: -1, cause: github.com/allan-simon/go-singleinstance
+    Vulnerabilities, Score: 0, cause: github.com/allan-simon/go-singleinstance
