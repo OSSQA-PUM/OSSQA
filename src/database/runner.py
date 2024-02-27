@@ -19,4 +19,7 @@ def test_add_sbom():
         print(f"sbom{i}.json")
         convert(f"sbom{i}.json")
 
+def test_add_sbomscore():
+    convert("SBOMscore.json")
+
 

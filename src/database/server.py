@@ -7,24 +7,24 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./our.db'
 db = SQLAlchemy(app)
 
 dependency_sbom = db.Table('dependency_sbom',
-                           db.Column('dependency_purl', db.Integer, db.ForeignKey('dependency.purl'), primary_key=True),
+                           db.Column('dependency_repo_commit', db.Integer, db.ForeignKey('dependency.repo_commit'),
+                                     primary_key=True),
                            db.Column('sbom_serialNumber', db.Integer, db.ForeignKey('sbom.serialNumber'),
                                      primary_key=True)
                            )
 
 
 class Dependency(db.Model):
-    purl = db.Column(db.String(60), primary_key=True)
+    repo_commit = db.Column(db.String(60), primary_key=True)
     score = db.Column(db.Integer, unique=False)
-    name = db.Column(db.String(60), unique=False)
-    version = db.Column(db.String(60), unique=False)
     date_added = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     sboms = db.relationship('SBOM', secondary=dependency_sbom, lazy='subquery',
                             back_populates='dependencies')
+    checks = db.relationship('DependencyCheck', backref='dependency', lazy=True)
 
     def to_dict(self):
-        return {'purl': self.purl,
+        return {'repo_commit': self.repo_commit,
                 'score': self.score,
                 'name': self.name,
                 'version': self.version,
@@ -32,18 +32,30 @@ class Dependency(db.Model):
                 }
 
 
+class DependencyCheck(db.Model):
+    details = db.Column(db.String(60), primary_key=True)
+    score = db.Column(db.Double, unique=False)
+    reason = db.Column(db.String(60), unique=False)
+    name = db.Column(db.String(60), unique=False)
+    dependency_repo = db.Column(db.String(60), db.ForeignKey('dependency.repo_commit'), unique=False)
+
+
+    def to_dict(self):
+        return {'details': self.details,
+                'score': self.score,
+                'reason': self.reason,
+                'name': self.name,
+                }
+
+
 class SBOM(db.Model):
     serialNumber = db.Column(db.String(60), primary_key=True)
-    bomFormat = db.Column(db.String(60), unique=False)
-    specVersion = db.Column(db.String(60), unique=False)
     version = db.Column(db.String(60), unique=False)
 
     dependencies = db.relationship('Dependency', secondary=dependency_sbom, lazy='subquery', back_populates='sboms')
 
     def to_dict(self):
         return {'serialNumber': self.serialNumber,
-                'bomFormat': self.bomFormat,
-                'specVersion': self.specVersion,
                 'version': self.version,
                 }
 
@@ -64,33 +76,24 @@ def handle_exception(e):
     return "generic error response", 500
 
 
-@app.route("/add_dependency", methods=["POST"])
-def add_dependency():
-    data = request.json
-    dep_id = data["id"]
-    score = data["score"]
-    dep = Dependency(id=dep_id, score=score)
-    db.session.add(dep)
-    db.session.commit()
-    return jsonify({"id": dep_id, "score": score}), 201
-
-
 def add_dependency_to_sbom(component):
-    name = component["name"]
-    version = component["version"]
-    purl = component["purl"]
-    score = None
-    dep = Dependency.query.filter_by(purl=purl).first()
+    repo_commit = component["repo"]["name"] + component["repo"]["commit"]
+    score = component["score"]
+    dep = Dependency.query.filter_by(repo_commit=repo_commit).first()
     if dep is None:
-        return Dependency(name=name, version=version, purl=purl, score=score)
+        return Dependency(repo_commit=repo_commit, score=score)
+    for check in data["checks"]:
+        details = check["details"]
+        score = check["score"]
+        reason = check["reason"]
+        name = check["name"]
+        check = DependencyCheck(details=details, score=score, reason=reason, name=name)
     return dep
 
 
 @app.route("/add_SBOM", methods=["POST"])
 def add_SBOM():
     data = request.json
-    bomFormat = data["bomFormat"]
-    specVersion = data["specVersion"]
     try:
         serialNumber = data["serialNumber"]
     except KeyError:
@@ -100,7 +103,7 @@ def add_SBOM():
     if sbom is not None:
         return "SBOM already exists", 409
 
-    sbom = SBOM(bomFormat=bomFormat, specVersion=specVersion, serialNumber=serialNumber, version=version)
+    sbom = SBOM(serialNumber=serialNumber, version=version)
     db.session.add(sbom)
     db.session.commit()
 
@@ -114,16 +117,6 @@ def add_SBOM():
             db.session.commit()
 
     return jsonify(sbom.to_dict()), 201
-
-
-@app.route("/show/SBOM", methods=["GET"])
-def get_message():
-    data = request.json
-    sbom_id = data["id"]
-    sbom = SBOM.query.filter_by(id=sbom_id).first()
-    if sbom is None:
-        return "Not found", 404
-    return jsonify(sbom.to_dict()), 200
 
 
 def initialize_db():
