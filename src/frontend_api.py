@@ -5,15 +5,15 @@ This file contains the API that communicates information
  from the commandline interface or webinterface to the main 
  application structure
 """
-import os
+#import os
 #import sys
 
 #import main_application_structure
 import json
-from io import StringIO
+#from io import StringIO
 
 
-def check_input_arguments(path, source_risk_assessment,\
+def check_input_arguments(source_risk_assessment,\
                     maintence, build_risk_assessment,\
                     continuous_testing, code_vunerabilities):
     """
@@ -50,16 +50,13 @@ def frontend_api(path, source_risk_assessment = 10,\
     security categories are defaulted to 10 if no value is
     given since that would equal a weight of 100%
     """
-    print(os.getcwd())
-    check_input_arguments(path, source_risk_assessment, maintence, 
+    check_input_arguments(source_risk_assessment, maintence, 
                               build_risk_assessment, continuous_testing,
                               code_vunerabilities)
     
-    #print(open(path, encoding="utf-8"))
-    #with open(path, encoding="utf-8") as file:
     sbom_json = open(path, encoding="utf-8")
     sbom_string = json.load(sbom_json)
-    #print(sbom)
+
        
     print(path, source_risk_assessment,\
                     maintence, build_risk_assessment,\
@@ -67,9 +64,10 @@ def frontend_api(path, source_risk_assessment = 10,\
     #return main_application_structure()
 
 
-frontend_api(path = "src/prototype/example-SBOM.json",  build_risk_assessment = 1, source_risk_assessment = 1,\
-                    maintence = 1,\
-                    continuous_testing = 1, code_vunerabilities = 10)
+frontend_api(path = "src/prototype/example-SBOM.json",  build_risk_assessment = 1,\
+                source_risk_assessment = 1,\
+                maintence = 1,\
+                continuous_testing = 1, code_vunerabilities = 10)
 
 
 
