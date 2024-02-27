@@ -5,12 +5,10 @@ This file contains the API that communicates information
  from the commandline interface or webinterface to the main 
  application structure
 """
-#import os
-#import sys
 
 #import main_application_structure
 import json
-#from io import StringIO
+from re import match
 
 
 def check_input_arguments(source_risk_assessment,\
@@ -31,11 +29,21 @@ def check_input_arguments(source_risk_assessment,\
     return
 
 
-def check_format_of_sbom(TBD):
+def check_format_of_sbom(sbom_string):
     """
     Checks that the inputed SBOM meets the standard
     requirement of CycloneDX
     """
+    if not sbom_string["bomFormat"] == "CycloneDX":
+        raise SyntaxError("bomFormat missing or not CycloneDX")
+    if not sbom_string["specVersion"] in ["1.2","1.3","1.4","1.5"]:
+        raise ValueError("CycloneDX version missing, out of date or incorrect")
+    if not match("^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", sbom_string["serialNumber"]):
+        raise SyntaxError("SBOM Serial number does not match the RFC-4122 format")
+    if not sbom_string["version"] >= 1:
+        raise ValueError("Version of SBOM is lower than 1")
+    if not isinstance(sbom_string["version"], int):
+        raise ValueError("Version of SBOM is not proper integer")
     return True
 
 
@@ -56,8 +64,7 @@ def frontend_api(path, source_risk_assessment = 10,\
     
     sbom_json = open(path, encoding="utf-8")
     sbom_string = json.load(sbom_json)
-
-       
+    check_format_of_sbom(sbom_string)
     print(path, source_risk_assessment,\
                     maintence, build_risk_assessment,\
                     continuous_testing, code_vunerabilities)
@@ -68,9 +75,6 @@ frontend_api(path = "src/prototype/example-SBOM.json",  build_risk_assessment = 
                 source_risk_assessment = 1,\
                 maintence = 1,\
                 continuous_testing = 1, code_vunerabilities = 10)
-
-
-
 
 
 # End-of-file (EOF)
