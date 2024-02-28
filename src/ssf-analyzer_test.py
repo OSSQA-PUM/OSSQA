@@ -91,6 +91,7 @@ def get_scorecard_score(platform, repo_owner, repo_name, git_url):
     return scorecard_score
 
 if __name__ == "__main__":
+    """
     url = "https://github.com/ossf/scorecard/tree/v4.13.1"
     url_split = url.replace("https://", "").split("/")
     platform = url_split[0]
@@ -105,3 +106,7 @@ if __name__ == "__main__":
 
     scorecard_score = get_scorecard_score(platform=platform, repo_owner=repo_owner, repo_name=repo_name, git_url=url)
     print(scorecard_score)
+    """
+
+    response = requests.get("https://github.com/apache/commons-text")
+    print(response.url)
