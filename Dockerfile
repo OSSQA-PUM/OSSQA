@@ -35,4 +35,4 @@ ENV PYTHONUNBUFFERED=1
 ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
 
 # Run main.py when the container is launched
-CMD ["python", "main.py"]
+CMD ["python", "cmd_ui/search_sbom.py"]

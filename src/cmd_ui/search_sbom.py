@@ -1,6 +1,5 @@
 
 from __future__ import print_function, unicode_literals
-from PyInquirer import prompt, print_json
 import glob
 import json
 import os
@@ -9,48 +8,66 @@ import subprocess
 from subprocess import call
 parser = argparse.ArgumentParser()
 
-questions = [
-    {"type": "list",
-     "name" : "choice",
-     "message" : "What do you want to do?",
-     "choices" : ["Search SBOM", "Edit token"]
-     }
-]
+def get_choice():
+    choice = input(": ")
+    return choice.strip()
 
-def edit_token():
-    answer = prompt(create_question("Choose token", search_files()))
-    return answer["choice"]
-def search_files():
-    files = [f for f in glob.glob("*.txt")]
+
+def display_ui():
+    print("What would you like to do?")
+    print("1. Search SBOM")
+    print("2. Edit token")
+    print("3. Exit")
+
+
+def display_tokens():
+    print("Choose a token:")
+    files = search_files()
+    for i, file in enumerate(files, start=1):
+        print(f"{i}. {file}")
     return files
 
-def create_question(message,choices):
-    question = [
-        {
-            "type": "list",
-            "name" : "choice",
-            "message" : message,
-            "choices" : choices
-        }
-    ]
-    return question
 
-answers = prompt(questions)
-print(answers)
-def clear():
-    # check and make call for specific operating system
-    _ = call('clear' if os.name == 'posix' else 'cls')
+def edit_token():
+    files = display_tokens()
+    user_choice = int(get_choice()) - 1
+    if 0 <= user_choice < len(files):
+        return files[user_choice]
+    else:
+        print("Invalid choice.")
+        return None
 
-while True:
-    answers = prompt(questions)
-    print(answers)
-    if answers["choice"] == "Edit token": 
-        clear()
-        token = open(edit_token(), "r").read()
-        print(f"new token {token}")
-    elif answers["choice"] == "Search SBOM": 
-        print("tjo")
-    clear()
+
+def main():
+    while True:
+        display_ui()
+        user_choice = get_choice()
+
+        if user_choice == "1":
+            print("tjo")
+
+        elif user_choice == "2":
+            # TODO: kanske dra ut detta till en separat funktion? 
+            os.system('cls' if os.name == 'nt' else 'clear')
+            chosen_file = edit_token()
+            if chosen_file is not None:
+                token = open(chosen_file, "r").read()
+                print(f"New token: {token}")
+
+        elif user_choice == "3":
+            print("Exiting the program.")
+            break
+
+        else:
+            print("Invalid choice. Please choose again.")
+
+
+
+def search_files():
+    # TODO: denna hittar bara requirements.txt, hann inte kolla på det
+    files = [f for f in glob.glob("*.txt")]
+    print(files)
+    return files
 
 
 
@@ -64,7 +81,7 @@ github_token = open(args.token,"r").read()
 sbom_json = open(args.file)
 sbom_data = json.load(sbom_json)
 """
-github_repos = []
+""" github_repos = []
 
 for value in sbom_data["components"]:
     dependency = value["name"]
@@ -92,5 +109,7 @@ for dependency in github_repos:
 for key in repo_score_dict["github.com/0xAX/notificator"].keys():
     print(key)
 
-    
+ """    
 
+if __name__ == "__main__":
+    main()
