@@ -29,7 +29,7 @@ class Dependency(db.Model):
 
 
 class DependencyCheck(db.Model):
-    details = db.Column(db.String(60), primary_key=True)
+    details = db.Column(db.String(60), primary_key=True) # TODO: details can be null, change primary key
     score = db.Column(db.Double, unique=False)
     reason = db.Column(db.String(60), unique=False)
     name = db.Column(db.String(60), unique=False)

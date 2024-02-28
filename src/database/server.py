@@ -31,12 +31,6 @@ def add_dependency_to_sbom(component):
     dep = Dependency.query.filter_by(repo_commit=repo_commit).first()
     if dep is None:
         return Dependency(repo_commit=repo_commit, score=score)
-    for check in data["checks"]:
-        details = check["details"]
-        score = check["score"]
-        reason = check["reason"]
-        name = check["name"]
-        check = DependencyCheck(details=details, score=score, reason=reason, name=name)
     return dep
 
 
@@ -64,6 +58,19 @@ def add_SBOM():
             sbom.dependencies.append(dep)
             dep.sboms.append(sbom)
             db.session.commit()
+            # TODO: change primary key of DependencyCheck before re-enabling
+            # for check in component["checks"]:
+            #     details = check["details"]
+            #     score = check["score"]
+            #     reason = check["reason"]
+            #     name = check["name"]
+            #     check = DependencyCheck(details=details, score=score, reason=reason, name=name)
+            #     db.session.add(check)
+            #     db.session.commit()
+            #     dep.checks.append(check)
+            #     check.dependency = dep
+            #     db.session.commit()
+            
 
     return jsonify(sbom.to_dict()), 201
 
