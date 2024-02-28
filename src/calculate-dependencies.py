@@ -29,6 +29,7 @@ class Dependency:
     failure_reason: Exception = None
     dependency_score: dict = None
 
+
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
     Parses the git URL and returns the platform, 
@@ -99,6 +100,7 @@ def get_component_url(component: dict) -> str:
     
     raise NameError("No VCS external reference found")
 
+
 def load_sbom_data(sbom_file: str) -> dict:
     """
     Loads the SBOM (Software Bill of Materials) data from a JSON file.
@@ -113,6 +115,7 @@ def load_sbom_data(sbom_file: str) -> dict:
         sbom_data = json.load(file)
     
     return sbom_data
+
 
 def parse_component(component: dict) -> Dependency:
     """
@@ -134,6 +137,7 @@ def parse_component(component: dict) -> Dependency:
         dependency.failure_reason = e
     return dependency
     
+
 def parse_sbom(sbom_file: str) \
     -> tuple[list[Dependency], list[Dependency], dict]:
     """
@@ -174,6 +178,7 @@ def parse_sbom(sbom_file: str) \
 
     return dependencies_data, failures, failure_reason
 
+
 def get_git_sha1_number(dependency: Dependency) -> str:
     """
     Retrieves the SHA1 number of a dependency from the GitHub API.
@@ -194,6 +199,7 @@ def get_git_sha1_number(dependency: Dependency) -> str:
         return response.json()[0]["sha"]
     else:
         return None
+
 
 def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None):
     """
@@ -219,6 +225,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None):
         return response.json()
     else:
         return None
+
 
 def lookup_database(needed_dependencies : list[Dependency]) \
     -> tuple[list[Dependency], list[Dependency]]:
@@ -261,6 +268,7 @@ def lookup_database(needed_dependencies : list[Dependency]) \
     
     return dependencies_with_scores, new_needed_dependencies
 
+
 def lookup_ssf(dependency: Dependency) -> dict:
     """
     Looks up the scorecard of a dependency 
@@ -276,6 +284,7 @@ def lookup_ssf(dependency: Dependency) -> dict:
     scorecard_score = try_get_from_ssf_api(dependency, sha1)
     
     return scorecard_score
+
 
 def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
     -> tuple[list[Dependency], list[Dependency]]:
@@ -316,6 +325,7 @@ def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
 
     return dependencies_with_scores, new_needed_dependencies
 
+
 def get_dependencies(sbom_file: str) \
     -> tuple[list[Dependency], list[Dependency]]:
     """
@@ -352,6 +362,7 @@ def get_dependencies(sbom_file: str) \
         + f"{len(needed_dependencies)}/{total_dependency_count} dependencies.")
 
     return scores, needed_dependencies, failures
+
 
 if __name__ == "__main__":
     sbom_path = "E:/programming/OSSQA/src/bom.json"
