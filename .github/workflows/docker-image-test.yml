@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image CI Test
 
 on:
   push:
@@ -24,8 +24,8 @@ jobs:
         ENV_FILE : ${{secrets.AUTH_TOKEN}}
 
     - name: Build the Docker image
-      run: docker compose build ossqa-prototype 
+      run: docker compose build ossqa-prototype-test
     - name: Run tests
-      run: docker compose run ossqa-prototype
+      run: docker compose run ossqa-prototype-test
 #    - name: Run python tests.
 #      run: docker-compose py-test
