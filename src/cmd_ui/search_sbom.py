@@ -1,11 +1,12 @@
 
 from __future__ import print_function, unicode_literals
 from PyInquirer import prompt, print_json
-
+import glob
 import json
+import os
 import argparse
 import subprocess
-
+from subprocess import call
 parser = argparse.ArgumentParser()
 
 questions = [
@@ -17,15 +18,40 @@ questions = [
 ]
 
 def edit_token():
-    
+    answer = prompt(create_question("Choose token", search_files()))
+    return answer["choice"]
+def search_files():
+    files = [f for f in glob.glob("*.txt")]
+    return files
+
+def create_question(message,choices):
+    question = [
+        {
+            "type": "list",
+            "name" : "choice",
+            "message" : message,
+            "choices" : choices
+        }
+    ]
+    return question
 
 answers = prompt(questions)
 print(answers)
+def clear():
+    # check and make call for specific operating system
+    _ = call('clear' if os.name == 'posix' else 'cls')
 
-if answers["choice"] == "Edit token": 
-    edit_token()
-elif answers["choice"] == "Search SBOM": 
-    print("tjo")
+while True:
+    answers = prompt(questions)
+    print(answers)
+    if answers["choice"] == "Edit token": 
+        clear()
+        token = open(edit_token(), "r").read()
+        print(f"new token {token}")
+    elif answers["choice"] == "Search SBOM": 
+        print("tjo")
+    clear()
+
 
 
 """
