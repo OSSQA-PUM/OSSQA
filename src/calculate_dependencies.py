@@ -1,4 +1,11 @@
-
+"""
+This file contains functions for parsing and analyzing dependencies 
+in a Software Bill of Materials (SBOM).
+It includes functions for parsing the SBOM, 
+retrieving dependency information from external sources,
+and looking up dependency scores 
+from a database and the Security Scorecards API.
+"""
 
 from multiprocessing import Pool
 from dataclasses import dataclass
