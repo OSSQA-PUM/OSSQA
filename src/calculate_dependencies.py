@@ -89,8 +89,10 @@ def get_component_url(component: dict) -> str:
         url = external_ref["url"]
         try:
             response = requests.get(url, timeout=5)
-        except requests.ConnectTimeout as e:
+        except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise ConnectionError(f"Connection to {url} timed out") from e
+        except requests.ConnectionError as e:
+            raise ConnectionError(f"Failed to connect to {url}") from e
 
         if response.status_code != 200:
             raise ConnectionError(f"Failed to connect to {url}")
@@ -116,7 +118,7 @@ def parse_component(component: dict) -> Dependency:
         dependency.platform, \
         dependency.repo_owner, \
         dependency.repo_name = parse_git_url(dependency.url)
-    except (ConnectionError, KeyError) as e:
+    except (ConnectionError, KeyError, NameError, ValueError) as e:
         dependency.failure_reason = e
     return dependency
 
@@ -340,7 +342,7 @@ def get_dependencies(sbom: dict) \
 
 
 if __name__ == "__main__":
-    SBOM_PATH = "C:/Programming/Kandidat/OSSQA/src/bom.json"
+    SBOM_PATH = "E:/programming/OSSQA/src/bom.json"
     with open(SBOM_PATH, "r", encoding="utf-8") as file:
         sbom_data = json.load(file)
     scores, needed, failures = get_dependencies(sbom=sbom_data)
