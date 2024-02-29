@@ -19,9 +19,9 @@ def check_input_arguments(source_risk_assessment,\
     dependencies fall within the bounds 0 to 10,
     raises ValueError if not.
     """
-    if not (0 <= source_risk_assessment <= 10 or \
-                0 <= maintence <=10 or 0 <= build_risk_assessment <= 10 or \
-                0 <= continuous_testing <= 10 or 0 <= code_vunerabilities <= 10):
+    if not (0 <= source_risk_assessment <= 10 and \
+                0 <= maintence <=10 and 0 <= build_risk_assessment <= 10 and \
+                0 <= continuous_testing <= 10 and 0 <= code_vunerabilities <= 10):
         raise ValueError("input arguments fall out of bounds, check if input variables are within the bounds 0 to 10",\
                                 [source_risk_assessment, maintence,\
                                 build_risk_assessment, continuous_testing,\
@@ -65,9 +65,9 @@ def frontend_api(path, source_risk_assessment = 10,\
     sbom_json = open(path, encoding="utf-8")
     sbom_string = json.load(sbom_json)
     check_format_of_sbom(sbom_string)
-    print(path, source_risk_assessment,\
-                    maintence, build_risk_assessment,\
-                    continuous_testing, code_vunerabilities)
+    #print(path, source_risk_assessment,\
+    #                maintence, build_risk_assessment,\
+    #                continuous_testing, code_vunerabilities)
     #return main_application_structure()
 
 
