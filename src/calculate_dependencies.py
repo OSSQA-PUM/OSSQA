@@ -114,8 +114,8 @@ def parse_component(component: dict) -> Dependency:
     dependency: Dependency = Dependency(json_component=component)
     try:
         dependency.url = get_component_url(component=component)
-        dependency.platform, 
-        dependency.repo_owner, 
+        dependency.platform, \
+        dependency.repo_owner, \
         dependency.repo_name = parse_git_url(dependency.url)
     except Exception as e:
         dependency.failure_reason = e
