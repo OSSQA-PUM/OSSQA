@@ -101,22 +101,6 @@ def get_component_url(component: dict) -> str:
     raise NameError("No VCS external reference found")
 
 
-def load_sbom_data(sbom_file: str) -> dict:
-    """
-    Loads the SBOM (Software Bill of Materials) data from a JSON file.
-
-    Args:
-        sbom_file (str): The path to the SBOM JSON file.
-
-    Returns:
-        dict: The SBOM data as a dictionary.
-    """
-    with open(sbom_file, "r") as file:
-        sbom_data = json.load(file)
-    
-    return sbom_data
-
-
 def parse_component(component: dict) -> Dependency:
     """
     Parses a component dictionary and returns a Dependency object.
@@ -138,22 +122,21 @@ def parse_component(component: dict) -> Dependency:
     return dependency
     
 
-def parse_sbom(sbom_file: str) \
+def parse_sbom(sbom: dict) \
     -> tuple[list[Dependency], list[Dependency], dict]:
     """
     Parses the SBOM (Software Bill of Materials) 
     and returns the dependencies, failures, and failure reasons.
 
     Args:
-        sbom_file (str): The path to the SBOM JSON file.
+        sbom_file (dict): The path to the SBOM JSON file.
 
     Returns:
         tuple[list[Dependency], list[Dependency], dict]: The dependencies, 
         failures, and failure reasons.
     """
     print("Parsing SBOM")
-    sbom_dict = load_sbom_data(sbom_file)
-    components = sbom_dict["components"]
+    components = sbom["components"]
 
     dependencies_data:list[Dependency] = []
     failures: list[Dependency] = []
@@ -326,7 +309,7 @@ def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
     return dependencies_with_scores, new_needed_dependencies
 
 
-def get_dependencies(sbom_file: str) \
+def get_dependencies(sbom: dict) \
     -> tuple[list[Dependency], list[Dependency]]:
     """
     Retrieves the dependencies from the SBOM (Software Bill of Materials) 
@@ -339,7 +322,7 @@ def get_dependencies(sbom_file: str) \
         tuple[list[Dependency], list[Dependency]]: The dependency scores, 
         new needed dependencies, and failures.
     """
-    dependencies, failures, failure_reason = parse_sbom(sbom_file=sbom_file)
+    dependencies, failures, failure_reason = parse_sbom(sbom=sbom)
     needed_dependencies = dependencies
     total_dependency_count = len(dependencies)
 
@@ -365,6 +348,8 @@ def get_dependencies(sbom_file: str) \
 
 
 if __name__ == "__main__":
-    sbom_path = "E:/programming/OSSQA/src/bom.json"
-    scores, needed, failures = get_dependencies(sbom_path)
+    sbom_path = "C:/Programming/Kandidat/OSSQA/src/bom.json"
+    with open(sbom_path, "r") as file:
+        sbom_data = json.load(file)
+    scores, needed, failures = get_dependencies(sbom=sbom_data)
     print(needed[0])
