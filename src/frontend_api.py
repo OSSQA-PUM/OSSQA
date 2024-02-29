@@ -71,10 +71,4 @@ def frontend_api(path, source_risk_assessment = 10,\
     #return main_application_structure()
 
 
-frontend_api(path = "src/prototype/example-SBOM.json",  build_risk_assessment = 1,\
-                source_risk_assessment = 1,\
-                maintence = 1,\
-                continuous_testing = 1, code_vunerabilities = 10)
-
-
 # End-of-file (EOF)
