@@ -59,7 +59,6 @@ class TestCalculateDependencies(unittest.TestCase):
             ]
         }
         dependency = parse_component(component)
-        print(dependency)
         self.assertEqual(dependency.platform, "github.com")
         self.assertEqual(dependency.repo_owner, "OSSQA-PUM")
         self.assertEqual(dependency.repo_name, "OSSQA")
