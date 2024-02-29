@@ -19,6 +19,8 @@ def display_ui():
     print("2. Edit token")
     print("3. Exit")
 
+def clear_console():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def display_tokens():
     print("Choose a token:")
@@ -37,6 +39,26 @@ def edit_token():
         print("Invalid choice.")
         return None
 
+def select_sbom():
+    clear_console()
+    print("Please select the SBOM to be searched \n")
+    sboms = [f for f in glob.glob("*.json")]
+    for i, sbom in enumerate(sboms):
+        print(f"{i}: {sbom}")
+    choice = get_choice()
+    if int(choice) < 0 or int(choice) > len(sboms):
+        print("Invalid choice")
+        return
+    
+    sbom_json = open(sboms[int(choice)])
+    sbom_data = json.load(sbom_json)
+    return sbom_data
+     
+
+def make_choice(choice: int) -> None:
+    if choice == "1": # Search SBOM
+        pass
+
 
 def main():
     while True:
@@ -44,14 +66,15 @@ def main():
         user_choice = get_choice()
 
         if user_choice == "1":
-            print("tjo")
-
+            sbom = select_sbom()
+            
         elif user_choice == "2":
             # TODO: kanske dra ut detta till en separat funktion? 
             os.system('cls' if os.name == 'nt' else 'clear')
             chosen_file = edit_token()
             if chosen_file is not None:
                 token = open(chosen_file, "r").read()
+                clear_console()
                 print(f"New token: {token}")
 
         elif user_choice == "3":
@@ -65,6 +88,7 @@ def main():
 
 def search_files():
     # TODO: denna hittar bara requirements.txt, hann inte kolla på det
+    # Funkar för mig? Får upp alla filer, kanske är en windows grej om du använde den datorn (funkar på Mac)
     files = [f for f in glob.glob("*.txt")]
     print(files)
     return files
