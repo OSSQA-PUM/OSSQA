@@ -1,3 +1,8 @@
+"""
+This file contains a calculator for calculating final scores based on 
+the scores of dependencies.
+"""
+
 import json
 from src.util import Dependency
 
@@ -10,6 +15,14 @@ def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
     """
     Calculates final scores based on the scores of dependencies.
     Each final score is the minimum of the dependency scores of the same type.
+
+    Args:
+        dependencies (list[Dependency]): 
+        A list of Dependency objects representing the dependencies.
+
+    Returns:
+        list[FinalScore]: 
+        A list of FinalScore objects containing the calculated final scores.
     """
     scores = list[FinalScore]()
 
@@ -33,9 +46,13 @@ def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
     return scores
 
 if __name__ == "__main__":
-    with open("E:/programming/OSSQA/src/final-score-calculator/example_repsonse.json") as f:
+    with open(
+        "E:/programming/OSSQA/src/final-score-calculator/example_repsonse.json"
+        ) as f:
         score_card = json.load(f)
-    dependency: Dependency = Dependency(json_component="", url="test", dependency_score=score_card)
+    dependency: Dependency = Dependency(
+        json_component="", url="test", dependency_score=score_card
+        )
 
     dependencies = [dependency]
 
