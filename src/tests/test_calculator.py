@@ -1,14 +1,18 @@
+"""
+This file contains test cases for the `calculate_final_scores` function in the `calculator` module.
+"""
+
 from src.final_score_calculator.calculator import calculate_final_scores
 from src.util import Dependency
 
 def test_calculate_final_scores_empty_dependencies():
-    # Test when dependencies list is empty
+    """Test when dependencies list is empty"""
     dependencies = []
     expected_scores = []
     assert calculate_final_scores(dependencies) == expected_scores
 
 def test_calculate_final_scores_single_dependency():
-    # Test when there is only one dependency
+    """Test when there is only one dependency"""
     dependencies = [
         Dependency(url="https://example.com", dependency_score={"checks": [
             {"name": "check1", "score": 5},
@@ -24,7 +28,7 @@ def test_calculate_final_scores_single_dependency():
     assert calculate_final_scores(dependencies) == expected_scores
 
 def test_calculate_final_scores_multiple_dependencies():
-    # Test when there are multiple dependencies
+    """Test when there are multiple dependencies"""
     dependencies = [
         Dependency(url="https://example.com", dependency_score={"checks": [
             {"name": "check1", "score": 5},
