@@ -8,36 +8,12 @@ from a database and the Security Scorecards API.
 """
 
 from multiprocessing import Pool
-from dataclasses import dataclass
 import json
 import requests
 import tqdm
-
-@dataclass
-class Dependency:
-    """
-    Represents a dependency for a project.
-
-    Attributes:
-        json_component (dict): The JSON representation of the dependency.
-        platform (str): The platform on which the dependency is used.
-        repo_owner (str): The owner of the repository 
-                          where the dependency is hosted.
-        repo_name (str): The name of the repository 
-                         where the dependency is hosted.
-        url (str): The URL of the dependency.
-        failure_reason (Exception): The reason for any failure 
-                                    related to the dependency.
-        dependency_score (dict): The scorecard related to the dependency.
-    """
-    json_component: dict
-    platform: str = None
-    repo_owner: str = None
-    repo_name: str = None
-    url: str = None
-    failure_reason: Exception = None
-    dependency_score: dict = None
-
+import subprocess
+from typing import Any
+from util import Dependency
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
@@ -311,6 +287,62 @@ def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
     return dependencies_with_scores, new_needed_dependencies
 
 
+def analyse_score(dependency: Dependency):
+    # Execute the Scorecard tool in a Docker container, 
+    # passing the necessary environment variables
+    url = dependency.url.replace("https://", "")
+
+    output = subprocess.check_output(
+        f'scorecard --repo={url} --show-details --format json', 
+        shell=True,
+        stderr=subprocess.DEVNULL
+    )
+    
+    # Decode and clean the output for JSON parsing
+    output = output.decode("utf-8")
+    output = output.replace(
+        "failed to get console mode for stdout: The handle is invalid.", ""
+        )
+    output = output.replace("\n", "")
+
+    json_output = json.loads(output)
+
+    return json_output
+
+
+def analyse_multiple_scores(dependencies: list[Dependency]) \
+    ->  list[Dependency]:
+    """
+    Analyzes multiple scores for a list of dependencies.
+
+    Args:
+        dependencies (list[Dependency]): 
+        The list of dependencies to be analyzed.
+
+    Returns:
+        list[Dependency]: The list of dependencies with updated scores.
+    """
+    scores = []
+    needed_dependencies = []
+    print("Analyzing dependencies...")
+    with Pool() as pool, tqdm.tqdm(total=len(dependencies)) as progress_bar:
+        # A json serialized object is returned from analyze_score()
+        dependency_score: Any
+        for dependency, dependency_score in zip(
+            dependencies, pool.imap_unordered(analyse_score, dependencies)):
+            if(dependency_score is None):
+                needed_dependencies.append(dependency)
+                progress_bar.update(1)
+                continue
+            dependency.dependency_score = dependency_score
+            scores.append(dependency)
+            progress_bar.update(1)
+    print("Successfully analyzed " \
+          + f"{len(scores)}/{len(dependencies)} dependencies")
+
+    return scores, needed_dependencies
+
+
 def get_dependencies(sbom: dict) \
     -> tuple[list[Dependency], list[Dependency], list[Dependency]]:
     """
@@ -333,17 +365,28 @@ def get_dependencies(sbom: dict) \
     # TODO try to recover failed components
     scores = []
 
-    new_scores, needed_dependencies = lookup_database(
-        needed_dependencies=needed_dependencies)
-    scores += new_scores
-
     new_scores, needed_dependencies = lookup_multiple_ssf(
         needed_dependencies=needed_dependencies)
     scores += new_scores
 
+    new_scores, needed_dependencies = lookup_database(
+        needed_dependencies=needed_dependencies)
+    scores += new_scores
+
+    analyzed_scores, needed_dependencies = analyse_multiple_scores(
+        dependencies=needed_dependencies)
+    scores += analyzed_scores
+
+    # TODO send data that was downloaded internally 
+    # to database (analyzed_scores)
+    
     print(
-        "Could not find stored data for "
-        + f"{len(needed_dependencies)}/{total_dependency_count} dependencies.")
+        "Successfully got scores for "
+        + f"{len(scores)}/"
+        + f"{total_dependency_count + len(failures)} dependencies. \n"
+        + f"{len(failures)} dependencies failed to be parsed. \n"
+        + f"{len(needed_dependencies)} dependencies could not be scored."
+    )
 
     return scores, needed_dependencies, failures
 
@@ -353,4 +396,3 @@ if __name__ == "__main__":
     with open(SBOM_PATH, "r", encoding="utf-8") as file:
         sbom_data = json.load(file)
     scores, needed, failures = get_dependencies(sbom=sbom_data)
-    print(needed[0])
