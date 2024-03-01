@@ -26,6 +26,13 @@ def check_input_arguments(source_risk_assessment,\
                                 [source_risk_assessment, maintence,\
                                 build_risk_assessment, continuous_testing,\
                                 code_vunerabilities])
+    if not (isinstance(source_risk_assessment, int) and \
+                isinstance(maintence, int) and isinstance(build_risk_assessment, int) and \
+                isinstance(continuous_testing, int) and isinstance(code_vunerabilities, int)):
+        raise ValueError("input arguments are not integers",\
+                                [source_risk_assessment, maintence,\
+                                build_risk_assessment, continuous_testing,\
+                                code_vunerabilities])
     return
 
 
