@@ -1,7 +1,9 @@
+import json
+from src.util import Dependency
+
 # Temporary data types until we create more modules and proper data types
 FinalScore = list[str, int, str]  # (name, score, repository)
 Score = list[str, int]  # (name, score)
-Dependency = list[str, list[Score]] # (repository, scores)
 
 
 def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
@@ -11,17 +13,30 @@ def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
     """
     scores = list[FinalScore]()
 
-    for dependency in dependencies:
-        if not scores:
-            scores = [[name, score, dependency[0]] for name, score in dependency[1]]
-        else:
-            for score_idx in range(len(dependency[1])):
-                (_, dep_score) = dependency[1][score_idx]
-                (_, curr_score, _) = scores[score_idx]
+    if not dependencies:
+        return scores
 
-                if dep_score < curr_score:
-                    # Replace current minimum score with dependency score
-                    scores[score_idx][1] = dep_score
-                    scores[score_idx][2] = dependency[0]
+    baseline: Dependency = dependencies[0]
+    for check in baseline.dependency_score["checks"]:
+        scores.append([check["name"], check["score"], baseline.url])
+
+    for dependency in dependencies:
+        dep_scores = dependency.dependency_score["checks"]
+        for score_idx, dep_score in enumerate(dep_scores):
+            curr_score = scores[score_idx][1]
+
+            if dep_score["score"] < curr_score:
+                # Replace current minimum score with dependency score
+                scores[score_idx][1] = dep_score["score"]
+                scores[score_idx][2] = dependency.url
     
     return scores
+
+if __name__ == "__main__":
+    with open("E:/programming/OSSQA/src/final-score-calculator/example_repsonse.json") as f:
+        score_card = json.load(f)
+    dependency: Dependency = Dependency(json_component="", url="test", dependency_score=score_card)
+
+    dependencies = [dependency]
+
+    print(calculate_final_scores(dependencies))
