@@ -20,6 +20,6 @@ def test_add_sbom():
         convert(f"sbom{i}.json")
 
 def test_add_sbomscore():
-    convert("SBOMscore.json")
+    convert("SBOM2_results.json")
 
 
