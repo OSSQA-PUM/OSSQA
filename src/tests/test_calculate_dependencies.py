@@ -16,7 +16,7 @@ and SSF lookup.
 To run the unit tests, execute this file as the main module.
 """
 import unittest
-from calculate_dependencies import (
+from .calculate_dependencies import (
     Dependency,
     parse_git_url,
     get_component_url,
