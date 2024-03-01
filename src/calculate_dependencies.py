@@ -13,7 +13,7 @@ import requests
 import tqdm
 import subprocess
 from typing import Any
-from util import Dependency
+from .util import Dependency
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
@@ -392,7 +392,7 @@ def get_dependencies(sbom: dict) \
 
 
 if __name__ == "__main__":
-    SBOM_PATH = "E:/programming/OSSQA/src/bom.json"
+    SBOM_PATH = "E:/programming/OSSQA/src/tests/test_bom.json"
     with open(SBOM_PATH, "r", encoding="utf-8") as file:
         sbom_data = json.load(file)
     scores, needed, failures = get_dependencies(sbom=sbom_data)
