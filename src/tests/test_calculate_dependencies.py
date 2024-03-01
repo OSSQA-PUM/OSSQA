@@ -15,8 +15,7 @@ and SSF lookup.
 
 To run the unit tests, execute this file as the main module.
 """
-import unittest
-from .calculate_dependencies import (
+from src.calculate_dependencies import (
     Dependency,
     parse_git_url,
     get_component_url,
@@ -29,125 +28,113 @@ from .calculate_dependencies import (
     lookup_multiple_ssf,
 )
 
+def test_parse_git_url():
+    """Test the parse_git_url function."""
+    url = "https://github.com/owner/repo"
+    platform, repo_owner, repo_name = parse_git_url(url)
+    assert platform == "github.com"
+    assert repo_owner == "owner"
+    assert repo_name == "repo"
 
-class TestCalculateDependencies(unittest.TestCase):
-    """Test case for the calculate_dependencies module."""
-
-    def test_parse_git_url(self):
-        """Test the parse_git_url function."""
-        url = "https://github.com/owner/repo"
-        platform, repo_owner, repo_name = parse_git_url(url)
-        self.assertEqual(platform, "github.com")
-        self.assertEqual(repo_owner, "owner")
-        self.assertEqual(repo_name, "repo")
-
-    def test_get_component_url(self):
-        """Test the get_component_url function."""
-        component = {
-            "externalReferences": [
-                {"type": "vcs", "url": "https://github.com/OSSQA-PUM/OSSQA"}
-            ]
-        }
-        url = get_component_url(component)
-        self.assertEqual(url, "https://github.com/OSSQA-PUM/OSSQA")
-
-    def test_parse_component(self):
-        """Test the parse_component function."""
-        component = {
-            "externalReferences": [
-                {"type": "vcs", "url": "https://github.com/OSSQA-PUM/OSSQA"}
-            ]
-        }
-        dependency = parse_component(component)
-        self.assertEqual(dependency.platform, "github.com")
-        self.assertEqual(dependency.repo_owner, "OSSQA-PUM")
-        self.assertEqual(dependency.repo_name, "OSSQA")
-
-    def test_parse_sbom(self):
-        """Test the parse_sbom function."""
-        sbom = {"components": []}
-        dependencies, failures, failure_reason = parse_sbom(sbom)
-        self.assertEqual(len(dependencies), 0)
-        self.assertEqual(len(failures), 0)
-        self.assertEqual(len(failure_reason), 0)
-
-    def test_get_git_sha1_number(self):
-        """Test the get_git_sha1_number function."""
-        dependency = Dependency(
-            json_component={},
-            platform="github.com",
-            repo_owner="owner",
-            repo_name="repo",
-        )
-        sha1 = get_git_sha1_number(dependency)
-        self.assertIsNone(sha1)
-
-    def test_try_get_from_ssf_api(self):
-        """Test the try_get_from_ssf_api function."""
-        dependency = Dependency(
-            json_component={},
-            platform="github.com",
-            repo_owner="owner",
-            repo_name="repo",
-        )
-        scorecard = try_get_from_ssf_api(dependency)
-        self.assertIsNone(scorecard)
-
-    def test_lookup_database(self):
-        """Test the lookup_database function."""
-        dependencies = [
-            Dependency(
-                json_component={},
-                platform="github.com",
-                repo_owner="owner",
-                repo_name="repo1",
-            ),
-            Dependency(
-                json_component={},
-                platform="github.com",
-                repo_owner="owner",
-                repo_name="repo2",
-            ),
+def test_get_component_url():
+    """Test the get_component_url function."""
+    component = {
+        "externalReferences": [
+            {"type": "vcs", "url": "https://github.com/OSSQA-PUM/OSSQA"}
         ]
-        dependencies_with_scores, new_needed_dependencies = lookup_database(
-            dependencies
-        )
-        self.assertEqual(len(dependencies_with_scores), 0)
-        self.assertEqual(len(new_needed_dependencies), 2)
+    }
+    url = get_component_url(component)
+    assert url == "https://github.com/OSSQA-PUM/OSSQA"
 
-    def test_lookup_ssf(self):
-        """Test the lookup_ssf function."""
-        dependency = Dependency(
+def test_parse_component():
+    """Test the parse_component function."""
+    component = {
+        "externalReferences": [
+            {"type": "vcs", "url": "https://github.com/OSSQA-PUM/OSSQA"}
+        ]
+    }
+    dependency = parse_component(component)
+    assert dependency.platform == "github.com"
+    assert dependency.repo_owner == "OSSQA-PUM"
+    assert dependency.repo_name == "OSSQA"
+
+def test_parse_sbom():
+    """Test the parse_sbom function."""
+    sbom = {"components": []}
+    dependencies, failures, failure_reason = parse_sbom(sbom)
+    assert len(dependencies) == 0
+    assert len(failures) == 0
+    assert len(failure_reason) == 0
+
+def test_get_git_sha1_number():
+    """Test the get_git_sha1_number function."""
+    dependency = Dependency(
+        json_component={},
+        platform="github.com",
+        repo_owner="owner",
+        repo_name="repo",
+    )
+    sha1 = get_git_sha1_number(dependency)
+    assert sha1 is None
+
+def test_try_get_from_ssf_api():
+    """Test the try_get_from_ssf_api function."""
+    dependency = Dependency(
+        json_component={},
+        platform="github.com",
+        repo_owner="owner",
+        repo_name="repo",
+    )
+    scorecard = try_get_from_ssf_api(dependency)
+    assert scorecard is None
+
+def test_lookup_database():
+    """Test the lookup_database function."""
+    dependencies = [
+        Dependency(
             json_component={},
             platform="github.com",
             repo_owner="owner",
-            repo_name="repo",
-        )
-        scorecard = lookup_ssf(dependency)
-        self.assertIsNone(scorecard)
+            repo_name="repo1",
+        ),
+        Dependency(
+            json_component={},
+            platform="github.com",
+            repo_owner="owner",
+            repo_name="repo2",
+        ),
+    ]
+    dependencies_with_scores, new_needed_dependencies = lookup_database(dependencies)
+    assert len(dependencies_with_scores) == 0
+    assert len(new_needed_dependencies) == 2
 
-    def test_lookup_multiple_ssf(self):
-        """Test the lookup_multiple_ssf function."""
-        dependencies = [
-            Dependency(
-                json_component={},
-                platform="github.com",
-                repo_owner="owner",
-                repo_name="repo1",
-            ),
-            Dependency(
-                json_component={},
-                platform="github.com",
-                repo_owner="owner",
-                repo_name="repo2",
-            ),
-        ]
-        dependencies_with_scores, new_needed_dependencies = lookup_multiple_ssf(
-            dependencies
-        )
-        self.assertEqual(len(dependencies_with_scores), 0)
-        self.assertEqual(len(new_needed_dependencies), 2)
+def test_lookup_ssf():
+    """Test the lookup_ssf function."""
+    dependency = Dependency(
+        json_component={},
+        platform="github.com",
+        repo_owner="owner",
+        repo_name="repo",
+    )
+    scorecard = lookup_ssf(dependency)
+    assert scorecard is None
 
-
-if __name__ == "__main__":
-    unittest.main()
+def test_lookup_multiple_ssf():
+    """Test the lookup_multiple_ssf function."""
+    dependencies = [
+        Dependency(
+            json_component={},
+            platform="github.com",
+            repo_owner="owner",
+            repo_name="repo1",
+        ),
+        Dependency(
+            json_component={},
+            platform="github.com",
+            repo_owner="owner",
+            repo_name="repo2",
+        ),
+    ]
+    dependencies_with_scores, new_needed_dependencies = lookup_multiple_ssf(dependencies)
+    assert len(dependencies_with_scores) == 0
+    assert len(new_needed_dependencies) == 2
