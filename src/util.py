@@ -20,7 +20,7 @@ class Dependency:
                                     related to the dependency.
         dependency_score (dict): The scorecard related to the dependency.
     """
-    json_component: dict
+    json_component: dict = None
     platform: str = None
     repo_owner: str = None
     repo_name: str = None
