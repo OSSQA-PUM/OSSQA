@@ -9,15 +9,16 @@ from subprocess import call
 parser = argparse.ArgumentParser()
 
 def get_choice():
-    choice = input(": ")
+    choice = input("Select: ")
     return choice.strip()
 
 
 def display_ui():
     print("What would you like to do?")
-    print("1. Search SBOM")
-    print("2. Edit token")
-    print("3. Exit")
+    print("1. Select SBOM")
+    print("2. Search selected SBOM")
+    print("3. Edit token")
+    print("4. Exit")
 
 def clear_console():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -50,10 +51,21 @@ def select_sbom():
         print("Invalid choice")
         return
     
-    sbom_json = open(sboms[int(choice)])
+    selected_sbom = sboms[int(choice)]
+    sbom_json = open(selected_sbom)
     sbom_data = json.load(sbom_json)
+    
+    clear_console()
+    print(f"SBOM selected to be searched: {selected_sbom}")
     return sbom_data
-     
+
+def search_sbom(sbom):
+    github_repos = list()
+    for value in sbom["components"]:    # We only want dependencies that are hosted on github.
+        dependency = value["name"]
+        if "github.com" in dependency:
+            github_repos.append(dependency)
+    
 
 def make_choice(choice: int) -> None:
     if choice == "1": # Search SBOM
@@ -67,17 +79,22 @@ def main():
 
         if user_choice == "1":
             sbom = select_sbom()
-            
+
         elif user_choice == "2":
-            # TODO: kanske dra ut detta till en separat funktion? 
-            os.system('cls' if os.name == 'nt' else 'clear')
+            if not token or not sbom:
+                print("No token or SBOM selected. Please select one and try again")
+
+
+        elif user_choice == "3":
+             
+            clear_console()
             chosen_file = edit_token()
             if chosen_file is not None:
                 token = open(chosen_file, "r").read()
                 clear_console()
                 print(f"New token: {token}")
 
-        elif user_choice == "3":
+        elif user_choice == "4":
             print("Exiting the program.")
             break
 
