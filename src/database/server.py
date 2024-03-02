@@ -99,8 +99,3 @@ def initialize_db():
     app.app_context().push()
     db.drop_all()
     db.create_all()
-
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(port=5080)
