@@ -1,12 +1,12 @@
 from flask import Flask, jsonify, request
 
-from models import db, dependency_sbom
+from database.models import db, dependency_sbom
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./our.db'
 db.init_app(app)
-from models import Dependency, DependencyCheck, SBOM
+from database.models import Dependency, DependencyCheck, SBOM
 
 
 @app.errorhandler(404)
@@ -74,13 +74,13 @@ def add_SBOM():
                 # if check exists, update it
                 check = DependencyCheck.query.filter_by(name=name, dependency_repo=dep.repo_commit).first()
                 if check is not None:
-                    print("updating check")
+                    #print("updating check")
                     check.score = score
                     check.reason = reason
                     check.details = details
                     db.session.commit()
                 else:  # if check does not exist, create it
-                    print("creating check: " + name + " for " + dep.repo_commit)
+                    #print("creating check: " + name + " for " + dep.repo_commit)
                     check = DependencyCheck(details=details, score=score, reason=reason, name=name,
                                             dependency_repo=dep.repo_commit)
                     db.session.add(check)

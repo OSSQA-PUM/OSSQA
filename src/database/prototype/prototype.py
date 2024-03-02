@@ -105,7 +105,7 @@ def analyze_dependencies(dependency_urls: list[str]) -> tuple[list[str], list[di
 
 
 def main():
-    sbom_path = "SBOM3.json"
+    sbom_path = "SBOM6.json"
     results_path = sbom_path.replace(".json", "_results.json")
 
     with open(sbom_path, "r") as file:
