@@ -8,7 +8,7 @@ from typing import Generator
 from database.models import SBOM, Dependency, DependencyCheck
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def app() -> Generator[Flask, None, None]:
     from database.server import app, db
     app.config.update({
@@ -24,12 +24,12 @@ def app() -> Generator[Flask, None, None]:
     db.drop_all()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def client(app) -> FlaskClient:
     return app.test_client()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def sbom_results() -> list[dict]:
     sbom_results = []
     for i in range(1, 10):
@@ -66,10 +66,10 @@ def test_add_sbom(client, sbom_results):
     assert DependencyCheck.query.count() == CHECKS_PER_DEPENDENCY * Dependency.query.count()
 
 
-def test_fetch_sbom(client, sbom_results):
+def test_get_sbom(client, sbom_results):
     for sbom_result in sbom_results:
         serial_number = sbom_result.get("serialNumber", sbom_result.get("$schema"))
 
-        response = client.get("/fetch_SBOM", json={"serial_number": serial_number})
+        response = client.get("/get_SBOM", json={"serial_number": serial_number})
         assert response.status_code == 200
-        assert response.data["serialNumber"] == serial_number
+        assert response.json["serialNumber"] == serial_number
