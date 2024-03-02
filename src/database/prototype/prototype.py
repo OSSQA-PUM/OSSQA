@@ -1,7 +1,7 @@
 # def calculate_sbom_scores(dependency_scores: List[List[Tuple[str, int, str]]]) -> List[Tuple[str, int, str]]:
 #     if not dependency_scores:
 #         return []
-    
+
 #     # Initialize scores with high values to easily find the minimum
 #     scores = [("", 100000)] * len(dependency_scores[0])
 
@@ -51,7 +51,7 @@ def get_dependency_urls(sbom_data: dict) -> list[str]:
                     #       a gitlab auth token
                     #elif gitlab_idx != -1:
                     #    url = url[gitlab_idx:]
-                    
+
                     if url.endswith(".git"):
                         url = url[:-4]
 
@@ -66,7 +66,7 @@ def analyze_dependency(dependency_url: str) -> tuple[list[tuple[str, int, str]],
     output = ""
     try:
         output = subprocess.check_output(
-            f'scorecard --repo={dependency_url} --show-details --format json', 
+            f'scorecard --repo={dependency_url} --show-details --format json',
             shell=True,
         )
     except subprocess.CalledProcessError:
@@ -105,9 +105,9 @@ def analyze_dependencies(dependency_urls: list[str]) -> tuple[list[str], list[di
 
 
 def main():
-    sbom_path = "SBOM2.json"
+    sbom_path = "SBOM6.json"
     results_path = sbom_path.replace(".json", "_results.json")
-    
+
     with open(sbom_path, "r") as file:
         sbom_data = json.load(file)
 
