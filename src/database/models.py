@@ -23,9 +23,8 @@ class Dependency(db.Model):
     def to_dict(self):
         return {'repo_commit': self.repo_commit,
                 'score': self.score,
-                'name': self.name,
-                'version': self.version,
                 'date_added': self.date_added,
+                'checks': [check.to_dict() for check in self.checks],
                 }
 
 
@@ -53,4 +52,5 @@ class SBOM(db.Model):
     def to_dict(self):
         return {'serialNumber': self.serialNumber,
                 'version': self.version,
+                'dependencies': [dep.to_dict() for dep in self.dependencies],
                 }

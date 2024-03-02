@@ -95,6 +95,14 @@ def add_SBOM():
     return jsonify(sbom.to_dict()), 201
 
 
+@app.route("/get_SBOM", methods=["GET"])
+def get_SBOM():
+    data = request.json
+    serial_number = data["serial_number"]
+    sbom = db.get_or_404(SBOM, serial_number)
+    return jsonify(sbom.to_dict()), 200
+
+
 def initialize_db():
     app.app_context().push()
     db.drop_all()
