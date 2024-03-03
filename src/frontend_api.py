@@ -44,13 +44,13 @@ def check_format_of_sbom(sbom_string):
     if not sbom_string["bomFormat"] == "CycloneDX":
         raise SyntaxError("bomFormat missing or not CycloneDX")
     if not sbom_string["specVersion"] in ["1.2","1.3","1.4","1.5"]:
-        raise ValueError("CycloneDX version missing, out of date or incorrect")
+        raise IndexError("CycloneDX version missing, out of date or incorrect")
     if not match("^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", sbom_string["serialNumber"]):
         raise SyntaxError("SBOM Serial number does not match the RFC-4122 format")
     if not sbom_string["version"] >= 1:
-        raise ValueError("Version of SBOM is lower than 1")
+        raise IndexError("Version of SBOM is lower than 1")
     if not isinstance(sbom_string["version"], int):
-        raise ValueError("Version of SBOM is not proper integer")
+        raise IndexError("Version of SBOM is not proper integer")
     return True
 
 
@@ -77,5 +77,11 @@ def frontend_api(path, source_risk_assessment = 10,\
     #                continuous_testing, code_vunerabilities)
     #return main_application_structure()
 
+#frontend_api(path = "src/prototype/example-SBOM.json",\
+#                                      build_risk_assessment = 10,\
+#                                      source_risk_assessment = 1,\
+#                                      maintence = 1,\
+#                                      continuous_testing = 5,\
+#                                      code_vunerabilities = 1)
 
 # End-of-file (EOF)
