@@ -76,7 +76,7 @@ def main():
             sbom = select_sbom()
 
         elif user_choice == "2":
-            if not os.environ['GITHUB_AUTH_TOKEN'] or not sbom:
+            if not os.environ.get('GITHUB_AUTH_TOKEN') or not sbom:
                 print("No token or SBOM selected. Please select one and try again")
                 break
             search_sbom(sbom)
@@ -101,4 +101,5 @@ def search_files():
 
 if __name__ == "__main__":
     main()
-    
+
+#EOF end of file
