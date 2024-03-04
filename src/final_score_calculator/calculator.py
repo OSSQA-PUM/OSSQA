@@ -11,7 +11,10 @@ FinalScore = list[str, int, str]  # (name, score, repository)
 Score = list[str, int]  # (name, score)
 
 
-def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
+def calculate_final_scores(
+        dependencies: list[Dependency], 
+        requirements: list[float] = [10, 10, 10, 10, 10]
+        ) -> list[FinalScore]:
     """
     Calculates final scores based on the scores of dependencies.
     Each final score is the minimum of the dependency scores of the same type.
@@ -19,6 +22,9 @@ def calculate_final_scores(dependencies: list[Dependency]) -> list[FinalScore]:
     Args:
         dependencies (list[Dependency]): 
         A list of Dependency objects representing the dependencies.
+
+        requirements (list[float], optional):
+        A list of user requirements for the final scores.
 
     Returns:
         list[FinalScore]: 
