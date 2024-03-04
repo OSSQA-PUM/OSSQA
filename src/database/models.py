@@ -46,11 +46,15 @@ class DependencyCheck(db.Model):
 class SBOM(db.Model):
     serialNumber = db.Column(db.String(60), primary_key=True)
     version = db.Column(db.String(60), unique=False)
+    repo_name = db.Column(db.String(60), unique=False)
+    repo_version = db.Column(db.String(60), unique=False)
 
     dependencies = db.relationship('Dependency', secondary=dependency_sbom, lazy='subquery', back_populates='sboms')
 
     def to_dict(self):
         return {'serialNumber': self.serialNumber,
                 'version': self.version,
+                'repo_name': self.repo_name,
+                'repo_version': self.repo_version,
                 'dependencies': [dep.to_dict() for dep in self.dependencies],
                 }
