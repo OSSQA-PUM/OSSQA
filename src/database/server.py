@@ -41,12 +41,11 @@ def add_SBOM():
         serialNumber = data["serialNumber"]
     except KeyError:
         serialNumber = data["$schema"]
-    version = data["version"]
-    sbom = SBOM.query.filter_by(serialNumber=serialNumber).first()
-    if sbom is not None:
-        return "SBOM already exists", 409
 
-    sbom = SBOM(serialNumber=serialNumber, version=version)
+    sbom = SBOM(serialNumber=serialNumber,
+                version=data["version"],
+                repo_name=data["name"],
+                repo_version=data["repo_version"])
     db.session.add(sbom)
     db.session.commit()
     # go through dependencies and add them to sbom
