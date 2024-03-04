@@ -36,7 +36,7 @@ def check_input_arguments(source_risk_assessment,\
     return
 
 
-def check_format_of_sbom(sbom_string):
+def check_format_of_sbom(sbom_string) -> bool:
     """
     Checks that the inputed SBOM meets the standard
     requirement of CycloneDX
@@ -72,9 +72,10 @@ def frontend_api(path, source_risk_assessment = 10,\
     sbom_json = open(path, encoding="utf-8")
     sbom_string = json.load(sbom_json)
     check_format_of_sbom(sbom_string)
-    #print(path, source_risk_assessment,\
-    #                maintence, build_risk_assessment,\
-    #                continuous_testing, code_vunerabilities)
+    print(path, source_risk_assessment,\
+                    maintence, build_risk_assessment,\
+                    continuous_testing, code_vunerabilities)
+    return
     #return main_application_structure()
 
 #frontend_api(path = "src/prototype/example-SBOM.json",\
