@@ -9,8 +9,9 @@ def add_SBOM(json_file: dict):
     except KeyError:
         data["serialNumber"] = json_file["$schema"]
     data["components"] = json_file["components"]
+    data['version'] = json_file["version"]
     data["name"] = json_file["metadata"]["name"]
-    data["version"] = json_file["metadata"]["version"]
+    data["repo_version"] = json_file["metadata"]["version"]
     r = requests.post("localhost:5080/add_SBOM", json=data)
     return r.status_code
 
@@ -41,7 +42,7 @@ def get_existing_dependencies(needed_dependencies: list):
             dependency_score={'score': current['score'], 'checks': current['checks']},
             platform=url_split[0],
             repo_owner=url_split[1],
-            repo_name = url_split[2],
+            repo_name=url_split[2],
             url=current['name']
         )
         result.append(dep_obj)
