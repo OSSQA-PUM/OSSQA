@@ -1,4 +1,5 @@
 import requests
+from util import Dependency
 
 
 def add_SBOM(json_file: dict):
@@ -43,4 +44,5 @@ def get_existing_dependencies(needed_dependencies: list):
             repo_name = url_split[2],
             url=current['name']
         )
-    return all_depencency_objects
+        result.append(dep_obj)
+    return result
