@@ -13,7 +13,7 @@ Score = list[str, int]  # (name, score)
 
 def calculate_final_scores(
         dependencies: list[Dependency], 
-        requirements: list[float] = [10, 10, 10, 10, 10]
+        requirements: list[float] = None
         ) -> list[FinalScore]:
     """
     Calculates final scores based on the scores of dependencies.
@@ -30,6 +30,9 @@ def calculate_final_scores(
         list[FinalScore]: 
         A list of FinalScore objects containing the calculated final scores.
     """
+    if not requirements:
+        requirements = [10] * 5
+
     scores = list[FinalScore]()
 
     if not dependencies:
