@@ -14,4 +14,11 @@ services:
       context: .
       dockerfile: ./src/prototype/Dockerfile
     env_file: .env
+    
+  ossqa-tests:
+    image: ossqa-tests
+    build:
+      context: .
+      dockerfile: ./src/tests/Dockerfile
+    env_file: .env
 
