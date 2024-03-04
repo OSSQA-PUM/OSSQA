@@ -1,13 +1,13 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
-WORKDIR /app
+WORKDIR /src
 
 # Setup virtual environment
-RUN python3 -m venv /app/venv
+RUN python3 -m venv /src/venv
 
 # Activate virtual environment for subsequent commands
-ENV PATH="/app/venv/bin:$PATH"
+ENV PATH="/src/venv/bin:$PATH"
 
 # Copy scorecard binary
 COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
@@ -26,10 +26,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # Turns off buffering for easier container logging
 ENV PYTHONUNBUFFERED=1
 
-# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# Creates a non-root user with an explicit UID and adds permission to access the /src folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
-RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /src
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["pytest", "tests/test_prototype.py"]
+CMD ["pytest", "tests", "--verbose"]

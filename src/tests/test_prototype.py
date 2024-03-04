@@ -1,5 +1,5 @@
 import pytest
-from prototype.prototype import analyze_dependency_score
+from src.prototype.prototype import analyze_dependency_score
 from typing import List, Tuple
 
 @pytest.fixture
