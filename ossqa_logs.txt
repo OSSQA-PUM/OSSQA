@@ -1,0 +1,19 @@
+URLs extracted: 9 out of 9
+Binary-Artifacts, Score: 9, cause: github.com/antlr/antlr4
+Branch-Protection, Score: 0, cause: github.com/chzyer/logex
+CI-Tests, Score: 0, cause: github.com/chzyer/logex
+CII-Best-Practices, Score: 0, cause: github.com/chzyer/logex
+Code-Review, Score: 0, cause: github.com/chzyer/logex
+Contributors, Score: 3, cause: github.com/armon/consul-api
+Dangerous-Workflow, Score: -1, cause: github.com/chzyer/logex
+Dependency-Update-Tool, Score: 0, cause: github.com/chzyer/logex
+Fuzzing, Score: 0, cause: github.com/chzyer/logex
+License, Score: 10, cause: github.com/chzyer/logex
+Maintained, Score: 0, cause: github.com/chzyer/logex
+Packaging, Score: -1, cause: github.com/chzyer/logex
+Pinned-Dependencies, Score: -1, cause: github.com/chzyer/logex
+SAST, Score: 0, cause: github.com/chzyer/logex
+Security-Policy, Score: 0, cause: github.com/chzyer/logex
+Signed-Releases, Score: -1, cause: github.com/chzyer/logex
+Token-Permissions, Score: -1, cause: github.com/chzyer/logex
+Vulnerabilities, Score: 0, cause: github.com/chzyer/logex
