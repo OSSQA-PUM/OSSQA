@@ -51,7 +51,14 @@ def check_format_of_sbom(sbom_string) -> bool:
         raise IndexError("Version of SBOM is lower than 1")
     if not isinstance(sbom_string["version"], int):
         raise IndexError("Version of SBOM is not proper integer")
-    return True
+    # Checks if name of SBOM exists
+    try:
+        name = sbom_string["metadata"]["tools"][0]["name"]
+    except (IndexError, KeyError):
+        name = ""
+    if name == "":
+        raise ValueError("Name could not be found, non valid SBOM")
+    return
 
 
 def frontend_api(path, source_risk_assessment = 10,\
@@ -78,11 +85,11 @@ def frontend_api(path, source_risk_assessment = 10,\
     return
     #return main_application_structure()
 
-#frontend_api(path = "src/prototype/example-SBOM.json",\
-#                                      build_risk_assessment = 10,\
-#                                      source_risk_assessment = 1,\
-#                                      maintence = 1,\
-#                                      continuous_testing = 5,\
-#                                      code_vunerabilities = 1)
+frontend_api(path = "src/prototype/example-SBOM.json",\
+                                      build_risk_assessment = 10,\
+                                      source_risk_assessment = 1,\
+                                      maintence = 1,\
+                                      continuous_testing = 5,\
+                                      code_vunerabilities = 1)
 
 # End-of-file (EOF)
