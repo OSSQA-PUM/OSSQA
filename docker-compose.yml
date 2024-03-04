@@ -14,4 +14,3 @@ services:
       context: .
       dockerfile: ./src/prototype/Dockerfile
     env_file: .env
-
