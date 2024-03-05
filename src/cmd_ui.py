@@ -1,10 +1,11 @@
 
 import glob
 import os
+from pathlib import Path
 
+import util
+import frontend_api
 
-from src import util
-from src import frontend_api
 
 def get_choice():
     choice = input("Select: ")
@@ -42,7 +43,7 @@ def set_token():
 def select_sbom():
     clear_console()
     print("Please select the SBOM to be searched \n")
-    sboms = [f for f in glob.glob("src/*.json")]
+    sboms = [f for f in glob.glob(str(Path(__file__).parent.absolute() / "tests" / "sboms" / "example-SBOM.json"))]
     for i, sbom in enumerate(sboms):
         print(f"{i}: {sbom}")
     choice = get_choice()
@@ -58,8 +59,8 @@ def select_sbom():
 
 
 def search_sbom(sbom):
-    print(sbom)
     dict_weighted_results = frontend_api.frontend_api(sbom)
+    print(dict_weighted_results)
     
 
 def make_choice(choice: int) -> None:
