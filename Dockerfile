@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy the requirements file into the Docker image
 COPY requirements.txt .
 
-# Copy the contents of the local src directory into the app/src directory in the Docker image
-COPY /src /app/src
+# Copy the contents of the local src directory into the app directory in the Docker image
+COPY /src /app
 
 # Copy the scorecard binary into the /usr/local/bin directory in the Docker image
 COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
@@ -40,4 +40,4 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 # Run src/__main__.py when the container is launched
-CMD ["python", "-m", "src"]
+ENTRYPOINT ["python", "__main__.py"]
