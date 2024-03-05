@@ -14,6 +14,9 @@ dependency_sbom = db.Table('dependency_sbom',
 
 
 class Dependency(db.Model):
+    """
+    Dependency model
+    """
     name = db.Column(db.String(60), primary_key=True)
     version = db.Column(db.String(60), primary_key=True)
     score = db.Column(db.Integer, unique=False)
@@ -33,6 +36,9 @@ class Dependency(db.Model):
 
 
 class DependencyCheck(db.Model):
+    """
+    DependencyCheck model
+    """
     details = db.Column(db.String(60), unique=False)  # TODO: details can be null, change primary key
     score = db.Column(db.Double, unique=False)
     reason = db.Column(db.String(60), unique=False)
@@ -48,6 +54,9 @@ class DependencyCheck(db.Model):
 
 
 class SBOM(db.Model):
+    """
+    SBOM model
+    """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     serialNumber = db.Column(db.String(60), unique=False)
     version = db.Column(db.String(60), unique=False)
