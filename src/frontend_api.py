@@ -13,7 +13,7 @@ from re import match
 
 def check_input_arguments(source_risk_assessment,\
                     maintence, build_risk_assessment,\
-                    continuous_testing, code_vunerabilities):
+                    continuous_testing, code_vunerabilities) -> None:
     """
     Checks wheter the arguments that weight the-
     dependencies fall within the bounds 0 to 10,
@@ -36,7 +36,7 @@ def check_input_arguments(source_risk_assessment,\
     return
 
 
-def check_format_of_sbom(sbom_string) -> bool:
+def check_format_of_sbom(sbom_string) -> None:
     """
     Checks that the inputed SBOM meets the standard
     requirement of CycloneDX
@@ -63,7 +63,7 @@ def check_format_of_sbom(sbom_string) -> bool:
 
 def frontend_api(path, source_risk_assessment = 10,\
                     maintence = 10, build_risk_assessment = 10,\
-                    continuous_testing = 10, code_vunerabilities = 10):
+                    continuous_testing = 10, code_vunerabilities = 10) ->None:
     """
     This function is called by either frontend interfaces,
     it takes the a file-path to a generated SBOM and desired
@@ -85,11 +85,11 @@ def frontend_api(path, source_risk_assessment = 10,\
     return
     #return main_application_structure()
 
-frontend_api(path = "src/prototype/example-SBOM.json",\
-                                      build_risk_assessment = 10,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 5,\
-                                      code_vunerabilities = 1)
+#frontend_api(path = "src/prototype/example-SBOM.json",\
+#                                      build_risk_assessment = 10,\
+#                                      source_risk_assessment = 1,\
+#                                      maintence = 1,\
+#                                      continuous_testing = 5,\
+#                                      code_vunerabilities = 1)
 
 # End-of-file (EOF)
