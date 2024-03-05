@@ -1,8 +1,8 @@
-import backend_communication
+#import backend_communication
 import calculate_dependencies
-import src.final_score_calculator.calculator as calculator
+import final_score_calculator.calculator as calculator
 
-def analyze_sbom(sbom: dict, requirements: list[float]):
+def analyze_sbom(sbom: dict, requirements: list[int]) -> float:
     """
     This function is called by frontend API and calls for SSFAnalyser and FSC
     Args:
@@ -25,5 +25,6 @@ def get_old_results(sbom: dict):
         dict: The old results
     """
     name = sbom['metadata']['name'] + sbom['metadata']['version']
-    old_results = backend_communication.get_existing_results(name)
-    return old_results
+    #old_results = backend_communication.get_existing_results(name)
+    #return old_results
+    return ["trash", "trash", "trash"] #REMOVE

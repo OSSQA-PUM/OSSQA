@@ -5,7 +5,7 @@ services:
     image: ossqa
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./src/Dockerfile
     env_file: .env
 
   ossqa-prototype:
