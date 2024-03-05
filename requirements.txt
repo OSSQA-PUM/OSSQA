@@ -3,3 +3,4 @@ numpy
 tqdm
 pylint
 requests
+pytest
