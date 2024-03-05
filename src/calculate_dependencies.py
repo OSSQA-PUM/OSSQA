@@ -169,7 +169,7 @@ def get_git_sha1_number(dependency: Dependency) -> str | None:
 
 
 def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
-    -> dict | None :
+    -> dict[str, str] | None :
     """
     Retrieves the scorecard of a dependency 
     from the SSF (Security Scorecards) API.
@@ -191,8 +191,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
     # Check if the response is successful
     if response.status_code == 200:
         return response.json()
-    else:
-        return None
+    return None
 
 
 def lookup_database(needed_dependencies : list[Dependency]) \
@@ -236,7 +235,7 @@ def lookup_database(needed_dependencies : list[Dependency]) \
     return dependencies_with_scores, new_needed_dependencies
 
 
-def lookup_ssf(dependency: Dependency) -> dict:
+def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
     """
     Looks up the scorecard of a dependency 
     in the SSF (Security Scorecards) API.
@@ -323,7 +322,7 @@ def analyse_score(dependency: Dependency):
 
 
 def analyse_multiple_scores(dependencies: list[Dependency]) \
-    ->  list[Dependency]:
+    ->  tuple[list[Dependency], list[Dependency]]:
     """
     Analyzes multiple scores for a list of dependencies.
 
