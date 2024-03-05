@@ -2,12 +2,14 @@ import requests
 from util import Dependency
 
 
-def add_SBOM(json_file: dict):
+def add_SBOM(sbom_json: dict, dependencies: list[Dependency]):
     """
     Adds a SBOM to the database
     Args:
-        json_file: dict
-        A dictionary containing the SBOM
+        sbom_json: dict 
+        An SBOM as a json object.
+        dependencies: list[Dependency]
+        The dependencies of the SBOM.
 
     Returns:
         int:
@@ -15,13 +17,20 @@ def add_SBOM(json_file: dict):
     """
     data = {}
     try:
-        data["serialNumber"] = json_file["serialNumber"]
+        data["serialNumber"] = sbom_json["serialNumber"]
     except KeyError:
-        data["serialNumber"] = json_file["$schema"]
-    data["components"] = json_file["components"]
-    data['version'] = json_file["version"]
-    data["name"] = json_file["metadata"]["name"]
-    data["repo_version"] = json_file["metadata"]["version"]
+        data["serialNumber"] = sbom_json["$schema"]
+    data['version'] = sbom_json["version"]
+    data["name"] = sbom_json["metadata"]["name"]
+    data["repo_version"] = sbom_json["metadata"]["version"]
+
+    data["components"] = [{
+        "name": dep.json_component["name"],
+        "version": dep.json_component["version"],
+        "score": dep.dependency_score["score"],
+        "checks": dep.dependency_score["checks"],
+    } for dep in dependencies]
+
     r = requests.post("localhost:5080/add_SBOM", json=data)
     return r.status_code
 
