@@ -1,10 +1,16 @@
 """
 Import file with code to be examined
 """
-import pytest
-from frontend_api import frontend_api 
 
-def test_integer_values() -> None:
+from pathlib import Path
+import pytest
+from frontend_api import frontend_api
+
+@pytest.fixture(scope="module")
+def example_SBOM() -> str:
+    return str(Path(__file__).parent.absolute() / "sboms" / "example-SBOM.json")
+
+def test_integer_values(example_SBOM) -> None:
     """
     Integer Value Testing:
 
@@ -15,7 +21,7 @@ def test_integer_values() -> None:
     expected_integer_errors = 500
     for i in range(-10, 101):
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = i,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -30,7 +36,7 @@ def test_integer_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = i,\
                                       maintence = 1,\
@@ -45,7 +51,7 @@ def test_integer_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = i,\
@@ -60,7 +66,7 @@ def test_integer_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -75,7 +81,7 @@ def test_integer_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -93,7 +99,7 @@ def test_integer_values() -> None:
     assert result
     assert total_errors == expected_integer_errors
 
-def test_decimal_values() -> None:
+def test_decimal_values(example_SBOM) -> None:
     """
     Decimal Value Testing:
 
@@ -112,7 +118,7 @@ def test_decimal_values() -> None:
         if i == int(i):
             i = int(i) # Because I don't want to check whole numbers here
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -130,7 +136,7 @@ def test_decimal_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -148,7 +154,7 @@ def test_decimal_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = x,\
@@ -166,7 +172,7 @@ def test_decimal_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = x,\
                                       maintence = 1,\
@@ -184,7 +190,7 @@ def test_decimal_values() -> None:
         except SyntaxError:
             continue
         try:
-            frontend_api(path = "src/prototype/example-SBOM.json",\
+            frontend_api(path = example_SBOM,\
                                       build_risk_assessment = x,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -205,7 +211,7 @@ def test_decimal_values() -> None:
     assert decimal_number_count == expected_decimal_errors
     assert neg_int_count == expected_negative_errors
 
-def test_valid_SBOM() -> None:
+def test_valid_SBOM(example_SBOM) -> None:
     """
     Valid SBOM Testing:
 
@@ -216,7 +222,7 @@ def test_valid_SBOM() -> None:
     # Testing if correct format of SBOM
     result = True
     try:
-        frontend_api(path = "src/prototype/example-SBOM.json",\
+        frontend_api(path = example_SBOM,\
                                       build_risk_assessment = 1,\
                                       source_risk_assessment = 1,\
                                       maintence = 1,\
@@ -227,5 +233,3 @@ def test_valid_SBOM() -> None:
     except IndexError:
         result = False
     assert result
-
-# End-of-file (EOF)

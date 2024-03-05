@@ -2,8 +2,8 @@
 This file contains test cases for the `calculate_final_scores` function in the `calculator` module.
 """
 
-from src.final_score_calculator.calculator import calculate_final_scores
-from src.util import Dependency
+from final_score_calculator.calculator import calculate_final_scores
+from util import Dependency
 
 def test_calculate_final_scores_empty_dependencies():
     """Test when dependencies list is empty"""

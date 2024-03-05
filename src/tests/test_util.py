@@ -1,5 +1,5 @@
 import pytest
-from src.util import Dependency, check_token_usage
+from util import Dependency, check_token_usage
 
 def test_dependency_creation():
     """

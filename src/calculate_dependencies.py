@@ -15,7 +15,7 @@ from typing import Any
 import requests
 import tqdm
 
-from .util import Dependency
+from util import Dependency
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """

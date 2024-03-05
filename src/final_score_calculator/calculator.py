@@ -4,7 +4,7 @@ the scores of dependencies.
 """
 
 import json
-from src.util import Dependency
+from util import Dependency
 
 # Temporary data types until we create more modules and proper data types
 FinalScore = list[str, int, str]  # (name, score, repository)
