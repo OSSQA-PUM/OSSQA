@@ -1,15 +1,21 @@
+"""
+This module provides functions for communicating with the backend 
+and managing SBOMs (Software Bill of Materials).
+"""
+
 import requests
 from util import Dependency
 
 
-def add_SBOM(sbom_json: dict, dependencies: list[Dependency]):
+def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
     """
     Adds a SBOM to the database
     Args:
         sbom_json: dict 
-        An SBOM as a json object.
+ 
+             An SBOM as a json object.
         dependencies: list[Dependency]
-        The dependencies of the SBOM.
+       The dependencies of the SBOM.
 
     Returns:
         int:
@@ -40,16 +46,15 @@ def get_history():
     """
     Gets previus SBOMs
     Returns:
-        list:
-        A list of the previous SBOMs
+        list:ious SBOM A list of the 
 
     """
-    response = requests.get("localhost:5080/get_history")
+    response = requests.get("localhost:5080/get_history",  timeout=5)
     return response.json()
 
 
 # ossqa history [ID]
-def get_SBOM(id: int):
+def get_sbom(id: int):
     """
     Gets a specific SBOM
     Args:
@@ -58,7 +63,10 @@ def get_SBOM(id: int):
     Returns:
 
     """
-    response = requests.get("localhost:5080/get_SBOM", data={"id": id})
+    response = requests.get(
+        "localhost:5080/get_SBOM", 
+        data={"id": id}, 
+        timeout=5)
     return response.json()
 
 
@@ -73,22 +81,29 @@ def get_existing_dependencies(needed_dependencies: list):
         A list of the existing dependencies as Dependency objects
     """
     dependency_primary_keys = []
-    for i in range(len(needed_dependencies)):
-        json_obj = needed_dependencies[i].json_component
-        dependency_primary_keys.append({'name': json_obj['name'], 'version': json_obj['version']})
+    for depencency in needed_dependencies:
+        json_obj = depencency.json_component
+        dependency_primary_keys.append(
+            {'name': json_obj['name'], 'version': json_obj['version']}
+            )
 
-    all_depencency_objects = requests.get("localhost:5080/get_existing_dependencies",
-                                          data=dependency_primary_keys).json()
+    all_depencencies = requests.get(
+        "localhost:5080/get_existing_dependencies",
+        data=dependency_primary_keys,
+        timeout=5
+        ).json()
     result = []
-    for i in range(len(all_depencency_objects)):
-        current = all_depencency_objects[i]
-        url_split = current['name'].replace("https://", "").split("/")
+    for depencency in all_depencencies:
+        url_split = depencency['name'].replace("https://", "").split("/")
         dep_obj = Dependency(
-            dependency_score={'score': current['score'], 'checks': current['checks']},
+            dependency_score={
+                'score': depencency['score'], 
+                'checks': depencency['checks']
+                },
             platform=url_split[0],
             repo_owner=url_split[1],
             repo_name=url_split[2],
-            url=current['name']
+            url=depencency['name']
         )
         result.append(dep_obj)
     return result
