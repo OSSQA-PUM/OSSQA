@@ -13,10 +13,9 @@ ENV PATH="/src/venv/bin:$PATH"
 COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
 RUN chmod +x /usr/local/bin/scorecard
 
-COPY src/tests/test_requirements.txt .
 COPY requirements.txt .
 COPY src .
-RUN python -m pip install -r test_requirements.txt
+RUN python -m pip install -r requirements.txt
 
 
 ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN

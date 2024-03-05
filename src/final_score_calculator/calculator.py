@@ -4,7 +4,7 @@ the scores of dependencies.
 """
 
 import json
-from src.util import Dependency
+from util import Dependency
 
 # Temporary data types until we create more modules and proper data types
 FinalScore = list[str, int, str]  # (name, score, repository)
@@ -56,11 +56,12 @@ def calculate_final_scores(
 
 if __name__ == "__main__":
     with open(
-        "E:/programming/OSSQA/src/final-score-calculator/example_repsonse.json"
+        "E:/programming/OSSQA/src/final-score-calculator/example_repsonse.json",
+        encoding="utf-8"
         ) as f:
         score_card = json.load(f)
     dependency: Dependency = Dependency(
-        json_component="", url="test", dependency_score=score_card
+        json_component={}, url="test", dependency_score=score_card
         )
 
     dependencies = [dependency]

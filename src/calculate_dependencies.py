@@ -7,13 +7,15 @@ and looking up dependency scores
 from a database and the Security Scorecards API.
 """
 
-from multiprocessing import Pool
 import json
+import subprocess
+from multiprocessing import Pool
+from typing import Any
+
 import requests
 import tqdm
-import subprocess
-from typing import Any
-from .util import Dependency
+
+from util import Dependency
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
@@ -123,7 +125,7 @@ def parse_sbom(sbom: dict) \
     components = sbom["components"]
 
     dependencies_data:list[Dependency] = []
-    failures: list[Dependency] = []
+    failed_components: list[Dependency] = []
     failure_reason: dict = {}
     success = 0
 
@@ -131,7 +133,7 @@ def parse_sbom(sbom: dict) \
         for dependency in pool.imap_unordered(parse_component, components):
             if dependency.failure_reason:
                 exception_type = type(dependency.failure_reason)
-                failures.append(dependency.json_component)
+                failed_components.append(dependency.json_component)
                 failure_reason[exception_type] = failure_reason.get(
                     exception_type, 0) + 1
                 progress_bar.update(1)
@@ -142,10 +144,10 @@ def parse_sbom(sbom: dict) \
             progress_bar.update(1)
     print(f"Successfully parsed {success}/{len(components)} components.")
 
-    return dependencies_data, failures, failure_reason
+    return dependencies_data, failed_components, failure_reason
 
 
-def get_git_sha1_number(dependency: Dependency) -> str:
+def get_git_sha1_number(dependency: Dependency) -> str | None:
     """
     Retrieves the SHA1 number of a dependency from the GitHub API.
 
@@ -166,7 +168,8 @@ def get_git_sha1_number(dependency: Dependency) -> str:
         return None
 
 
-def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None):
+def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
+    -> dict[str, str] | None :
     """
     Retrieves the scorecard of a dependency 
     from the SSF (Security Scorecards) API.
@@ -188,8 +191,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None):
     # Check if the response is successful
     if response.status_code == 200:
         return response.json()
-    else:
-        return None
+    return None
 
 
 def lookup_database(needed_dependencies : list[Dependency]) \
@@ -233,7 +235,7 @@ def lookup_database(needed_dependencies : list[Dependency]) \
     return dependencies_with_scores, new_needed_dependencies
 
 
-def lookup_ssf(dependency: Dependency) -> dict:
+def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
     """
     Looks up the scorecard of a dependency 
     in the SSF (Security Scorecards) API.
@@ -288,7 +290,16 @@ def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
 
 
 def analyse_score(dependency: Dependency):
-    # Execute the Scorecard tool in a Docker container, 
+    """
+    Analyzes the score of a dependency.
+
+    Args:
+        dependency (Dependency): The dependency object.
+
+    Returns:
+        json_output: The scorecard of the dependency.
+    """
+    # Execute the Scorecard tool in a Docker container
     # passing the necessary environment variables
     url = dependency.url.replace("https://", "")
 
@@ -297,7 +308,7 @@ def analyse_score(dependency: Dependency):
         shell=True,
         stderr=subprocess.DEVNULL
     )
-    
+
     # Decode and clean the output for JSON parsing
     output = output.decode("utf-8")
     output = output.replace(
@@ -311,7 +322,7 @@ def analyse_score(dependency: Dependency):
 
 
 def analyse_multiple_scores(dependencies: list[Dependency]) \
-    ->  list[Dependency]:
+    ->  tuple[list[Dependency], list[Dependency]]:
     """
     Analyzes multiple scores for a list of dependencies.
 
@@ -322,7 +333,7 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
     Returns:
         list[Dependency]: The list of dependencies with updated scores.
     """
-    scores = []
+    dependency_scores = []
     needed_dependencies = []
     print("Analyzing dependencies...")
     with Pool() as pool, tqdm.tqdm(total=len(dependencies)) as progress_bar:
@@ -330,17 +341,17 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
         dependency_score: Any
         for dependency, dependency_score in zip(
             dependencies, pool.imap_unordered(analyse_score, dependencies)):
-            if(dependency_score is None):
+            if dependency_score is None :
                 needed_dependencies.append(dependency)
                 progress_bar.update(1)
                 continue
             dependency.dependency_score = dependency_score
-            scores.append(dependency)
+            dependency_scores.append(dependency)
             progress_bar.update(1)
     print("Successfully analyzed " \
-          + f"{len(scores)}/{len(dependencies)} dependencies")
+          + f"{len(dependency_scores)}/{len(dependencies)} dependencies")
 
-    return scores, needed_dependencies
+    return dependency_scores, needed_dependencies
 
 
 def get_dependencies(sbom: dict) \
