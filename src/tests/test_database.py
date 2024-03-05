@@ -1,22 +1,34 @@
+"""
+This module handles the tests for the database and backend modules.
+"""
+
 import json
-import pytest
 import os.path
-from flask import Flask
-from flask.testing import FlaskClient
 from typing import Generator
 
-from database.models import SBOM, Dependency, DependencyCheck
+import pytest
+from flask import Flask
+from flask.testing import FlaskClient
+
+from database.models import db, SBOM, Dependency, DependencyCheck
+from database.server import create_test_app
+
+# This is based on what is in the test data files,
+# not what is in actual analysis results
+CHECKS_PER_DEPENDENCY = 3
 
 
-@pytest.fixture
-def app() -> Generator[Flask, None, None]:
-    from database.server import app, db
-    app.config.update({
-        "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///./test.db",
-    })
-    app.app_context().push()
-    db.create_all()
+@pytest.fixture(name="app", scope="module")
+def fixture_app() -> Generator[Flask, None, None]:
+    """
+    Creates a test app usable for testing, and disposes of any generated
+    test data once it has been used.
+
+    Return:
+        Generator[Flask, None, None]: A generator containing the test app.
+            This can be used as a regular Flask object.
+    """
+    app = create_test_app()
 
     yield app
 
@@ -24,52 +36,174 @@ def app() -> Generator[Flask, None, None]:
     db.drop_all()
 
 
-@pytest.fixture
-def client(app) -> FlaskClient:
+@pytest.fixture(name="client", scope="module")
+def fixture_client(app: Flask) -> FlaskClient:
+    """
+    Creates a test client that handles requests to the test app.
+
+    Return:
+        FlaskClient: The test client.
+    """
     return app.test_client()
 
 
-@pytest.fixture
-def sbom_results() -> list[dict]:
-    sbom_results = []
-    for i in range(1, 10):
-        file_name = f"src/tests/SBOM{i}_results.json"
+@pytest.fixture(name="sbom_results_list", scope="module")
+def fixture_sbom_results_list() -> list[dict]:
+    """
+    Creates a list of SBOM results that is to be used when making assertions
+    and requests to the test app.
+
+    Return:
+        list[dict]: The SBOM results.
+    """
+    # TODO: add more test data
+    # TODO: replace test data based on actual analysis results
+    #       (DONT FORGET TO UPDATE CHECKS_PER_DEPENDENCY WHEN YOU DO)
+    data = []
+    for i in range(1, 2):
+        file_name = f"src/tests/add_sbom_{i}.json"
         if os.path.exists(file_name):
-            file = open(file_name, "r")
-            result = json.load(file)
-            file.close()
-            sbom_results.append(result)
-    return sbom_results
+            with open(file_name, "r", encoding="utf-8") as file:
+                data.append(json.load(file))
+    return data
 
 
-def test_add_sbom(client, sbom_results):
-    results_posted = 0
-    #min_dependencies = 0
-    #max_dependencies = 0
-    CHECKS_PER_DEPENDENCY = 18
+def test_add_sbom(client: FlaskClient, sbom_results_list: list[dict]):
+    """
+    Tests adding SBOM results to the database via the /add_SBOM endpoint.
 
-    # TODO: There are duplicates in sbom_result["components"] so you can't reliably control the
-    #       number of dependencies, uncomment dependency lines when this is fixed OR find another
-    #       reliable way of controling it
-    for sbom_result in sbom_results:
-        results_posted += 1
-        #min_dependencies = max(Dependency.query.count(), len(sbom_result["components"]))
-        #max_dependencies = Dependency.query.count() + len(sbom_result["components"])
+    Args:
+        client (FlaskClient): The test client that makes the requests
+            to the test app.
+        sbom_results_list (list[dict]): The SBOM results to send to the
+            test app.
+    """
+    min_dependency_count = 0  # The amount of dependencies if maximum possible
+                              # dependencies are shared between sboms
+    max_dependency_count = 0  # The amount of dependencies if no dependencies
+                              # are shared between sboms
 
-        response = client.post("/add_SBOM", json=sbom_result)
+    for sbom_results in sbom_results_list:
+        min_dependency_count = max(Dependency.query.count(),
+                                   len(sbom_results["components"]))
+        max_dependency_count = Dependency.query.count() \
+                               + len(sbom_results["components"])
+
+        response = client.post("/add_SBOM", json=sbom_results)
         assert response.status_code == 201
 
-    assert SBOM.query.count() == results_posted
-    #assert Dependency.query.count() >= min_dependencies
-    #assert Dependency.query.count() <= max_dependencies
-    assert Dependency.query.count() != 0  # TODO: remove when the two lines above can be tested reliably
-    assert DependencyCheck.query.count() == CHECKS_PER_DEPENDENCY * Dependency.query.count()
+    assert SBOM.query.count() == len(sbom_results_list)
+    assert Dependency.query.count () >= min_dependency_count
+    assert Dependency.query.count () <= max_dependency_count
+    assert DependencyCheck.query.count() == Dependency.query.count() \
+                                            * CHECKS_PER_DEPENDENCY
 
 
-def test_fetch_sbom(client, sbom_results):
-    for sbom_result in sbom_results:
-        serial_number = sbom_result.get("serialNumber", sbom_result.get("$schema"))
+def test_get_sbom(client, sbom_results_list):
+    """
+    Tests getting the SBOM results (that were added to the database) via the
+    /get_SBOM endpoint.
 
-        response = client.get("/fetch_SBOM", json={"serial_number": serial_number})
+    Args:
+        client (FlaskClient): The test client that makes the requests
+            to the test app.
+        sbom_results_list (list[dict]): The SBOM results that were sent to the
+            test app.
+    """
+    for i in range(1, len(sbom_results_list) + 1):
+        # Tests getting each SBOM added by sbom_results_list
+        response = client.get("/get_SBOM", json={"id": i})
         assert response.status_code == 200
-        assert response.data["serialNumber"] == serial_number
+
+    for i in range(len(sbom_results_list) + 1, len(sbom_results_list) + 10):
+        # Tests getting SBOMs not added by sbom_results_list
+        response = client.get("/get_SBOM", json={"id": i})
+        assert response.status_code == 404
+
+
+def test_get_existing_dependencies(client, sbom_results_list):
+    """
+    Tests getting the existing dependencies (that were added to the database)
+    via the /get_existing_dependencies endpoint.
+
+    Args:
+        client (FlaskClient): The test client that makes the requests
+            to the test app.
+        sbom_results_list (list[dict]): The SBOM results that were sent to the
+            test app.
+    """
+    existing_dependencies = []
+    for sbom_results in sbom_results_list:
+        for component in sbom_results["components"]:
+            existing_dependencies.append({
+                "name": component["name"],
+                "version": component["version"],
+            })
+    non_existing_dependencies = [
+        {
+            "name": "nonexistingcomponent1",
+            "version": "nonexistingversion1",
+        },{
+            "name": "nonexistingcomponent2",
+            "version": "nonexistingversion2",
+        },{
+            "name": "nonexistingcomponent3",
+            "version": "nonexistingversion3",
+        }
+    ]
+    mixed_dependencies = existing_dependencies + non_existing_dependencies
+
+    def check_existing_dependencies(response):
+        for dependency in response.json:
+            is_found = False
+            for existing_dep in existing_dependencies:
+                name = existing_dep["name"]
+                version = existing_dep["version"]
+                name_version = f"{name}@{version}"
+                if dependency["name_version"] == name_version:
+                    is_found = True
+                    break
+            assert is_found
+
+    def check_non_existing_dependencies(response):
+        for dependency in response.json:
+            is_not_found = True
+            for non_existing_dep in non_existing_dependencies:
+                name = non_existing_dep["name"]
+                version = non_existing_dep["version"]
+                name_version = f"{name}@{version}"
+                if dependency["name_version"] == name_version:
+                    is_not_found = False
+                    break
+            assert is_not_found
+
+    # Test where all dependencies exist
+    response = client.get("/get_existing_dependencies",
+                          json=existing_dependencies)
+    assert response.status_code == 200
+    assert len(response.json) == len(existing_dependencies)
+    check_existing_dependencies(response)
+    check_non_existing_dependencies(response)
+
+    # Test where some dependencies exist
+    response = client.get("/get_existing_dependencies",
+                          json=mixed_dependencies)
+    assert response.status_code == 200
+    assert len(response.json) == len(existing_dependencies)
+    check_existing_dependencies(response)
+    check_non_existing_dependencies(response)
+
+    # Test where no dependencies exist
+    response = client.get("/get_existing_dependencies",
+                          json=non_existing_dependencies)
+    assert response.status_code == 200
+    assert len(response.json) == 0
+    check_existing_dependencies(response)
+    check_non_existing_dependencies(response)
+
+    # Test where no dependencies are sent
+    response = client.get("/get_existing_dependencies", json=[])
+    assert response.status_code == 200
+    assert len(response.json) == 0
+    check_existing_dependencies(response)
+    check_non_existing_dependencies(response)
