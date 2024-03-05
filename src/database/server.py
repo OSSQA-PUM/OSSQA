@@ -26,6 +26,14 @@ def handle_exception(e):
 
 
 def add_dependency_to_sbom(component):
+    """
+    Add a dependency to the sbom
+    Args:
+        component: component to turn into a dependency
+
+    Returns:
+        Dependency: dependency to be added
+    """
     repo_commit = component["repo"]["name"] + component["repo"]["commit"]
     score = component["score"]
     dep = Dependency.query.filter_by(repo_commit=repo_commit).first()
@@ -36,17 +44,21 @@ def add_dependency_to_sbom(component):
 
 @app.route("/add_SBOM", methods=["POST"])
 def add_SBOM():
+    """
+    Add a SBOM to the database
+    Returns:
+        json: the added SBOM
+    """
     data = request.json
     try:
         serialNumber = data["serialNumber"]
     except KeyError:
         serialNumber = data["$schema"]
-    version = data["version"]
-    sbom = SBOM.query.filter_by(serialNumber=serialNumber).first()
-    if sbom is not None:
-        return "SBOM already exists", 409
 
-    sbom = SBOM(serialNumber=serialNumber, version=version)
+    sbom = SBOM(serialNumber=serialNumber,
+                version=data["version"],
+                repo_name=data["name"],
+                repo_version=data["repo_version"])
     db.session.add(sbom)
     db.session.commit()
     # go through dependencies and add them to sbom
@@ -74,13 +86,11 @@ def add_SBOM():
                 # if check exists, update it
                 check = DependencyCheck.query.filter_by(name=name, dependency_repo=dep.repo_commit).first()
                 if check is not None:
-                    #print("updating check")
                     check.score = score
                     check.reason = reason
                     check.details = details
                     db.session.commit()
                 else:  # if check does not exist, create it
-                    #print("creating check: " + name + " for " + dep.repo_commit)
                     check = DependencyCheck(details=details, score=score, reason=reason, name=name,
                                             dependency_repo=dep.repo_commit)
                     db.session.add(check)
@@ -95,12 +105,23 @@ def add_SBOM():
     return jsonify(sbom.to_dict()), 201
 
 
+@app.route("/get_SBOM", methods=["GET"])
+def get_SBOM():
+    """
+    Get a SBOM from the database
+    Returns:
+        json: the SBOM
+    """
+    data = request.json
+    serial_number = data["serial_number"]
+    sbom = db.get_or_404(SBOM, serial_number)
+    return jsonify(sbom.to_dict()), 200
+
+
 def initialize_db():
+    """
+    Initialize the database
+    """
     app.app_context().push()
     db.drop_all()
     db.create_all()
-
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(port=5080)
