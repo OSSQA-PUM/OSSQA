@@ -1,9 +1,9 @@
 """
-This file contains functions for parsing and analyzing dependencies 
+This file contains functions for parsing and analyzing dependencies
 in a Software Bill of Materials (SBOM).
-It includes functions for parsing the SBOM, 
+It includes functions for parsing the SBOM,
 retrieving dependency information from external sources,
-and looking up dependency scores 
+and looking up dependency scores
 from a database and the Security Scorecards API.
 """
 
@@ -19,16 +19,16 @@ from util import Dependency
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
-    Parses the git URL and returns the platform, 
+    Parses the git URL and returns the platform,
     repository owner, and repository name.
 
     Args:
         url (str): The git URL.
 
     Returns:
-        tuple[str, str, str]: The platform, repository owner, 
+        tuple[str, str, str]: The platform, repository owner,
         and repository name.
-    
+
     Raises:
         ValueError: If the platform is not supported.
     """
@@ -55,13 +55,13 @@ def get_component_url(component: dict) -> str:
         str: The URL of the component.
 
     Raises:
-        KeyError: 
+        KeyError:
         If no external references are found.
 
-        ConnectionError: 
+        ConnectionError:
         If there is a connection error while accessing the URL.
-        
-        NameError: 
+
+        NameError:
         If no VCS (Version Control System) external reference is found.
     """
     external_refs = component.get("externalReferences")
@@ -111,14 +111,14 @@ def parse_component(component: dict) -> Dependency:
 def parse_sbom(sbom: dict) \
     -> tuple[list[Dependency], list[Dependency], dict]:
     """
-    Parses the SBOM (Software Bill of Materials) 
+    Parses the SBOM (Software Bill of Materials)
     and returns the dependencies, failures, and failure reasons.
 
     Args:
         sbom_file (dict): The path to the SBOM JSON file.
 
     Returns:
-        tuple[list[Dependency], list[Dependency], dict]: The dependencies, 
+        tuple[list[Dependency], list[Dependency], dict]: The dependencies,
         failures, and failure reasons.
     """
     print("Parsing SBOM")
@@ -171,12 +171,12 @@ def get_git_sha1_number(dependency: Dependency) -> str | None:
 def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
     -> dict[str, str] | None :
     """
-    Retrieves the scorecard of a dependency 
+    Retrieves the scorecard of a dependency
     from the SSF (Security Scorecards) API.
 
     Args:
         dependency (Dependency): The dependency object.
-        commit_sha1 (str, optional): The SHA1 number of the commit. 
+        commit_sha1 (str, optional): The SHA1 number of the commit.
                                      Defaults to None.
 
     Returns:
@@ -197,15 +197,15 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
 def lookup_database(needed_dependencies : list[Dependency]) \
     -> tuple[list[Dependency], list[Dependency]]:
     """
-    Looks up the needed dependencies in the database 
+    Looks up the needed dependencies in the database
     and returns the dependencies with scores and the new needed dependencies.
 
     Args:
-        needed_dependencies (list[Dependency]): 
+        needed_dependencies (list[Dependency]):
         The list of needed dependencies.
 
     Returns:
-        tuple[list[Dependency], list[Dependency]]: 
+        tuple[list[Dependency], list[Dependency]]:
         The dependencies with scores and the new needed dependencies.
     """
     dependencies_with_scores = []
@@ -215,6 +215,7 @@ def lookup_database(needed_dependencies : list[Dependency]) \
     # fake database response for now
     # (the database did not have any of the needed dependencies)
     database_response = [None] * len(needed_dependencies)
+    #database_response = get_existing_dependencies(needed_dependencies)
 
     # Calculate the dependencies that are not in the database
     print("Looking up dependencies in database")
@@ -237,7 +238,7 @@ def lookup_database(needed_dependencies : list[Dependency]) \
 
 def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
     """
-    Looks up the scorecard of a dependency 
+    Looks up the scorecard of a dependency
     in the SSF (Security Scorecards) API.
 
     Args:
@@ -254,15 +255,15 @@ def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
 def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
     -> tuple[list[Dependency], list[Dependency]]:
     """
-    Looks up the needed dependencies in the SSF (Security Scorecards) API 
+    Looks up the needed dependencies in the SSF (Security Scorecards) API
     and returns the dependencies with scores and the new needed dependencies.
 
     Args:
-        needed_dependencies (list[Dependency]): 
+        needed_dependencies (list[Dependency]):
         The list of needed dependencies.
 
     Returns:
-        tuple[list[Dependency], list[Dependency]]: The dependencies 
+        tuple[list[Dependency], list[Dependency]]: The dependencies
         with scores and the new needed dependencies.
     """
     dependencies_with_scores = []
@@ -304,7 +305,7 @@ def analyse_score(dependency: Dependency):
     url = dependency.url.replace("https://", "")
 
     output = subprocess.check_output(
-        f'scorecard --repo={url} --show-details --format json', 
+        f'scorecard --repo={url} --show-details --format json',
         shell=True,
         stderr=subprocess.DEVNULL
     )
@@ -327,7 +328,7 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
     Analyzes multiple scores for a list of dependencies.
 
     Args:
-        dependencies (list[Dependency]): 
+        dependencies (list[Dependency]):
         The list of dependencies to be analyzed.
 
     Returns:
@@ -357,14 +358,14 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
 def get_dependencies(sbom: dict) \
     -> tuple[list[Dependency], list[Dependency], list[Dependency]]:
     """
-    Retrieves the dependencies from the SBOM (Software Bill of Materials) 
+    Retrieves the dependencies from the SBOM (Software Bill of Materials)
     and performs database and SSF (Security Scorecards) lookups.
 
     Args:
         sbom_file (str): The path to the SBOM JSON file.
 
     Returns:
-        tuple[list[Dependency], list[Dependency]]: The dependency scores, 
+        tuple[list[Dependency], list[Dependency]]: The dependency scores,
         new needed dependencies, and failures.
     """
     dependencies, failures, failure_reason = parse_sbom(sbom=sbom)
@@ -388,9 +389,9 @@ def get_dependencies(sbom: dict) \
         dependencies=needed_dependencies)
     scores += analyzed_scores
 
-    # TODO send data that was downloaded internally 
+    # TODO send data that was downloaded internally
     # to database (analyzed_scores)
-    
+
     print(
         "Successfully got scores for "
         + f"{len(scores)}/"
