@@ -3,7 +3,6 @@ This module handles the tests for the database and backend modules.
 """
 
 import json
-import os.path
 from typing import Generator
 
 import pytest
@@ -61,10 +60,9 @@ def fixture_sbom_results_list() -> list[dict]:
     #       (DONT FORGET TO UPDATE CHECKS_PER_DEPENDENCY WHEN YOU DO)
     data = []
     for i in range(1, 2):
-        file_name = f"src/tests/add_sbom_{i}.json"
-        if os.path.exists(file_name):
-            with open(file_name, "r", encoding="utf-8") as file:
-                data.append(json.load(file))
+        file_name = f"src/tests/sboms/database/add_sbom_{i}.json"
+        with open(file_name, "r", encoding="utf-8") as file:
+            data.append(json.load(file))
     return data
 
 
