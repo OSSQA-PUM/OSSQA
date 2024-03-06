@@ -6,7 +6,7 @@ import os
 import numpy as np # Notice that numpy may not be is not installed on your local machine,
 #but it will be installed in the docker container since it is declared in the requirements.txt file
 
-
+from cmd_ui import main as cmd_ui_main
 
 def do_something():
     """Example code to test docker container."""
@@ -21,7 +21,7 @@ def do_something():
 
 def main():
     """Main function of the program"""
-    do_something()
+    cmd_ui_main()
 
 if __name__ == "__main__":
     main()
