@@ -8,6 +8,7 @@ from util import Dependency
 
 @pytest.fixture
 def fixture_dependency():
+    """Fixture for a dependency"""
     json_component = {"name": "dependency", "version": "1.0"}
     platform = "github.com"
     repo_owner = "user"

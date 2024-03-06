@@ -1,3 +1,7 @@
+"""
+Test cases for util.py
+"""
+
 import json
 from pathlib import Path
 import pytest
@@ -6,6 +10,9 @@ validate_scorecard, Checks
 
 @pytest.fixture
 def fixture_dependency():
+    """
+    Fixture for dependency.
+    """
     json_component = {"name": "dependency", "version": "1.0"}
     platform = "github.com"
     repo_owner = "user"
@@ -73,11 +80,17 @@ def test_dependency_creation(fixture_dependency):
     assert dependency.dependency_score == dependency_score
 
 def test_checks_enum(fixture_dependency: Dependency):
+    """
+    Test case for checks enum.
+    """
     all_checks = Checks.all()
     for check in fixture_dependency.dependency_score["checks"]:
         assert check["name"] in all_checks
 
 def test_dependency_get_check(fixture_dependency):
+    """
+    Test case for dependency get check.
+    """
     assert fixture_dependency.get_check(Checks.BINARY_ARTIFACTS)["score"] == -1
     assert fixture_dependency.get_check(Checks.BINARY_ARTIFACTS)["name"] == Checks.BINARY_ARTIFACTS
 
