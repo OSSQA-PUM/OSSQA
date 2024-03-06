@@ -15,7 +15,7 @@ from typing import Any
 import requests
 import tqdm
 
-from util import Dependency
+from util import Dependency, validate_scorecard
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
     """
@@ -189,9 +189,18 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
     + (f"?commit={commit_sha1}" if commit_sha1 else ""), timeout=10)
 
     # Check if the response is successful
-    if response.status_code == 200:
-        return response.json()
-    return None
+    if response.status_code != 200:
+        return None
+    try:
+        json_response = response.json()
+        scorecard = json_response["scorecard"]
+    except (json.JSONDecodeError, KeyError):
+        return None
+
+    if not validate_scorecard(scorecard):
+        return None
+    
+    return json.load(json_response)
 
 
 def lookup_database(needed_dependencies : list[Dependency]) \
