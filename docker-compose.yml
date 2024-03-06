@@ -22,10 +22,3 @@ services:
       dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
-  ossqa-database:
-    image: ossqa-database
-    build:
-      context: .
-      dockerfile: ./src/database/prototype/Dockerfile
-    env_file: .env
-
