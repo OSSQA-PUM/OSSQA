@@ -12,7 +12,6 @@ import json
 from re import match
 from MAS import analyze_sbom
 
-
 def check_input_arguments(source_risk_assessment,\
                     maintence, build_risk_assessment,\
                     continuous_testing, code_vunerabilities) -> None:
@@ -24,7 +23,8 @@ def check_input_arguments(source_risk_assessment,\
     if not (0 <= source_risk_assessment <= 10 and \
                 0 <= maintence <=10 and 0 <= build_risk_assessment <= 10 and \
                 0 <= continuous_testing <= 10 and 0 <= code_vunerabilities <= 10):
-        raise ValueError("input arguments fall out of bounds, check if input variables are within the bounds 0 to 10",\
+        raise ValueError("input arguments fall out of bounds,\
+                                check if input variables are within the bounds 0 to 10",\
                                 [source_risk_assessment, maintence,\
                                 build_risk_assessment, continuous_testing,\
                                 code_vunerabilities])
@@ -35,8 +35,6 @@ def check_input_arguments(source_risk_assessment,\
                                 [source_risk_assessment, maintence,\
                                 build_risk_assessment, continuous_testing,\
                                 code_vunerabilities])
-    return
-
 
 def check_format_of_sbom(sbom_file) -> None:
     """
@@ -47,7 +45,8 @@ def check_format_of_sbom(sbom_file) -> None:
         raise SyntaxError("bomFormat missing or not CycloneDX")
     if not sbom_file["specVersion"] in ["1.2","1.3","1.4","1.5"]:
         raise IndexError("CycloneDX version missing, out of date or incorrect")
-    if not match("^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", sbom_file["serialNumber"]):
+    if not match("^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",\
+                 sbom_file["serialNumber"]):
         raise SyntaxError("SBOM Serial number does not match the RFC-4122 format")
     if not sbom_file["version"] >= 1:
         raise IndexError("Version of SBOM is lower than 1")
@@ -60,12 +59,10 @@ def check_format_of_sbom(sbom_file) -> None:
         name = ""
     if name == "":
         raise ValueError("Name could not be found, non valid SBOM")
-    return
-
 
 def frontend_api(path, source_risk_assessment = 10,\
                     maintence = 10, build_risk_assessment = 10,\
-                    continuous_testing = 10, code_vunerabilities = 10) ->None:
+                    continuous_testing = 10, code_vunerabilities = 10) -> list[float]:
     """
     This function is called by either frontend interfaces,
     it takes the a file-path to a generated SBOM and desired
@@ -77,13 +74,9 @@ def frontend_api(path, source_risk_assessment = 10,\
     check_input_arguments(source_risk_assessment, maintence, 
                               build_risk_assessment, continuous_testing,
                               code_vunerabilities)
-    
     sbom_file = open(path, encoding="utf-8")
     sbom_dict = json.load(sbom_file)
     check_format_of_sbom(sbom_dict)
-    print(path, source_risk_assessment,\
-                    maintence, build_risk_assessment,\
-                    continuous_testing, code_vunerabilities)
     return analyze_sbom(sbom_dict, [source_risk_assessment, maintence, 
                               build_risk_assessment, continuous_testing,
                               code_vunerabilities] )

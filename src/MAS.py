@@ -2,7 +2,7 @@
 import calculate_dependencies
 import final_score_calculator.calculator as calculator
 
-def analyze_sbom(sbom: dict, requirements: list[int]) -> float:
+def analyze_sbom(sbom: dict, requirements: list[int]) -> list[float]:
     """
     This function is called by frontend API and calls for SSFAnalyser and FSC
     Args:
@@ -11,9 +11,9 @@ def analyze_sbom(sbom: dict, requirements: list[int]) -> float:
     Returns:
         dictionary: The final scores
     """
-    score_dict = calculate_dependencies.get_dependencies(sbom)
-    score = calculator.calculate_final_scores(score_dict, requirements)
-    return score
+    scored, needed, failed = calculate_dependencies.get_dependencies(sbom)
+    scores = calculator.calculate_final_scores(scored, requirements)
+    return scores
 
 
 def get_old_results(sbom: dict):

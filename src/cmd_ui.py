@@ -8,11 +8,17 @@ import frontend_api
 
 
 def get_choice():
+    """
+    Helper to get user input
+    """
     choice = input("Select: ")
     return choice.strip()
 
 
 def display_ui():
+    """
+    Helper to display the main menu
+    """
     print("What would you like to do?")
     print("1. Select SBOM")
     print("2. Search selected SBOM")
@@ -21,18 +27,16 @@ def display_ui():
 
 
 def clear_console():
+    """
+    Helper to clear the console
+    """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def display_tokens():
-    print("Choose a token:")
-    files = search_files()
-    for i, file in enumerate(files, start=1):
-        print(f"{i}. {file}")
-    return files
-
-
 def set_token():
+    """
+    Set GitHub token
+    """
     print("Set a token:")
     os.environ['GITHUB_AUTH_TOKEN'] = input("Input your token: ")
     if not util.check_token_usage():
@@ -40,35 +44,42 @@ def set_token():
         print("Token was invalid")
 
 
-def select_sbom():
+def select_sbom() -> str:
+    """
+    Function for selecting an SBOM that the user has downloaded
+    Returns:
+        str: the path to the selected SBOM
+    """
     clear_console()
     print("Please select the SBOM to be searched \n")
-    sboms = [f for f in glob.glob(str(Path(__file__).parent.absolute() / "tests" / "sboms" / "example-SBOM.json"))]
+    #Finds the SBOMS that the user has
+    sboms = list(list(glob.glob(str(Path(__file__).parent.absolute()\
+                                / 'tests' / 'sboms' / 'example-SBOM.json'))))
     for i, sbom in enumerate(sboms):
         print(f"{i}: {sbom}")
     choice = get_choice()
+    #Checks that the choice is valid
     if int(choice) < 0 or int(choice) > len(sboms):
         print("Invalid choice")
         return
-    
     selected_sbom = sboms[int(choice)]
-    
     clear_console()
     print(f"SBOM selected to be searched: {selected_sbom}")
     return selected_sbom
 
 
 def search_sbom(sbom):
+    """
+    Searches the SBOM through the Frontend API
+    """
     dict_weighted_results = frontend_api.frontend_api(sbom)
     print(dict_weighted_results)
-    
-
-def make_choice(choice: int) -> None:
-    if choice == "1": # Search SBOM
-        pass
 
 
 def main():
+    """
+    TODO: add docstring
+    """
     while True:
         display_ui()
         user_choice = get_choice()
@@ -95,6 +106,9 @@ def main():
 
 
 def search_files():
+    """
+    TODO: add doctring
+    """
     files = [f for f in glob.glob("*.txt")]
     print(files)
     return files
