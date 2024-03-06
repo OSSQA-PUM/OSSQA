@@ -2,7 +2,5 @@
 numpy
 tqdm
 pylint
-flask
-flask-sqlalchemy
 requests
 pytest
