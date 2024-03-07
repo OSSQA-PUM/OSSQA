@@ -147,7 +147,7 @@ def parse_sbom(sbom: dict) \
     return dependencies_data, failed_components, failure_reason
 
 
-def get_git_sha1_number(dependency: Dependency) -> str | None:
+def get_git_sha1_number(dependency: Dependency) -> str:
     """
     Retrieves the SHA1 number of a dependency from the GitHub API.
 
@@ -164,8 +164,7 @@ def get_git_sha1_number(dependency: Dependency) -> str | None:
     # Check if the response is successful
     if response.status_code == 200:
         return response.json()[0]["sha"]
-    else:
-        return None
+    return ""
 
 
 def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
@@ -199,7 +198,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
 
     if not validate_scorecard(scorecard):
         return None
-    
+
     return json.load(json_response)
 
 
@@ -365,18 +364,27 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
 
 
 def get_dependencies(sbom: dict) \
-    -> tuple[list[Dependency], list[Dependency], list[Dependency]]:
+    -> tuple[list[Dependency], list[Dependency], dict]:
     """
-    Retrieves the dependencies from the SBOM (Software Bill of Materials)
-    and performs database and SSF (Security Scorecards) lookups.
+    Retrieves dependencies from the provided software bill of materials (SBOM),
+    performs various lookups and analyses on the dependencies, and returns the
+    scores for the successfully retrieved dependencies along with any remaining
+    dependencies and failure reasons.
 
     Args:
-        sbom_file (str): The path to the SBOM JSON file.
+        sbom (dict): The software bill of materials (SBOM) containing 
+            information about the dependencies.
 
     Returns:
-        tuple[list[Dependency], list[Dependency]]: The dependency scores,
-        new needed dependencies, and failures.
+        tuple: A tuple containing three elements:
+            - A list of Dependency objects representing the successfully 
+                retrieved dependencies along with their scores.
+            - A list of Dependency objects representing the remaining 
+                dependencies that could not be scored.
+            - A dictionary containing the failure reasons for the dependencies 
+                that failed to be parsed.
     """
+
     dependencies, failures, failure_reason = parse_sbom(sbom=sbom)
     needed_dependencies = dependencies
     total_dependency_count = len(dependencies)
@@ -409,11 +417,4 @@ def get_dependencies(sbom: dict) \
         + f"{len(needed_dependencies)} dependencies could not be scored."
     )
 
-    return scores, needed_dependencies, failures
-
-
-if __name__ == "__main__":
-    SBOM_PATH = "E:/programming/OSSQA/src/tests/test_bom.json"
-    with open(SBOM_PATH, "r", encoding="utf-8") as file:
-        sbom_data = json.load(file)
-    scores, needed, failures = get_dependencies(sbom=sbom_data)
+    return scores, needed_dependencies + failures, failure_reason
