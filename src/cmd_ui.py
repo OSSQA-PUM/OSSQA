@@ -1,4 +1,6 @@
-
+"""
+This module is the command line interface for the SBOM search tool.
+"""
 import glob
 import os
 from pathlib import Path
@@ -11,6 +13,9 @@ import frontend_api
 def get_choice():
     """
     Helper to get user input
+
+    Returns:
+        str: the user's choice
     """
     choice = input("Select: ")
     return choice.strip()
@@ -19,6 +24,9 @@ def get_choice():
 def display_ui():
     """
     Helper to display the main menu
+
+    Returns:
+        None
     """
     print("What would you like to do?")
     print("1. Select SBOM")
@@ -30,13 +38,19 @@ def display_ui():
 def clear_console():
     """
     Helper to clear the console
+
+    Returns:
+        None
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def set_token():
     """
-    Set GitHub token
+    Helper to set the token
+
+    Returns:
+        None
     """
     print("Set a token:")
     os.environ['GITHUB_AUTH_TOKEN'] = input("Input your token: ")
@@ -47,7 +61,7 @@ def set_token():
 
 def select_sbom() -> str:
     """
-    Function for selecting an SBOM that the user has downloaded
+    Function for selecting the SBOM
     Returns:
         str: the path to the selected SBOM
     """
@@ -58,11 +72,13 @@ def select_sbom() -> str:
                                 / 'tests' / 'sboms' / 'example-SBOM.json'))))
     for i, sbom in enumerate(sboms):
         print(f"{i}: {sbom}")
-    choice = get_choice()
+    choice = "not valid"
+    while not choice.isdigit():
+        choice = get_choice()
     #Checks that the choice is valid
     if int(choice) < 0 or int(choice) > len(sboms):
         print("Invalid choice")
-        return
+        return select_sbom()
     selected_sbom = sboms[int(choice)]
     clear_console()
     print(f"SBOM selected to be searched: {selected_sbom}")
@@ -71,7 +87,12 @@ def select_sbom() -> str:
 
 def search_sbom(sbom):
     """
-    Searches the SBOM through the Frontend API
+    Function for searching the selected SBOM
+    Args:
+        sbom (str): the path to the selected SBOM
+    
+    Returns:
+        None
     """
     dict_weighted_results:list[(str, int, str)] #(checkname, score, dependency)
     dict_weighted_results = frontend_api.frontend_api(sbom)
@@ -81,8 +102,13 @@ def search_sbom(sbom):
 
 def main():
     """
-    TODO: add docstring
+    Main function of the program
+
+    Returns:
+        None
     """
+    sbom = ""
+
     while True:
         display_ui()
         user_choice = get_choice()
@@ -91,9 +117,14 @@ def main():
             sbom = select_sbom()
 
         elif user_choice == "2":
-            if not os.environ.get('GITHUB_AUTH_TOKEN') or not sbom:
-                print("No token or SBOM selected. Please select one and try again")
-                break
+            if not os.environ.get('GITHUB_AUTH_TOKEN'):
+                print("No token selected. Please select one and try again")
+                continue
+
+            if not sbom:
+                print("No SBOM selected. Please select one and try again")
+                continue
+
             search_sbom(sbom)
 
         elif user_choice == "3":
@@ -110,7 +141,12 @@ def main():
 
 def search_files():
     """
-    TODO: add doctring
+    Function for searching the selected SBOM
+    Args:
+        sbom (str): the path to the selected SBOM
+
+    Returns:
+        None
     """
     files = [f for f in glob.glob("*.txt")]
     print(files)
@@ -119,5 +155,3 @@ def search_files():
 
 if __name__ == "__main__":
     main()
-
-#EOF end of file
