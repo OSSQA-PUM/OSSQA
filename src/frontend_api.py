@@ -10,7 +10,7 @@ This file contains the API that communicates information
 import json
 
 from re import match
-from MAS import analyze_sbom
+from mas import analyze_sbom
 
 def check_input_arguments(source_risk_assessment,\
                     maintence, build_risk_assessment,\
