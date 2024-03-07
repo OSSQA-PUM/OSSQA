@@ -1,4 +1,16 @@
+"""
+This module contains utility functions and classes for the project.
 
+Functions:
+    check_token_usage: Check the usage of the GitHub Personal Access Token.
+    contains_all_checks: Check if the scorecard contains the required checks.
+    validate_scorecard: Validate the scorecard.
+
+Classes:
+    Checks: Represents the checks that can be performed on a dependency.
+    UserRequirements: Represents the user requirements for a project.
+    Dependency: Represents a dependency for a project.
+"""
 from dataclasses import dataclass
 from enum import StrEnum
 import os
