@@ -13,7 +13,7 @@ def example_sbom() -> str:
     """
     Fixture for the example SBOM file.
     """
-    return str(Path(__file__).parent.absolute() / "sboms" / "example-SBOM.json")
+    return str(Path(__file__).parent.absolute()/"sboms"/"example-SBOM.json")
 
 
 def test_integer_values() -> None:
