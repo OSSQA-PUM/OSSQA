@@ -1,12 +1,10 @@
 """
 Created: 27/2-2024
-Last Edit: 05/03-2024
+Last Edit: 07/03-2024
 This file contains the API that communicates information
  from the commandline interface or webinterface to the main 
  application structure
 """
-
-#import main_application_structure
 import json
 
 from re import match
@@ -15,16 +13,39 @@ from util import UserRequirements
 
 def check_input_arguments(requirements: UserRequirements) -> None:
     """
-    Checks wheter the arguments that weight the-
-    dependencies fall within the bounds 0 to 10,
-    raises ValueError if not.
+    Check if the input arguments meet the specified requirements.
+
+    Args:
+        requirements (UserRequirements): The user requirements object.
+
+    Returns:
+        None
     """
-    requirements.validate()
+    try:
+        requirements.validate()
+    except ValueError as e:
+        raise ValueError("Input arguments are invalid") from e
+    except TypeError as e:
+        raise TypeError("Input arguments are not integers") from e
 
 def check_format_of_sbom(sbom_file) -> None:
     """
-    Checks that the inputed SBOM meets the standard
-    requirement of CycloneDX
+    Checks the format of the SBOM file.
+
+    Args:
+        sbom_file (dict): The SBOM file to be checked.
+
+    Raises:
+        SyntaxError: If the 'bomFormat' is missing or not 'CycloneDX'.
+
+        IndexError: If the 'specVersion' is missing, out of date, or incorrect.
+
+        SyntaxError: If the 'serialNumber' does not match the RFC-4122 format.
+
+        IndexError: If the 'version' of SBOM is lower than 1
+        or not a proper integer.
+
+        ValueError: If the name could not be found, indicating a non-valid SBOM.
     """
     if not sbom_file["bomFormat"] == "CycloneDX":
         raise SyntaxError("bomFormat missing or not CycloneDX")
@@ -54,22 +75,31 @@ def check_format_of_sbom(sbom_file) -> None:
     if name == "":
         raise ValueError("Name could not be found, non valid SBOM")
 
-def frontend_api(path, user_requirements: UserRequirements = None) -> list[float]:
+def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
     """
-    This function is called by either frontend interfaces,
-    it takes the a file-path to a generated SBOM and desired
-    priority of security categories
-    and returns a list of weighted scores,
-    security categories are defaulted to 10 if no value is
-    given since that would equal a weight of 100%
-    """
-    if not user_requirements:
-        user_requirements = UserRequirements()
+    Analyzes the software bill of materials (SBOM) stored in a JSON file and 
+    returns a list of floats.
 
-    check_input_arguments(user_requirements)
+    Args:
+        path (str): The file path to the SBOM JSON file.
+
+        requirements (UserRequirements, optional): 
+        User-defined requirements for the analysis. Defaults to None.
+
+    Returns:
+        list[float]: A list of floats representing the analysis results.
+
+    Raises:
+        InputArgumentsError: If the input arguments are invalid.
+        SBOMFormatError: If the SBOM format is invalid.
+    """
+    if not requirements:
+        requirements = UserRequirements()
+
+    check_input_arguments(requirements)
 
     with open(path, encoding="utf-8") as sbom_file:
         sbom_dict = json.load(sbom_file)
         check_format_of_sbom(sbom_dict)
-        return analyze_sbom(sbom_dict, requirements=user_requirements)
+        return analyze_sbom(sbom_dict, requirements=requirements)
 # End-of-file (EOF)
