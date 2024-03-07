@@ -39,6 +39,48 @@ class Checks(StrEnum):
 
 
 @dataclass
+class UserRequirements:
+    """
+    Represents the user requirements for a project.
+
+    Attributes:
+        source_risk_assessment (int): The risk assessment of the source.
+        maintence (int): The maintenance of the project.
+        build_risk_assessment (int): The risk assessment of the build.
+        continuous_testing (int): The continuous testing of the project.
+        code_vunerabilities (int): The code vulnerabilities of the project.
+    """
+    source_risk_assessment: int = 10
+    maintence: int = 10
+    build_risk_assessment: int = 10
+    continuous_testing: int = 10
+    code_vunerabilities: int = 10
+
+    def validate(self):
+        """
+        Validate the user requirements.
+
+        Raises:
+            ValueError: If the user requirements are invalid.
+        """
+        if not (isinstance(self.source_risk_assessment, int) and
+                isinstance(self.maintence, int) and
+                isinstance(self.build_risk_assessment, int) and
+                isinstance(self.continuous_testing, int) and
+                isinstance(self.code_vunerabilities, int)):
+            raise ValueError("input arguments are not integers")
+
+        if not (0 <= self.source_risk_assessment <= 10 and
+                0 <= self.maintence <=10 and
+                0 <= self.build_risk_assessment <= 10 and
+                0 <= self.continuous_testing <= 10 and
+                0 <= self.code_vunerabilities <= 10):
+            raise ValueError(
+                "input arguments fall out of bounds,\
+                check if input variables are within the bounds 0 to 10")
+
+
+@dataclass
 class Dependency:
     """
     Represents a dependency for a project.

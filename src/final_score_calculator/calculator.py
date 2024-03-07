@@ -3,7 +3,7 @@ This file contains a calculator for calculating final scores based on
 the scores of dependencies.
 """
 
-from util import Dependency, Checks
+from util import Dependency, Checks, UserRequirements
 
 # Temporary data types until we create more modules and proper data types
 FinalScore = list[str, int, str]  # (name, score, repository)
@@ -12,7 +12,7 @@ Score = list[str, int]  # (name, score)
 
 def calculate_final_scores(
         dependencies: list[Dependency],
-        requirements: list[float] = None
+        requirements: UserRequirements = None
         ) -> list[FinalScore]:
     """
     Calculates final scores based on the scores of dependencies.
@@ -30,7 +30,7 @@ def calculate_final_scores(
         A list of FinalScore objects containing the calculated final scores.
     """
     if not requirements:
-        requirements = [10] * 5
+        requirements = UserRequirements()
 
     scores = list[FinalScore]()
 
