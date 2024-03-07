@@ -99,7 +99,7 @@ def test_check_token_usage():
     """
     Test case for checking token usage.
     """
-    check_token_usage()
+    assert check_token_usage() is not None
 
 
 def test_contains_all_checks(fixture_dependency):
