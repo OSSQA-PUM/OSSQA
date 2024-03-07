@@ -2,6 +2,7 @@
 import glob
 import os
 from pathlib import Path
+from tabulate import tabulate
 
 import util
 import frontend_api
@@ -72,8 +73,10 @@ def search_sbom(sbom):
     """
     Searches the SBOM through the Frontend API
     """
+    dict_weighted_results:list[(str, int, str)] #(checkname, score, dependency)
     dict_weighted_results = frontend_api.frontend_api(sbom)
-    print(dict_weighted_results)
+    print(tabulate(dict_weighted_results,
+                   headers=["Checkname", "Score", "Dependency"]))
 
 
 def main():
