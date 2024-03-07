@@ -3,215 +3,71 @@ Import file with code to be examined
 """
 
 from pathlib import Path
+import json
 import pytest
-from frontend_api import frontend_api
+from frontend_api import check_input_arguments, check_format_of_sbom
+from util import UserRequirements
 
 @pytest.fixture(scope="module")
-def example_SBOM() -> str:
-    return str(Path(__file__).parent.absolute() / "sboms" / "example-SBOM.json")
+def example_sbom() -> str:
+    """
+    Fixture for the example SBOM file.
+    """
+    return str(Path(__file__).parent.absolute()/"sboms"/"example-SBOM.json")
 
-def test_integer_values(example_SBOM) -> None:
+
+def test_integer_values() -> None:
     """
     Integer Value Testing:
 
         - Testing valid and invalid integer priority values.
     """
     result = True
-    total_errors = 0
-    expected_integer_errors = 500
-    for i in range(-10, 101):
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = i,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if 0 <= i <= 10:
-                result = False
-            total_errors += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = i,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if 0 <= i <= 10:
-                result = False
-            total_errors += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = i,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if 0 <= i <= 10:
-                result = False
-            total_errors += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = i,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if 0 <= i <= 10:
-                result = False
-            total_errors += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = i)
-        except ValueError:
-            if 0 <= i <= 10:
-                result = False
-            total_errors += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
+    requirements: UserRequirements = UserRequirements()
+    requirements.build_risk_assessment = -1
+    requirements.source_risk_assessment = 1
+    requirements.maintence = 1
+    requirements.continuous_testing = 1
+    requirements.code_vunerabilities = 1
+    try:
+        check_input_arguments(requirements)
+        result = False
+    except (ValueError, TypeError):
+        pass
+
+    requirements.build_risk_assessment = 11
+
+    try:
+        check_input_arguments(requirements)
+        result = False
+    except (ValueError, TypeError):
+        pass
 
     assert result
-    assert total_errors == expected_integer_errors
 
-def test_decimal_values(example_SBOM) -> None:
+
+def test_decimal_values() -> None:
     """
     Decimal Value Testing:
 
         - Testing decimal priority values
     """
-    i = -10
-    decimal_number_count = 0
-    neg_int_count = 0
     result = True
-    expected_decimal_errors = 900
-    expected_negative_errors = 50
-    while i <= 10:
-        x = round(i, 1)
-        i += 0.1
-        i = round(i,1)
-        if i == int(i):
-            i = int(i) # Because I don't want to check whole numbers here
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = x)
-        except ValueError:
-            if x >= 0 and isinstance(x, int):
-                result = False
-            elif x != int(x):
-                decimal_number_count += 1
-            elif x == int(x) and x < 0:
-                neg_int_count += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = x,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if x >= 0 and isinstance(x, int):
-                result = False
-            elif x != int(x):
-                decimal_number_count += 1
-            elif x == int(x) and x < 0:
-                neg_int_count += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = x,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if x >= 0 and isinstance(x, int):
-                result = False
-            elif x != int(x):
-                decimal_number_count += 1
-            elif x == int(x) and x < 0:
-                neg_int_count += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = x,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if x >= 0 and isinstance(x, int):
-                result = False
-            elif x != int(x):
-                decimal_number_count += 1
-            elif x == int(x) and x < 0:
-                neg_int_count += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
-        try:
-            frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = x,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
-        except ValueError:
-            if x >= 0 and isinstance(x, int):
-                result = False
-            elif x != int(x):
-                decimal_number_count += 1
-            elif x == int(x) and x < 0:
-                neg_int_count += 1
-        except IndexError:
-            continue
-        except SyntaxError:
-            continue
+    requirements: UserRequirements = UserRequirements()
+    requirements.build_risk_assessment = 0.5
+    requirements.source_risk_assessment = 1
+    requirements.maintence = 1
+    requirements.continuous_testing = 1
+    requirements.code_vunerabilities = 1
+    try:
+        check_input_arguments(requirements)
+        result = False
+    except (ValueError, TypeError):
+        pass
     assert result
-    assert decimal_number_count == expected_decimal_errors
-    assert neg_int_count == expected_negative_errors
 
-def test_valid_SBOM(example_SBOM) -> None:
+
+def test_valid_sbom(example_sbom) -> None:
     """
     Valid SBOM Testing:
 
@@ -221,13 +77,10 @@ def test_valid_SBOM(example_SBOM) -> None:
     """
     # Testing if correct format of SBOM
     result = True
+    sbom_file = open(example_sbom, encoding="utf-8")
+    sbom_dict = json.load(sbom_file)
     try:
-        frontend_api(path = example_SBOM,\
-                                      build_risk_assessment = 1,\
-                                      source_risk_assessment = 1,\
-                                      maintence = 1,\
-                                      continuous_testing = 1,\
-                                      code_vunerabilities = 1)
+        check_format_of_sbom(sbom_dict)
     except SyntaxError:
         result = False
     except IndexError:

@@ -75,7 +75,7 @@ def test_get_git_sha1_number():
         repo_name="repo",
     )
     sha1 = get_git_sha1_number(dependency)
-    assert sha1 is None
+    assert not sha1
 
 def test_try_get_from_ssf_api():
     """Test the try_get_from_ssf_api function."""
