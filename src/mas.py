@@ -23,7 +23,8 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[float]:
     
     Args:
         sbom (dict): The SBOM to be analyzed.
-        requirements (list[float]): The requirements for the SBOM.
+        requirements (UserRequirements): The user-defined requirements 
+                                        for the analysis.
         
     Returns:
         list[float]: The final scores.

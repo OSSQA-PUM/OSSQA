@@ -22,8 +22,8 @@ def calculate_final_scores(
         dependencies (list[Dependency]): 
         A list of Dependency objects representing the dependencies.
 
-        requirements (list[float], optional):
-        A list of user requirements for the final scores.
+        requirements (UserRequirements, optional):
+        User-defined requirements for the analysis. Defaults to None.
 
     Returns:
         list[FinalScore]: 
