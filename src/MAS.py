@@ -13,7 +13,7 @@ the old results for a given SBOM.
 
 import calculate_dependencies
 from final_score_calculator import calculator
-from backend_communication import get_existing_results
+from backend_communication import get_sbom
 
 def analyze_sbom(sbom: dict, requirements: list[int]) -> list[float]:
     """
@@ -44,5 +44,5 @@ def get_old_results(sbom: dict):
         dict: The old results.
     """
     name = sbom['metadata']['name'] + sbom['metadata']['version']
-    old_results = backend_communication.get_existing_results(name)
+    old_results = get_sbom(name)
     return old_results
