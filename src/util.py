@@ -68,7 +68,7 @@ class UserRequirements:
                 isinstance(self.build_risk_assessment, int) and
                 isinstance(self.continuous_testing, int) and
                 isinstance(self.code_vunerabilities, int)):
-            raise ValueError("input arguments are not integers")
+            raise TypeError("input arguments are not integers")
 
         if not (0 <= self.source_risk_assessment <= 10 and
                 0 <= self.maintence <=10 and
@@ -129,7 +129,7 @@ def check_token_usage():
               including the limit, used, and remaining counts.
               Returns None if the authentication fails.
     """
-    
+
     # Replace 'your_token_here' with your actual GitHub Personal Access Token
     token = os.environ.get('GITHUB_AUTH_TOKEN')
 
@@ -143,12 +143,15 @@ def check_token_usage():
     # Check if the request was successful
     if response.status_code == 200:
         user_data = response.headers
-    
-        return {"limit": user_data['X-RateLimit-Limit'], "used": user_data['x-ratelimit-used'], "remaining": user_data['X-RateLimit-Remaining']}
 
-    else:
-        print(f"Failed to authenticate. Status code: {response.status_code}")
-        return None
+        return {
+            "limit": user_data['X-RateLimit-Limit'],
+            "used": user_data['x-ratelimit-used'],
+            "remaining": user_data['X-RateLimit-Remaining']
+            }
+
+    print(f"Failed to authenticate. Status code: {response.status_code}")
+    return None
 
 
 def contains_all_checks(scorecard_checks: list[dict]) -> bool:
