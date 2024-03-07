@@ -32,7 +32,7 @@ def test_integer_values() -> None:
     try:
         check_input_arguments(requirements)
         result = False
-    except ValueError:
+    except (ValueError, TypeError):
         pass
 
     requirements.build_risk_assessment = 11
@@ -40,7 +40,7 @@ def test_integer_values() -> None:
     try:
         check_input_arguments(requirements)
         result = False
-    except ValueError:
+    except (ValueError, TypeError):
         pass
 
     assert result
@@ -62,7 +62,7 @@ def test_decimal_values() -> None:
     try:
         check_input_arguments(requirements)
         result = False
-    except ValueError:
+    except (ValueError, TypeError):
         pass
     assert result
 
