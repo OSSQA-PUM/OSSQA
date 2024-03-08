@@ -34,9 +34,6 @@ def parse_git_url(url: str) -> tuple[str, str, str]:
         ValueError: If the platform is not supported.
     """
     url_split = urlparse(url)
-    # https://github.com/codegangsta/inject
-    # url_split = ['github.com', 'codegangsta', 'inject']
-    # ParseResult(scheme='https', netloc='github.com', path='/codegangsta/inject', params='', query='', fragment='')
     platform = url_split.netloc
 
     if platform != "github.com":

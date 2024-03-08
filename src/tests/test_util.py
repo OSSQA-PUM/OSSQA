@@ -5,7 +5,7 @@ Test cases for util.py
 import json
 from pathlib import Path
 import pytest
-from util import Dependency, check_token_usage, contains_all_checks, \
+from util import Dependency, contains_all_checks, \
 validate_scorecard, Checks
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def fixture_dependency():
                             dependency_score)
     return dependency
 
-def test_dependency_creation(fixture_dependency):
+def test_dependency_creation():
     """
     Test case for dependency creation.
     """
