@@ -100,10 +100,7 @@ class Dependency:
     Attributes:
         json_component (dict): The JSON representation of the dependency.
         platform (str): The platform on which the dependency is used.
-        repo_owner (str): The owner of the repository 
-                          where the dependency is hosted.
-        repo_name (str): The name of the repository 
-                         where the dependency is hosted.
+        repo_path (str): The path to the repo
         url (str): The URL of the dependency.
         failure_reason (Exception): The reason for any failure 
                                     related to the dependency.
@@ -111,8 +108,7 @@ class Dependency:
     """
     json_component: dict = None
     platform: str = None
-    repo_owner: str = None
-    repo_name: str = None
+    repo_path: str = None
     url: str = None
     failure_reason: Exception = None
     dependency_score: dict = None
