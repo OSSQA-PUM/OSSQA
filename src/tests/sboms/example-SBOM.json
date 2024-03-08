@@ -33,12 +33,12 @@
     "component": {
       "bom-ref": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
       "type": "application",
-      "name": "github.com/ProtonMail/proton-bridge",
+      "name": "github.com/ossf/scorecard",
       "version": "v1.8.0",
       "purl": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
       "externalReferences": [
         {
-          "url": "https://github.com/ProtonMail/proton-bridge",
+          "url": "https://github.com/ossf/scorecard",
           "type": "vcs"
         }
       ]

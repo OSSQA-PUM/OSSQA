@@ -192,14 +192,13 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
         return None
     try:
         json_response = response.json()
-        scorecard = json_response["scorecard"]
     except (json.JSONDecodeError, KeyError):
         return None
 
-    if not validate_scorecard(scorecard):
+    if not validate_scorecard(json_response):
         return None
 
-    return json.load(json_response)
+    return json_response
 
 
 def lookup_database(needed_dependencies : list[Dependency]) \

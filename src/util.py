@@ -184,10 +184,9 @@ def contains_all_checks(scorecard_checks: list[dict]) -> bool:
 
         if "score" not in check:
             return False
-        if not check["score"]:
-            return False
         if check_name in not_found:
             not_found.remove(check_name)
+
     return not not_found
 
 
@@ -205,7 +204,6 @@ def validate_scorecard(scorecard: dict) -> bool:
         scorecard_checks:list[dict] = scorecard["checks"]
     except KeyError:
         return False
-
     return contains_all_checks(scorecard_checks)
 
 
