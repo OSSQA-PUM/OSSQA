@@ -4,6 +4,8 @@ and managing SBOMs (Software Bill of Materials).
 """
 
 import requests
+from urllib.parse import urlparse
+
 
 from util import Dependency
 
@@ -93,16 +95,16 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         ).json()
     result = []
     for depencency in all_depencencies:
-        url_split = depencency['name'].replace("https://", "").split("/")
+        url_split = urlparse(depencency['name'])
+
         dep_obj = Dependency(
-            dependency_score={
+            dependency_score = {
                 'score': depencency['score'],
                 'checks': depencency['checks']
                 },
-            platform=url_split[0],
-            repo_owner=url_split[1],
-            repo_name=url_split[2],
-            url=depencency['name']
+            platform = url_split.netloc,
+            repo_path = url_split.path,
+            url = depencency['name']
         )
         result.append(dep_obj)
     return result

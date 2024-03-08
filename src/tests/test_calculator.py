@@ -11,8 +11,7 @@ def fixture_dependency():
     """Fixture for a dependency"""
     json_component = {"name": "dependency", "version": "1.0"}
     platform = "github.com"
-    repo_owner = "user"
-    repo_name = "repo"
+    repo_path = "/user/repo"
     url = "https://github.com/user/repo"
     failure_reason = None
     dependency_score = {
@@ -40,8 +39,7 @@ def fixture_dependency():
 
     dependency = Dependency(json_component,
                             platform,
-                            repo_owner,
-                            repo_name,
+                            repo_path,
                             url,
                             failure_reason,
                             dependency_score)

@@ -11,6 +11,7 @@ import json
 import subprocess
 from multiprocessing import Pool
 from typing import Any
+from urllib.parse import urlparse
 
 import requests
 import tqdm
@@ -32,16 +33,18 @@ def parse_git_url(url: str) -> tuple[str, str, str]:
     Raises:
         ValueError: If the platform is not supported.
     """
-    url_split = url.replace("https://", "").split("/")
-    platform = url_split[0]
+    url_split = urlparse(url)
+    # https://github.com/codegangsta/inject
+    # url_split = ['github.com', 'codegangsta', 'inject']
+    # ParseResult(scheme='https', netloc='github.com', path='/codegangsta/inject', params='', query='', fragment='')
+    platform = url_split.netloc
 
     if platform != "github.com":
         raise ValueError("Platform not supported")
 
-    repo_owner = url_split[1]
-    repo_name = url_split[2]
+    repo_path = url_split.path
 
-    return platform, repo_owner, repo_name
+    return platform, repo_path
 
 
 def get_component_url(component: dict) -> str:
@@ -101,8 +104,7 @@ def parse_component(component: dict) -> Dependency:
     try:
         dependency.url = get_component_url(component=component)
         dependency.platform, \
-        dependency.repo_owner, \
-        dependency.repo_name = parse_git_url(dependency.url)
+        dependency.repo_path = parse_git_url(dependency.url)
     except (ConnectionError, KeyError, NameError, ValueError) as e:
         dependency.failure_reason = e
     return dependency
@@ -159,8 +161,8 @@ def get_git_sha1_number(dependency: Dependency) -> str:
     """
     # Call the GitHub API
     response = requests.get(f"""https://api.github.com/repos/
-                            {dependency.repo_owner}/{dependency.repo_name}
-                            /commits""", timeout=10)
+                            {dependency.repo_path}/commits""", 
+                            timeout=10)
     # Check if the response is successful
     if response.status_code == 200:
         return response.json()[0]["sha"]
@@ -184,7 +186,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
     # Call the SSF API
     response = requests.get(
     "https://api.securityscorecards.dev/projects/"
-    + f"{dependency.platform}/{dependency.repo_owner}/{dependency.repo_name}"
+    + f"{dependency.platform}/{dependency.repo_path}"
     + (f"?commit={commit_sha1}" if commit_sha1 else ""), timeout=10)
 
     # Check if the response is successful
