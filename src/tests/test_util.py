@@ -99,8 +99,40 @@ def test_check_token_usage():
     """
     Test case for checking token usage.
     """
-    check_token_usage()
+    assert check_token_usage() is not None
 
+
+def test_contains_all_checks(fixture_dependency):
+    """
+    Test case for checking if all checks are present.
+    """
+    dependency_score = fixture_dependency.dependency_score
+    assert contains_all_checks(dependency_score["checks"])
+    del dependency_score["checks"][0]
+    assert not contains_all_checks(dependency_score["checks"])
+
+
+def test_validate_scorecard(fixture_dependency):
+    """
+    Test case for validating the scorecard.
+    """
+    dependency_score = fixture_dependency.dependency_score
+    assert validate_scorecard(dependency_score)
+    del dependency_score["checks"][0]
+    assert not validate_scorecard(dependency_score)
+    dependency_score["checks"].append({"name": "radom-score", "score": -1})
+    assert not validate_scorecard(dependency_score)
+
+    dependency_score = fixture_dependency.dependency_score
+    del dependency_score["checks"][0]["score"]
+    assert not validate_scorecard(dependency_score)
+
+    ssf_scorecard_path = str(Path(__file__).parent.parent.absolute() \
+                             / "final_score_calculator" \
+                             / "example_response.json")
+    with open(ssf_scorecard_path, "r", encoding="utf-8") as file:
+        dependency_score = json.load(file)
+    assert validate_scorecard(dependency_score)
 
 def test_contains_all_checks(fixture_dependency):
     """
