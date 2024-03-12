@@ -16,6 +16,7 @@ from final_score_calculator import calculator
 from backend_communication import get_sbom
 from util import UserRequirements
 
+
 def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[float]:
     """
     This function is called by the frontend API and calls 
