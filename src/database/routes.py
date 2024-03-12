@@ -33,7 +33,7 @@ def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:
 
 
 def create_or_update_check(data: dict, dep_name_verison: str) \
-    -> tuple[DependencyCheck, bool]:
+        -> tuple[DependencyCheck, bool]:
     """
     Create or update a check in the database
 
@@ -78,6 +78,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         app (Flask): The flask app.
         db (SQLAlchemy): The database.
     """
+
     @app.errorhandler(404)
     def page_not_found(error):
         print("Error:", error)
@@ -92,6 +93,14 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
     def handle_exception(error):
         print("Error:", error)
         return "Internal server error", 500
+
+    @app.route("/test_route", methods=["GET"])
+    def test_route():
+        return "Hello, World!", 200
+
+    @app.route("/", methods=["GET"])
+    def empty():
+        return "Hello, empty!", 200
 
     @app.route("/add_SBOM", methods=["POST"])
     def add_sbom():

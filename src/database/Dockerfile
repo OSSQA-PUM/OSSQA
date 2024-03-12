@@ -9,7 +9,7 @@ RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
 # Copy the application source and requirements
-COPY ./src/database/prototype /app
+COPY ./src/database /app
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
@@ -22,5 +22,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
-
-CMD [ "python", "prototype.py" ]
+CMD [ "python", "database_main.py"]

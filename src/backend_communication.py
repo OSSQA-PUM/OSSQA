@@ -7,6 +7,8 @@ import requests
 
 from util import Dependency
 
+host = "http://localhost:5080"
+
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
     """
@@ -35,7 +37,7 @@ def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
         "checks": dep.dependency_score["checks"],
     } for dep in dependencies]
 
-    r = requests.post("localhost:5080/add_SBOM", json=data, timeout=5)
+    r = requests.post(host + "/add_SBOM", json=data, timeout=5)
     return r.status_code
 
 
@@ -47,7 +49,7 @@ def get_history():
     Returns:
         list: The previous SBOMs.
     """
-    response = requests.get("localhost:5080/get_history",  timeout=5)
+    response = requests.get(host + "/get_history", timeout=5)
     return response.json()
 
 
@@ -63,11 +65,15 @@ def get_sbom(sbom_id: int):
         dict: A dictionary-representation of the SBOM.
     """
     response = requests.get(
-        "localhost:5080/get_SBOM",
+        host + "/get_SBOM",
         data={"id": sbom_id},
         timeout=5)
     return response.json()
 
+def test_database():
+    result = requests.get(host + "/test_route", timeout=5)
+    print(result.text)
+    return result.text
 
 def get_existing_dependencies(needed_dependencies: list[Dependency]):
     """
@@ -84,13 +90,13 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         json_obj = depencency.json_component
         dependency_primary_keys.append(
             {'name': json_obj['name'], 'version': json_obj['version']}
-            )
+        )
 
     all_depencencies = requests.get(
-        "localhost:5080/get_existing_dependencies",
+        host + "/get_existing_dependencies",
         data=dependency_primary_keys,
         timeout=5
-        ).json()
+    ).json()
     result = []
     for depencency in all_depencencies:
         url_split = depencency['name'].replace("https://", "").split("/")
@@ -98,7 +104,7 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
             dependency_score={
                 'score': depencency['score'],
                 'checks': depencency['checks']
-                },
+            },
             platform=url_split[0],
             repo_owner=url_split[1],
             repo_name=url_split[2],
