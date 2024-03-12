@@ -158,7 +158,7 @@ def get_git_sha1_number(dependency: Dependency) -> str:
     """
     # Call the GitHub API
     response = requests.get(f"""https://api.github.com/repos/
-                            {dependency.repo_path}/commits""", 
+                            {dependency.repo_path}/commits""",
                             timeout=10)
     # Check if the response is successful
     if response.status_code == 200:

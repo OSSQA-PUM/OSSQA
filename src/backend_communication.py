@@ -3,11 +3,13 @@ This module provides functions for communicating with the backend
 and managing SBOMs (Software Bill of Materials).
 """
 
-import requests
-from urllib.parse import urlparse
-
-
 from util import Dependency
+from urllib.parse import urlparse
+import requests
+
+
+
+
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
