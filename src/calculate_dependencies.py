@@ -16,7 +16,7 @@ import requests
 import tqdm
 
 from util import Dependency, validate_scorecard
-from backend_communication import get_existing_dependencies, test_database
+from backend_communication import *
 
 
 def parse_git_url(url: str) -> tuple[str, str, str]:
@@ -216,14 +216,7 @@ def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Depende
     """
     dependencies_with_scores = []
 
-    # TODO try to get needed_dependencies scores from our database
-    # Assume database response is in the same order as needed_dependencies
-    # fake database response for now
-    # (the database did not have any of the needed dependencies)
-    #database_response = [None] * len(needed_dependencies)
-    print(test_database())
     database_response = get_existing_dependencies(needed_dependencies)
-
     # Calculate the dependencies that are not in the database
     print("Looking up dependencies in database")
     success = 0
@@ -402,6 +395,7 @@ def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], di
     scores += analyzed_scores
 
     # TODO send data that was downloaded internally
+    add_sbom(sbom, analyzed_scores)
     # to database (analyzed_scores)
 
     print(

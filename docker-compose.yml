@@ -11,8 +11,6 @@ services:
       - "5080:5080"
     expose:
       - "5080"
-#    links:
-#      - ossqa
 
   ossqa:
     image: ossqa
@@ -23,8 +21,8 @@ services:
       - ossqa-database
     network_mode: host
     env_file: .env
-    ports:
-      - "9999:80"
+    expose:
+      - "5080"
     command: ["python", "__main__.py", "&"]
 
   ossqa-prototype:

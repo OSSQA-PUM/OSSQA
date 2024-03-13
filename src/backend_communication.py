@@ -27,8 +27,9 @@ def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
     except KeyError:
         data["serialNumber"] = sbom_json["$schema"]
     data['version'] = sbom_json["version"]
-    data["name"] = sbom_json["metadata"]["name"]
-    data["repo_version"] = sbom_json["metadata"]["version"]
+    tools = sbom_json["metadata"]["tools"]
+    data["name"] = tools[0]["name"]
+    data["repo_version"] = tools[0]["version"]
 
     data["components"] = [{
         "name": dep.json_component["name"],
@@ -86,29 +87,32 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         list: A list of the existing dependencies.
     """
     dependency_primary_keys = []
-    for depencency in needed_dependencies:
-        json_obj = depencency.json_component
+    for dependency in needed_dependencies:
+        json_obj = dependency.json_component
         dependency_primary_keys.append(
             {'name': json_obj['name'], 'version': json_obj['version']}
         )
-
-    all_depencencies = requests.get(
+    all_dependencies = requests.get(
         host + "/get_existing_dependencies",
         data=dependency_primary_keys,
         timeout=5
-    ).json()
+    )
+    if all_dependencies.status_code == 500:
+        return []
+
+    all_dependencies_json = all_dependencies.json()
     result = []
-    for depencency in all_depencencies:
-        url_split = depencency['name'].replace("https://", "").split("/")
+    for dependency in all_dependencies_json:
+        url_split = dependency['name'].replace("https://", "").split("/")
         dep_obj = Dependency(
             dependency_score={
-                'score': depencency['score'],
-                'checks': depencency['checks']
+                'score': dependency['score'],
+                'checks': dependency['checks']
             },
             platform=url_split[0],
             repo_owner=url_split[1],
             repo_name=url_split[2],
-            url=depencency['name']
+            url=dependency['name']
         )
         result.append(dep_obj)
     return result
