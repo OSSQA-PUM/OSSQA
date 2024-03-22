@@ -9,6 +9,14 @@ from decorator import decorator
 def __log_success(module_name: str,
                   function_name: str,
                   test_case_ids: list[int]):
+    """
+    Logs a test as a success.
+
+    Args:
+        module_name (str): The name of the module containing the test function.
+        function_name (str): The name of the test function.
+        test_case_ids (list[int]): The associated test case IDs.
+    """
     if test_case_ids:
         test_case_str = ",".join(f"TF{i}" for i in test_case_ids)
     else:
@@ -26,6 +34,15 @@ def __log_failure(module_name: str,
                   function_name: str,
                   test_case_ids: list[int],
                   error: AssertionError):
+    """
+    Logs a test as a failure.
+
+    Args:
+        module_name (str): The name of the module containing the test function.
+        function_name (str): The name of the test function.
+        test_case_ids (list[int]): The associated test case IDs.
+        error (AssertionError): The error that caused the failure.
+    """
     if test_case_ids:
         test_case_str = ",".join(f"TF{i}" for i in test_case_ids)
     else:
@@ -48,7 +65,7 @@ def log_test_results(test_case_ids: list[int]):
     Logs the results of a test.
 
     Args:
-        test_case_id (list[int]): The associated test case IDs.
+        test_case_ids (list[int]): The associated test case IDs.
     """
     def deco(func):
         def wrapper(func, *args, **kwargs):
