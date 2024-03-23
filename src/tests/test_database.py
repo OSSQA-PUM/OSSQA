@@ -12,6 +12,7 @@ from flask.testing import FlaskClient
 
 from database.models import db, SBOM, Dependency, DependencyCheck
 from database.server import create_test_app
+from tests.decorators import log_test_results
 
 # This is based on what is in the test data files,
 # not what is in actual analysis results
@@ -68,6 +69,7 @@ def fixture_sbom_results_list() -> list[dict]:
     return data
 
 
+@log_test_results([4])
 def test_add_sbom(client: FlaskClient, sbom_results_list: list[dict]):
     """
     Tests adding SBOM results to the database via the /add_SBOM endpoint.
@@ -99,6 +101,7 @@ def test_add_sbom(client: FlaskClient, sbom_results_list: list[dict]):
                                             * CHECKS_PER_DEPENDENCY
 
 
+@log_test_results([5])
 def test_get_sbom(client, sbom_results_list):
     """
     Tests getting the SBOM results (that were added to the database) via the
@@ -121,6 +124,7 @@ def test_get_sbom(client, sbom_results_list):
         assert response.status_code == 404
 
 
+@log_test_results([])  # TODO add relevant test case
 def test_get_existing_dependencies(client, sbom_results_list):
     """
     Tests getting the existing dependencies (that were added to the database)

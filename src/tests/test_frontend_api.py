@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import pytest
 from frontend_api import check_input_arguments, check_format_of_sbom
+from tests.decorators import log_test_results
 from util import UserRequirements
 
 @pytest.fixture(scope="module")
@@ -16,6 +17,8 @@ def example_sbom() -> str:
     return str(Path(__file__).parent.absolute()/"sboms"/"example-SBOM.json")
 
 
+@log_test_results([6])  # TODO move to cmd_ui tests when it has been
+                        #      implemented as a CLI?
 def test_integer_values() -> None:
     """
     Integer Value Testing:
@@ -46,6 +49,8 @@ def test_integer_values() -> None:
     assert result
 
 
+@log_test_results([6])  # TODO move to cmd_ui tests when it has been
+                        #      implemented as a CLI?
 def test_decimal_values() -> None:
     """
     Decimal Value Testing:
@@ -67,6 +72,8 @@ def test_decimal_values() -> None:
     assert result
 
 
+@log_test_results([6])  # TODO move to cmd_ui tests when it has been
+                        #      implemented as a CLI?
 def test_valid_sbom(example_sbom) -> None:
     """
     Valid SBOM Testing:

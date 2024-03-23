@@ -1,10 +1,12 @@
 """
 This file contains test cases for the `calculate_final_scores` function in the `calculator` module.
 """
-import pytest
 import copy
+import pytest
 from final_score_calculator.calculator import calculate_final_scores
+from tests.decorators import log_test_results
 from util import Dependency
+
 
 @pytest.fixture
 def fixture_dependency():
@@ -45,12 +47,16 @@ def fixture_dependency():
                             dependency_score)
     return dependency
 
+
+@log_test_results([2])
 def test_calculate_final_scores_empty_dependencies():
     """Test when dependencies list is empty"""
     dependencies = []
     expected_scores = []
     assert calculate_final_scores(dependencies) == expected_scores
 
+
+@log_test_results([2])
 def test_calculate_final_scores_single_dependency(fixture_dependency):
     """Test when there is only one dependency"""
     dependencies = [
@@ -78,6 +84,8 @@ def test_calculate_final_scores_single_dependency(fixture_dependency):
     ]
     assert calculate_final_scores(dependencies) == expected_scores
 
+
+@log_test_results([2])
 def test_calculate_final_scores_multiple_dependencies(fixture_dependency):
     """Test when there are multiple dependencies"""
 
