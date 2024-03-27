@@ -132,7 +132,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             dependency, new_dependency = create_or_update_dependency(component)
             if new_dependency:
                 j += 1
-                print("new dependency")
+                print("adding " + dependency.name_version + " to db")
                 db.session.add(dependency)
             sbom.dependencies.append(dependency)
             db.session.commit()
@@ -185,11 +185,21 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         if not dep_name_versions:
             return jsonify([]), 69
 
+        print("dep_name_versions: " + str(dep_name_versions))
         dependencies = []
-        print("all dependencies in DB: ")
         all_deps = Dependency.query.filter_by().all()
+        all_sboms = SBOM.query.filter_by().all()
+
+        print("All dependencies in DB: ")
         for dep in all_deps:
-            print(dep.name_version)
+            print("Dependency name: " + dep.name_version)
+        print("END OF DEPENDENCIES")
+
+        print("All SBOMs in DB: ")
+        for sbom in all_sboms:
+            print("Dependency name: " + sbom.name)
+        print("END OF SBOM")
+
         for dep_name_version in dep_name_versions:
             print("\n dep_name_version: ", dep_name_version)
             # find dependency in database
@@ -197,9 +207,9 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 name_version=dep_name_version).first()
             # if no match, continue
             if not dependency:
-                print("No dependency found")
+                print(dep_name_version + " not found")
                 continue
-            print("dependency found")
+            print(dependency.name + " found")
             dependencies.append({"name_version": dependency.name_version,
                                  "score": dependency.score,
                                  "checks": [check.to_dict() for check in dependency.checks]})
