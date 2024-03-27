@@ -214,10 +214,12 @@ def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Depende
         The dependencies with scores and the new needed dependencies.
     """
     dependencies_with_scores = []
-
+    print("Looking up dependencies in database...")
     database_response = get_existing_dependencies(needed_dependencies)
+
     # Calculate the dependencies that are not in the database
-    print("Looking up dependencies in database")
+    print("Found: ", str(len(database_response)) + " existing dependencies in database")
+
     success = 0
     new_needed_dependencies = []
     with tqdm.tqdm(total=len(needed_dependencies)) as progress_bar:
@@ -394,7 +396,7 @@ def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], di
     scores += analyzed_scores
 
     # TODO send data that was downloaded internally
-    add_sbom(sbom, analyzed_scores)
+    add_sbom(sbom, scores)
     # to database (analyzed_scores)
 
     print(
