@@ -95,9 +95,9 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         data=dependency_primary_keys,
         timeout=5
     )
-    print("all dependencies:" + str(all_dependencies.request))
-    print("all dependencies json:" + str(all_dependencies.json()))
     result = []
+    if not all_dependencies:
+        return result
     all_dependencies = all_dependencies.json()
     # TODO: research why .json() removes "name_version" from the object
     for dependency in all_dependencies:
