@@ -5,7 +5,7 @@ Test cases for util.py
 import json
 from pathlib import Path
 import pytest
-from util import Dependency, check_token_usage, contains_all_checks, \
+from util import Dependency, contains_all_checks, \
 validate_scorecard, Checks
 
 @pytest.fixture
@@ -15,8 +15,7 @@ def fixture_dependency():
     """
     json_component = {"name": "dependency", "version": "1.0"}
     platform = "github.com"
-    repo_owner = "user"
-    repo_name = "repo"
+    repo_path = "/user/repo"
     url = "https://github.com/user/repo"
     failure_reason = None
     dependency_score = {
@@ -44,37 +43,33 @@ def fixture_dependency():
 
     dependency = Dependency(json_component,
                             platform,
-                            repo_owner,
-                            repo_name,
+                            repo_path,
                             url,
                             failure_reason,
                             dependency_score)
     return dependency
 
-def test_dependency_creation(fixture_dependency):
+def test_dependency_creation():
     """
     Test case for dependency creation.
     """
     json_component = {"name": "dependency", "version": "1.0"}
     platform = "github.com"
-    repo_owner = "user"
-    repo_name = "repo"
+    repo_path = "/user/repo"
     url = "https://github.com/user/repo"
     failure_reason = None
     dependency_score = {"security": 5, "maintainability": 4}
 
     dependency = Dependency(json_component,
                             platform,
-                            repo_owner,
-                            repo_name,
+                            repo_path,
                             url,
                             failure_reason,
                             dependency_score)
 
     assert dependency.json_component == json_component
     assert dependency.platform == platform
-    assert dependency.repo_owner == repo_owner
-    assert dependency.repo_name == repo_name
+    assert dependency.repo_path == repo_path
     assert dependency.url == url
     assert dependency.failure_reason == failure_reason
     assert dependency.dependency_score == dependency_score

@@ -31,10 +31,9 @@ from calculate_dependencies import (
 def test_parse_git_url():
     """Test the parse_git_url function."""
     url = "https://github.com/owner/repo"
-    platform, repo_owner, repo_name = parse_git_url(url)
+    platform, repo_path = parse_git_url(url)
     assert platform == "github.com"
-    assert repo_owner == "owner"
-    assert repo_name == "repo"
+    assert repo_path == "/owner/repo"
 
 def test_get_component_url():
     """Test the get_component_url function."""
@@ -55,8 +54,7 @@ def test_parse_component():
     }
     dependency = parse_component(component)
     assert dependency.platform == "github.com"
-    assert dependency.repo_owner == "OSSQA-PUM"
-    assert dependency.repo_name == "OSSQA"
+    assert dependency.repo_path == "/OSSQA-PUM/OSSQA"
 
 def test_parse_sbom():
     """Test the parse_sbom function."""
@@ -71,8 +69,7 @@ def test_get_git_sha1_number():
     dependency = Dependency(
         json_component={},
         platform="github.com",
-        repo_owner="owner",
-        repo_name="repo",
+        repo_path="/owner/repo"
     )
     sha1 = get_git_sha1_number(dependency)
     assert not sha1
@@ -82,8 +79,7 @@ def test_try_get_from_ssf_api():
     dependency = Dependency(
         json_component={},
         platform="github.com",
-        repo_owner="owner",
-        repo_name="repo",
+        repo_path="/owner/repo"
     )
     scorecard = try_get_from_ssf_api(dependency)
     assert scorecard is None
@@ -94,14 +90,12 @@ def test_lookup_database():
         Dependency(
             json_component={},
             platform="github.com",
-            repo_owner="owner",
-            repo_name="repo1",
+            repo_path="/owner/repo1"
         ),
         Dependency(
             json_component={},
             platform="github.com",
-            repo_owner="owner",
-            repo_name="repo2",
+            repo_path="/owner/repo2"
         ),
     ]
     dependencies_with_scores, new_needed_dependencies = lookup_database(dependencies)
@@ -113,8 +107,7 @@ def test_lookup_ssf():
     dependency = Dependency(
         json_component={},
         platform="github.com",
-        repo_owner="owner",
-        repo_name="repo",
+        repo_path="/owner/repo"
     )
     scorecard = lookup_ssf(dependency)
     assert scorecard is None
@@ -125,14 +118,12 @@ def test_lookup_multiple_ssf():
         Dependency(
             json_component={},
             platform="github.com",
-            repo_owner="owner",
-            repo_name="repo1",
+            repo_path="/owner/repo1"
         ),
         Dependency(
             json_component={},
             platform="github.com",
-            repo_owner="owner",
-            repo_name="repo2",
+            repo_path="/owner/repo2"
         ),
     ]
     dependencies_with_scores, new_needed_dependencies = lookup_multiple_ssf(dependencies)
