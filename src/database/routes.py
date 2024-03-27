@@ -3,6 +3,7 @@ This module handles the endpoints that the backend communication interface
 interfaces with. It also handles functionality for creating and updating
 various objects in the database.
 """
+import json
 
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -50,6 +51,9 @@ def create_or_update_check(data: dict, dep_name_verison: str) \
     details = data["details"]
     reason = data["reason"]
     score = data["score"]
+
+    if isinstance(details, list):
+        details = "".join(details)
 
     check = DependencyCheck.query.filter_by(
         name=name,
@@ -114,19 +118,21 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (object): The added SBOM.
         """
-        # NOTE: should we really commit before the absolute end?
-        #       what if something fails?
-
+        # TODO: fix problem where dependencies don't get added to sbom
         sbom = SBOM(serial_number=request.json["serialNumber"],
                     version=request.json["version"],
                     repo_name=request.json["name"],
                     repo_version=request.json["repo_version"])
         db.session.add(sbom)
         db.session.commit()
-
+        i = 0
+        j = 0
         for component in request.json["components"]:
+            i += 1
             dependency, new_dependency = create_or_update_dependency(component)
             if new_dependency:
+                j += 1
+                print("new dependency")
                 db.session.add(dependency)
             sbom.dependencies.append(dependency)
             db.session.commit()
@@ -138,9 +144,10 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 )
                 if new_check:
                     db.session.add(check)
-                    dependency.checks.append(check)
+                dependency.checks.append(check)
                 db.session.commit()
-
+        db.session.commit()
+        print(f"Added {j} out of {j} dependencies")
         return jsonify(sbom.to_dict()), 201
 
     @app.route("/get_SBOM", methods=["GET"])
@@ -160,6 +167,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
 
     @app.route("/get_existing_dependencies", methods=["GET"])
     def get_existing_dependencies():
+        print("get_existing_dependencies")
         """
         Get existing dependencies in the database, based on which are sent in.
 
@@ -171,21 +179,29 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             json (array): The existing dependencies.
         """
         dep_name_versions: list[str] = []
-        immutabledict = request.form
-        for dep in immutabledict.values():
-            print(dep)
-            dep_name_versions.append(f"{dep[0]}@{dep[1]}")
+        immutable_dict = request.form.to_dict(flat=False)
+        for name, version in immutable_dict.items():
+            dep_name_versions.append(f"{name}@{version[0]}")
         if not dep_name_versions:
-            return jsonify([]), 200
+            return jsonify([]), 69
 
         dependencies = []
+        print("all dependencies in DB: ")
+        all_deps = Dependency.query.filter_by().all()
+        for dep in all_deps:
+            print(dep.name_version)
         for dep_name_version in dep_name_versions:
+            print("\n dep_name_version: ", dep_name_version)
             # find dependency in database
             dependency = Dependency.query.filter_by(
                 name_version=dep_name_version).first()
             # if no match, continue
             if not dependency:
+                print("No dependency found")
                 continue
-            dependencies.append(dependency.to_dict())
-
+            print("dependency found")
+            dependencies.append({"name_version": dependency.name_version,
+                                 "score": dependency.score,
+                                 "checks": [check.to_dict() for check in dependency.checks]})
+        print("returning dependencies: " + str(dependencies))
         return jsonify(dependencies), 200

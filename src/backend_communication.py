@@ -11,6 +11,7 @@ host = "http://localhost:5080"
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
+    print("\n")
     """
     Adds a SBOM to the database.
 
@@ -71,10 +72,6 @@ def get_sbom(sbom_id: int):
         timeout=5)
     return response.json()
 
-def test_database():
-    result = requests.get(host + "/test_route", timeout=5)
-    print(result.text)
-    return result.text
 
 def get_existing_dependencies(needed_dependencies: list[Dependency]):
     """
@@ -87,32 +84,29 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         list: A list of the existing dependencies.
     """
     dependency_primary_keys = []
-    for dependency in needed_dependencies:
-        json_obj = dependency.json_component
-        dependency_primary_keys.append(
-            {'name': json_obj['name'], 'version': json_obj['version']}
-        )
+    for i in range(len(needed_dependencies)):
+        json_obj = needed_dependencies[i].json_component
+        dependency_primary_keys.append((json_obj['name'], json_obj['version']))
+
     all_dependencies = requests.get(
         host + "/get_existing_dependencies",
         data=dependency_primary_keys,
         timeout=5
     )
-    if all_dependencies.status_code == 500:
-        return []
-
-    all_dependencies_json = all_dependencies.json()
+    print("all dependencies:" + str(all_dependencies.request))
+    print("all dependencies json:" + str(all_dependencies.json()))
     result = []
-    for dependency in all_dependencies_json:
-        url_split = dependency['name'].replace("https://", "").split("/")
-        dep_obj = Dependency(
-            dependency_score={
-                'score': dependency['score'],
-                'checks': dependency['checks']
-            },
-            platform=url_split[0],
-            repo_owner=url_split[1],
-            repo_name=url_split[2],
-            url=dependency['name']
-        )
+    all_dependencies = all_dependencies.json()
+    # TODO: research why .json() removes "name_version" from the object
+    for dependency in all_dependencies:
+        print("!!!!!!!dependency!!!!!!! " + str(dependency))
+        # url_split = dependency['name'].replace("https://", "").split("/")
+        url_split = dependency['name_version'].split("/").split("@")
+        dep_obj = Dependency(dependency_score={'score': dependency['score'], 'checks': dependency['checks']},
+                             platform=url_split[0],
+                             repo_owner=url_split[1],
+                             repo_name=url_split[2],
+                             url=dependency['name']
+                             )
         result.append(dep_obj)
     return result
