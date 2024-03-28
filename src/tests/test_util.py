@@ -5,8 +5,10 @@ Test cases for util.py
 import json
 from pathlib import Path
 import pytest
+from tests.decorators import log_test_results
 from util import Dependency, contains_all_checks, \
 validate_scorecard, Checks
+
 
 @pytest.fixture
 def fixture_dependency():
@@ -49,6 +51,8 @@ def fixture_dependency():
                             dependency_score)
     return dependency
 
+
+@log_test_results([])  # TODO add relevant test case
 def test_dependency_creation():
     """
     Test case for dependency creation.
@@ -74,6 +78,8 @@ def test_dependency_creation():
     assert dependency.failure_reason == failure_reason
     assert dependency.dependency_score == dependency_score
 
+
+@log_test_results([])  # TODO add relevant test case
 def test_checks_enum(fixture_dependency: Dependency):
     """
     Test case for checks enum.
@@ -82,6 +88,8 @@ def test_checks_enum(fixture_dependency: Dependency):
     for check in fixture_dependency.dependency_score["checks"]:
         assert check["name"] in all_checks
 
+
+@log_test_results([])  # TODO add relevant test case
 def test_dependency_get_check(fixture_dependency):
     """
     Test case for dependency get check.
@@ -90,6 +98,7 @@ def test_dependency_get_check(fixture_dependency):
     assert fixture_dependency.get_check(Checks.BINARY_ARTIFACTS)["name"] == Checks.BINARY_ARTIFACTS
 
 
+@log_test_results([])  # TODO add relevant test case
 def test_contains_all_checks(fixture_dependency):
     """
     Test case for checking if all checks are present.
@@ -100,6 +109,7 @@ def test_contains_all_checks(fixture_dependency):
     assert not contains_all_checks(dependency_score["checks"])
 
 
+@log_test_results([])  # TODO add relevant test case
 def test_validate_scorecard(fixture_dependency):
     """
     Test case for validating the scorecard.
@@ -121,6 +131,7 @@ def test_validate_scorecard(fixture_dependency):
     with open(ssf_scorecard_path, "r", encoding="utf-8") as file:
         dependency_score = json.load(file)
     assert validate_scorecard(dependency_score)
+
 
 if __name__ == "__main__":
     pytest.main()

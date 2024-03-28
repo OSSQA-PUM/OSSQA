@@ -7,3 +7,4 @@ flask-sqlalchemy
 requests
 pytest
 tabulate
+decorator

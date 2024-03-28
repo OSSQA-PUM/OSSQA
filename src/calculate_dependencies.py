@@ -370,16 +370,16 @@ def get_dependencies(sbom: dict) \
     dependencies and failure reasons.
 
     Args:
-        sbom (dict): The software bill of materials (SBOM) containing 
+        sbom (dict): The software bill of materials (SBOM) containing
             information about the dependencies.
 
     Returns:
         tuple: A tuple containing three elements:
-            - A list of Dependency objects representing the successfully 
+            - A list of Dependency objects representing the successfully
                 retrieved dependencies along with their scores.
-            - A list of Dependency objects representing the remaining 
+            - A list of Dependency objects representing the remaining
                 dependencies that could not be scored.
-            - A dictionary containing the failure reasons for the dependencies 
+            - A dictionary containing the failure reasons for the dependencies
                 that failed to be parsed.
     """
 
