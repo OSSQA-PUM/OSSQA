@@ -44,7 +44,6 @@ def create_app() -> Flask:
     register_endpoints(app, db)
 
     app.app_context().push()
-    db.drop_all()
     db.create_all()
 
     return app

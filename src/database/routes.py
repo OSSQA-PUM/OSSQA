@@ -132,7 +132,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             dependency, new_dependency = create_or_update_dependency(component)
             if new_dependency:
                 j += 1
-                print("adding " + dependency.name_version + " to db")
                 db.session.add(dependency)
             sbom.dependencies.append(dependency)
             db.session.commit()
@@ -147,7 +146,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 dependency.checks.append(check)
                 db.session.commit()
         db.session.commit()
-        print(f"Added {j} out of {j} dependencies")
         return jsonify(sbom.to_dict()), 201
 
     @app.route("/get_SBOM", methods=["GET"])
@@ -167,7 +165,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
 
     @app.route("/get_existing_dependencies", methods=["GET"])
     def get_existing_dependencies():
-        print("get_existing_dependencies")
         """
         Get existing dependencies in the database, based on which are sent in.
 
@@ -185,33 +182,16 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         if not dep_name_versions:
             return jsonify([]), 69
 
-        print("dep_name_versions: " + str(dep_name_versions))
         dependencies = []
-        all_deps = Dependency.query.filter_by().all()
-        all_sboms = SBOM.query.filter_by().all()
-
-        print("All dependencies in DB: ")
-        for dep in all_deps:
-            print("Dependency name: " + dep.name_version)
-        print("END OF DEPENDENCIES")
-
-        print("All SBOMs in DB: ")
-        for sbom in all_sboms:
-            print("Dependency name: " + sbom.name)
-        print("END OF SBOM")
 
         for dep_name_version in dep_name_versions:
-            print("\n dep_name_version: ", dep_name_version)
             # find dependency in database
             dependency = Dependency.query.filter_by(
                 name_version=dep_name_version).first()
             # if no match, continue
             if not dependency:
-                print(dep_name_version + " not found")
                 continue
-            print(dependency.name + " found")
             dependencies.append({"name_version": dependency.name_version,
                                  "score": dependency.score,
                                  "checks": [check.to_dict() for check in dependency.checks]})
-        print("returning dependencies: " + str(dependencies))
         return jsonify(dependencies), 200
