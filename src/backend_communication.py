@@ -11,7 +11,6 @@ host = "http://localhost:5080"
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
-    print("\n")
     """
     Adds a SBOM to the database.
 
@@ -32,12 +31,16 @@ def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
     data["name"] = tools[0]["name"]
     data["repo_version"] = tools[0]["version"]
 
-    data["components"] = [{
-        "name": dep.json_component["name"],
-        "version": dep.json_component["version"],
-        "score": dep.dependency_score["score"],
-        "checks": dep.dependency_score["checks"],
-    } for dep in dependencies]
+    components = []
+
+    for dep in dependencies:
+        components.append({
+            "name": dep.json_component["name"],
+            "version": dep.json_component["version"],
+            "score": dep.dependency_score["score"],
+            "checks": dep.dependency_score["checks"],
+        })
+    data["components"] = components
 
     r = requests.post(host + "/add_SBOM", json=data, timeout=5)
     return r.status_code
@@ -97,16 +100,14 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
     if not all_dependencies:
         return result
     all_dependencies = all_dependencies.json()
-    # TODO: research why .json() removes "name_version" from the object
     for dependency in all_dependencies:
-        print("!!!!!!!dependency!!!!!!! " + str(dependency))
         # url_split = dependency['name'].replace("https://", "").split("/")
-        url_split = dependency['name_version'].split("/").split("@")
+        url_split = dependency['name_version'].split("/")
         dep_obj = Dependency(dependency_score={'score': dependency['score'], 'checks': dependency['checks']},
                              platform=url_split[0],
                              repo_owner=url_split[1],
-                             repo_name=url_split[2],
-                             url=dependency['name']
+                             repo_name=url_split[2].split("@")[0],
+                             url=dependency['name_version'].split("@")[0]
                              )
         result.append(dep_obj)
     return result

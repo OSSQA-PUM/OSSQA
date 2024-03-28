@@ -117,6 +117,37 @@ class Dependency:
     failure_reason: Exception = None
     dependency_score: dict = None
 
+    def __eq__(self, other):
+        """
+        Check if two dependencies are equal.
+
+        Args:
+            other (Dependency): The other dependency to compare with.
+
+        Returns:
+            bool: True if the dependencies are equal, False otherwise.
+        """
+        name_version = self.platform + self.repo_owner + self.repo_name
+        other_name_version = other.platform + other.repo_owner + other.repo_name
+        return name_version == other_name_version
+
+    def to_dict(self) -> dict:
+        """
+        Convert the dependency to a dictionary.
+
+        Returns:
+            dict: The dictionary representation of the dependency.
+        """
+        return {
+            "platform": self.platform,
+            "repo_owner": self.repo_owner,
+            "repo_name": self.repo_name,
+            "url": self.url,
+            "dependency_score": self.dependency_score
+        }
+
+
+
     def get_check(self, name: Checks) -> dict:
         """
         Get the check with the given name from the dependency scores.
