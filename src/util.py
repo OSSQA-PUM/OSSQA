@@ -198,7 +198,7 @@ def contains_all_checks(scorecard_checks: list[dict]) -> bool:
     Check if the scorecard contains the required checks.
 
     Args:
-        scorecard (dict): The scorecard to be checked.
+        scorecard_checks (dict): The scorecard to be checked.
 
     Returns:
         bool: True if the scorecard contains the required checks, 

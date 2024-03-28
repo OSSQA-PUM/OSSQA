@@ -3,7 +3,6 @@ This module handles the endpoints that the backend communication interface
 interfaces with. It also handles functionality for creating and updating
 various objects in the database.
 """
-import json
 
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
@@ -98,14 +97,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         print("Error:", error)
         return "Internal server error", 500
 
-    @app.route("/test_route", methods=["GET"])
-    def test_route():
-        return "Hello, World!", 200
-
-    @app.route("/", methods=["GET"])
-    def empty():
-        return "Hello, empty!", 200
-
     @app.route("/add_SBOM", methods=["POST"])
     def add_sbom():
         """
@@ -118,20 +109,17 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (object): The added SBOM.
         """
-        # TODO: fix problem where dependencies don't get added to sbom
+
         sbom = SBOM(serial_number=request.json["serialNumber"],
                     version=request.json["version"],
                     repo_name=request.json["name"],
                     repo_version=request.json["repo_version"])
         db.session.add(sbom)
         db.session.commit()
-        i = 0
-        j = 0
+
         for component in request.json["components"]:
-            i += 1
             dependency, new_dependency = create_or_update_dependency(component)
             if new_dependency:
-                j += 1
                 db.session.add(dependency)
             sbom.dependencies.append(dependency)
             db.session.commit()
@@ -143,7 +131,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 )
                 if new_check:
                     db.session.add(check)
-                dependency.checks.append(check)
+                    dependency.checks.append(check)
                 db.session.commit()
         db.session.commit()
         return jsonify(sbom.to_dict()), 201
@@ -183,7 +171,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             return jsonify([]), 69
 
         dependencies = []
-
         for dep_name_version in dep_name_versions:
             # find dependency in database
             dependency = Dependency.query.filter_by(
