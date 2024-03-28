@@ -219,17 +219,17 @@ def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Depende
     database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
 
     # Calculate the dependencies that are not in the database
-    print("Found: ", str(len(database_response)) + " existing dependencies in database")
 
     new_needed_dependencies = needed_dependencies.copy()
     success = 0
 
     with tqdm.tqdm(total=len(database_response)) as progress_bar:
-        for respose in database_response:
-            idx = new_needed_dependencies.index(respose)
-            dep = new_needed_dependencies.pop(idx)
-            dep.dependency_score = respose.dependency_score
-            dependencies_with_scores.append(dep)
+        for response in database_response:
+            if response in new_needed_dependencies:
+                idx = new_needed_dependencies.index(response)
+                dep = new_needed_dependencies.pop(idx)
+                dep.dependency_score = response.dependency_score
+                dependencies_with_scores.append(dep)
             success += 1
             progress_bar.update(1)
     print(f"Successfully looked up {success}/{len(needed_dependencies)} "
