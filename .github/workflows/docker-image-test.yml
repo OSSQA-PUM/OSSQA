@@ -1,0 +1,33 @@
+name: Docker Image CI Test
+
+on:
+  push:
+    branches: [ "dev"]
+  pull_request:
+    branches: [ "main", "dev"]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Echo secrets
+      run: |
+        echo $ENV_FILE >> ./.env
+        cat ./.env
+      shell: bash
+      env:
+        ENV_FILE : ${{secrets.AUTH_TOKEN}}
+
+    - name: Build the Docker image
+      run: docker compose build ossqa-tests
+    - name: Run tests
+      run: docker compose run --name ossqa-tests-container ossqa-tests
+    - name: Print test logs
+      run: |
+        docker cp ossqa-tests-container:/app/test_logs.txt ./test_logs.txt
+        echo "$(cat ./test_logs.txt)"
