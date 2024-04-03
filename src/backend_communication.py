@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 import requests
 
 from util import Dependency
-
 host = "http://localhost:5080"
 
 
