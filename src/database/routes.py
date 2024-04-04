@@ -7,7 +7,7 @@ various objects in the database.
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from models import SBOM, Dependency, DependencyCheck
+from database.models import SBOM, Dependency, DependencyCheck
 
 
 def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:

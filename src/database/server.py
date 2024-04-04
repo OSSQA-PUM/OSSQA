@@ -5,8 +5,8 @@ which is our backend and database.
 
 from flask import Flask
 
-from models import db
-from routes import register_endpoints
+from database.models import db
+from database.routes import register_endpoints
 
 
 def create_test_app() -> Flask:

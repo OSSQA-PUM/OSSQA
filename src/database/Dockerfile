@@ -9,7 +9,8 @@ RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
 # Copy the application source and requirements
-COPY ./src/database /app
+COPY ./src/database /app/database
+COPY ./src/database_main.py /app/database_main.py
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
