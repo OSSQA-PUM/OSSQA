@@ -123,8 +123,8 @@ class Dependency:
         Returns:
             bool: True if the dependencies are equal, False otherwise.
         """
-        name_version = self.platform + self.repo_owner + self.repo_name
-        other_name_version = other.platform + other.repo_owner + other.repo_name
+        name_version = str(self.platform) + str(self.repo_path[0]) + str(self.repo_path[1])
+        other_name_version = str(other.platform) + str(other.repo_path[0]) + str(other.repo_path[1])
         return name_version == other_name_version
 
     def to_dict(self) -> dict:
@@ -136,8 +136,6 @@ class Dependency:
         """
         return {
             "platform": self.platform,
-            "repo_owner": self.repo_owner,
-            "repo_name": self.repo_name,
             "url": self.url,
             "dependency_score": self.dependency_score
         }

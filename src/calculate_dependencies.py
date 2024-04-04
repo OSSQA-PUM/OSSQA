@@ -228,10 +228,14 @@ def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Depende
                 dep = new_needed_dependencies.pop(idx)
                 dep.dependency_score = response.dependency_score
                 dependencies_with_scores.append(dep)
+
             success += 1
             progress_bar.update(1)
+
     print(f"Successfully looked up {success}/{len(needed_dependencies)} "
           + "dependencies in the database.")
+
+    #// TODO: Fix issue where new_needed_dependencies include all dependencies
     return dependencies_with_scores, new_needed_dependencies
 
 
@@ -388,6 +392,7 @@ def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], di
     new_scores, needed_dependencies = lookup_database(
         needed_dependencies=needed_dependencies)
     scores += new_scores
+    print(len(needed_dependencies))
 
     analyzed_scores, needed_dependencies = analyse_multiple_scores(
         dependencies=needed_dependencies)
