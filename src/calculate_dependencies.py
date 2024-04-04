@@ -17,8 +17,10 @@ import requests
 import tqdm
 
 from util import Dependency, validate_scorecard
+from backend_communication import *
 
-def parse_git_url(url: str) -> tuple[str, str, str]:
+
+def parse_git_url(url: str) -> tuple[str, str]:
     """
     Parses the git URL and returns the platform,
     repository owner, and repository name.
@@ -27,7 +29,7 @@ def parse_git_url(url: str) -> tuple[str, str, str]:
         url (str): The git URL.
 
     Returns:
-        tuple[str, str, str]: The platform, repository path,
+        tuple[str, str, str]: The platform, repository owner,
         and repository name.
 
     Raises:
@@ -100,21 +102,20 @@ def parse_component(component: dict) -> Dependency:
     dependency: Dependency = Dependency(json_component=component)
     try:
         dependency.url = get_component_url(component=component)
-        dependency.platform, \
-        dependency.repo_path = parse_git_url(dependency.url)
+        dependency.platform, dependency.repo_path = parse_git_url(dependency.url)
+        dependency.version = component["version"]
     except (ConnectionError, KeyError, NameError, ValueError) as e:
         dependency.failure_reason = e
     return dependency
 
 
-def parse_sbom(sbom: dict) \
-    -> tuple[list[Dependency], list[Dependency], dict]:
+def parse_sbom(sbom: dict) -> tuple[list[Dependency], list[Dependency], dict]:
     """
     Parses the SBOM (Software Bill of Materials)
     and returns the dependencies, failures, and failure reasons.
 
     Args:
-        sbom_file (dict): The path to the SBOM JSON file.
+        sbom (dict): The path to the SBOM JSON file.
 
     Returns:
         tuple[list[Dependency], list[Dependency], dict]: The dependencies,
@@ -123,7 +124,7 @@ def parse_sbom(sbom: dict) \
     print("Parsing SBOM")
     components = sbom["components"]
 
-    dependencies_data:list[Dependency] = []
+    dependencies_data: list[Dependency] = []
     failed_components: list[Dependency] = []
     failure_reason: dict = {}
     success = 0
@@ -166,8 +167,7 @@ def get_git_sha1_number(dependency: Dependency) -> str:
     return ""
 
 
-def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
-    -> dict[str, str] | None :
+def try_get_from_ssf_api(dependency: Dependency, commit_sha1=None) -> dict[str, str] | None:
     """
     Retrieves the scorecard of a dependency
     from the SSF (Security Scorecards) API.
@@ -200,8 +200,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1 = None) \
     return json_response
 
 
-def lookup_database(needed_dependencies : list[Dependency]) \
-    -> tuple[list[Dependency], list[Dependency]]:
+def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
     """
     Looks up the needed dependencies in the database
     and returns the dependencies with scores and the new needed dependencies.
@@ -215,34 +214,33 @@ def lookup_database(needed_dependencies : list[Dependency]) \
         The dependencies with scores and the new needed dependencies.
     """
     dependencies_with_scores = []
-
-    # TODO try to get needed_dependencies scores from our database
-    # Assume database response is in the same order as needed_dependencies
-    # fake database response for now
-    # (the database did not have any of the needed dependencies)
-    database_response = [None] * len(needed_dependencies)
-    #database_response = get_existing_dependencies(needed_dependencies)
+    print("Looking up dependencies in database...")
+    database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
 
     # Calculate the dependencies that are not in the database
-    print("Looking up dependencies in database")
+
+    new_needed_dependencies = needed_dependencies.copy()
     success = 0
-    new_needed_dependencies = []
-    with tqdm.tqdm(total=len(needed_dependencies)) as progress_bar:
-        for database_response, dependency in zip(
-            database_response, needed_dependencies):
-            if database_response is None:
-                new_needed_dependencies.append(dependency)
-            else:
-                dependency.dependency_score = database_response
-                dependencies_with_scores.append(dependency)
-                success += 1
+
+    with tqdm.tqdm(total=len(database_response)) as progress_bar:
+        for response in database_response:
+            if response in new_needed_dependencies:
+                idx = new_needed_dependencies.index(response)
+                dep = new_needed_dependencies.pop(idx)
+                dep.dependency_score = response.dependency_score
+                dependencies_with_scores.append(dep)
+
+            success += 1
             progress_bar.update(1)
+
     print(f"Successfully looked up {success}/{len(needed_dependencies)} "
           + "dependencies in the database.")
+
+    #// TODO: Fix issue where new_needed_dependencies include all dependencies
     return dependencies_with_scores, new_needed_dependencies
 
 
-def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
+def lookup_ssf(dependency: Dependency) -> dict[str, str] | None:
     """
     Looks up the scorecard of a dependency
     in the SSF (Security Scorecards) API.
@@ -258,8 +256,7 @@ def lookup_ssf(dependency: Dependency) -> dict[str,str] | None:
     return scorecard_score
 
 
-def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
-    -> tuple[list[Dependency], list[Dependency]]:
+def lookup_multiple_ssf(needed_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
     """
     Looks up the needed dependencies in the SSF (Security Scorecards) API
     and returns the dependencies with scores and the new needed dependencies.
@@ -279,8 +276,8 @@ def lookup_multiple_ssf(needed_dependencies : list[Dependency]) \
     success = 0
     with Pool() as pool, tqdm.tqdm(total=work_count) as progress_bar:
         for scorecard_score, dependency in zip(
-            pool.imap_unordered(lookup_ssf, needed_dependencies),
-            needed_dependencies):
+                pool.imap_unordered(lookup_ssf, needed_dependencies),
+                needed_dependencies):
             if scorecard_score is None:
                 new_needed_dependencies.append(dependency)
                 progress_bar.update(1)
@@ -309,7 +306,6 @@ def analyse_score(dependency: Dependency):
     # Execute the Scorecard tool in a Docker container
     # passing the necessary environment variables
     url = dependency.url.replace("https://", "")
-    print(url)
 
     output = subprocess.check_output(
         f'scorecard --repo={url} --show-details --format json',
@@ -321,7 +317,7 @@ def analyse_score(dependency: Dependency):
     output = output.decode("utf-8")
     output = output.replace(
         "failed to get console mode for stdout: The handle is invalid.", ""
-        )
+    )
     output = output.replace("\n", "")
 
     json_output = json.loads(output)
@@ -329,8 +325,7 @@ def analyse_score(dependency: Dependency):
     return json_output
 
 
-def analyse_multiple_scores(dependencies: list[Dependency]) \
-    ->  tuple[list[Dependency], list[Dependency]]:
+def analyse_multiple_scores(dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
     """
     Analyzes multiple scores for a list of dependencies.
 
@@ -348,8 +343,8 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
         # A json serialized object is returned from analyze_score()
         dependency_score: Any
         for dependency, dependency_score in zip(
-            dependencies, pool.imap_unordered(analyse_score, dependencies)):
-            if dependency_score is None :
+                dependencies, pool.imap_unordered(analyse_score, dependencies)):
+            if dependency_score is None:
                 needed_dependencies.append(dependency)
                 progress_bar.update(1)
                 continue
@@ -358,12 +353,10 @@ def analyse_multiple_scores(dependencies: list[Dependency]) \
             progress_bar.update(1)
     print("Successfully analyzed " \
           + f"{len(dependency_scores)}/{len(dependencies)} dependencies")
-
     return dependency_scores, needed_dependencies
 
 
-def get_dependencies(sbom: dict) \
-    -> tuple[list[Dependency], list[Dependency], dict]:
+def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], dict]:
     """
     Retrieves dependencies from the provided software bill of materials (SBOM),
     performs various lookups and analyses on the dependencies, and returns the
@@ -388,7 +381,6 @@ def get_dependencies(sbom: dict) \
     needed_dependencies = dependencies
     total_dependency_count = len(dependencies)
 
-    #print(failure_reason)
 
     # TODO try to recover failed components
     scores = []
@@ -406,6 +398,7 @@ def get_dependencies(sbom: dict) \
     scores += analyzed_scores
 
     # TODO send data that was downloaded internally
+    add_sbom(sbom, scores)
     # to database (analyzed_scores)
 
     print(
