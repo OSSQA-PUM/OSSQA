@@ -165,11 +165,10 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             json (array): The existing dependencies.
         """
         dep_name_versions: list[str] = []
-        immutable_dict = request.form.to_dict(flat=False)
-        for name, version in immutable_dict.items():
-            dep_name_versions.append(f"{name}@{version[0]}")
-        if not dep_name_versions:
-            return jsonify([]), 69
+        for dependency in request.json:
+            name = dependency["name"]
+            version = dependency["version"]
+            dep_name_versions.append(f"{name}@{version}")
 
         dependencies = []
         for dep_name_version in dep_name_versions:

@@ -2,11 +2,8 @@
 This module provides functions for communicating with the backend
 and managing SBOMs (Software Bill of Materials).
 """
-
-from util import Dependency
 from urllib.parse import urlparse
 import requests
-
 from util import Dependency
 
 host = "http://localhost:5080"
@@ -86,25 +83,27 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         list: A list of the existing dependencies.
     """
     dependency_primary_keys = []
-    for i in range(len(needed_dependencies)):
-        json_obj = needed_dependencies[i].json_component
-        dependency_primary_keys.append((json_obj['name'], json_obj['version']))
+    for needed_dependency in needed_dependencies:
+        json_obj = needed_dependency.json_component
+        dependency_primary_keys.append({
+            "name": json_obj["name"],
+            "version": json_obj["version"],
+        })
 
-    all_dependencies = requests.get(host + "/get_existing_dependencies",
-                                    data=dependency_primary_keys,
+    response = requests.get(host + "/get_existing_dependencies",
+                                    json=dependency_primary_keys,
                                     timeout=5
                                     )
-    result = []
-    if not all_dependencies:
-        return result
-    all_dependencies = all_dependencies.json()
-    for dependency in all_dependencies:
-        url_split = urlparse(dependency['url'])
-        dep_obj = Dependency(dependency_score={'score': dependency['score'], 'checks': dependency['checks']},
-                             platform=url_split.netloc,
-                             repo_path=url_split.path,
-                             url=dependency['url'],
-                             version=dependency['name_version'].split("@")[1]
-                             )
+
+    result: list[Dependency] = []
+    for dependency in response.json():
+        parsed_url = urlparse(dependency["url"])
+        dependency_score = {"score": dependency["score"],
+                            "checks": dependency["checks"]}
+        dep_obj = Dependency(dependency_score=dependency_score,
+                             platform=parsed_url.netloc,
+                             repo_path=parsed_url.path,
+                             url=dependency["url"],
+                             version=dependency["name_version"].split("@")[1])
         result.append(dep_obj)
     return result
