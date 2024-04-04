@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import requests
 
 from util import Dependency
+
 host = "http://localhost:5080"
 
 
@@ -34,9 +35,10 @@ def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
 
     data["components"] = [{
         "name": dep.json_component["name"],
-        "version": dep.json_component["version"],
+        "version": dep.version,
         "score": dep.dependency_score["score"],
         "checks": dep.dependency_score["checks"],
+        "url": dep.url
     } for dep in dependencies]
 
     r = requests.post(host + "/add_SBOM", json=data, timeout=5)
@@ -97,11 +99,12 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         return result
     all_dependencies = all_dependencies.json()
     for dependency in all_dependencies:
-        url_split = urlparse(dependency['name_version'])
+        url_split = urlparse(dependency['url'])
         dep_obj = Dependency(dependency_score={'score': dependency['score'], 'checks': dependency['checks']},
-                            platform = url_split.netloc,
-                            repo_path = url_split.path.split("@")[0],
-                            url=dependency['name_version'].split("@")[0]
+                             platform=url_split.netloc,
+                             repo_path=url_split.path,
+                             url=dependency['url'],
+                             version=dependency['name_version'].split("@")[1]
                              )
         result.append(dep_obj)
     return result

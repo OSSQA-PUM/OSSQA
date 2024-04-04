@@ -20,7 +20,7 @@ from util import Dependency, validate_scorecard
 from backend_communication import *
 
 
-def parse_git_url(url: str) -> tuple[str, str, str]:
+def parse_git_url(url: str) -> tuple[str, str]:
     """
     Parses the git URL and returns the platform,
     repository owner, and repository name.
@@ -102,7 +102,8 @@ def parse_component(component: dict) -> Dependency:
     dependency: Dependency = Dependency(json_component=component)
     try:
         dependency.url = get_component_url(component=component)
-        dependency.repo_path = parse_git_url(dependency.url)
+        dependency.platform, dependency.repo_path = parse_git_url(dependency.url)
+        dependency.version = component["version"]
     except (ConnectionError, KeyError, NameError, ValueError) as e:
         dependency.failure_reason = e
     return dependency
@@ -380,7 +381,6 @@ def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], di
     needed_dependencies = dependencies
     total_dependency_count = len(dependencies)
 
-    # print(failure_reason)
 
     # TODO try to recover failed components
     scores = []
@@ -392,7 +392,6 @@ def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], di
     new_scores, needed_dependencies = lookup_database(
         needed_dependencies=needed_dependencies)
     scores += new_scores
-    print(len(needed_dependencies))
 
     analyzed_scores, needed_dependencies = analyse_multiple_scores(
         dependencies=needed_dependencies)

@@ -45,6 +45,8 @@ class Dependency(db.Model):
     score = db.Column(db.Double, unique=False)
     date_added = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+    url = db.Column(db.String(120), unique=False)
+
     checks = db.relationship("DependencyCheck",
                              backref="dependency",
                              lazy=True)

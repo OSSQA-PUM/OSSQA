@@ -23,13 +23,14 @@ def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:
     """
     name_version = f"{component['name']}@{component['version']}"
     score = component["score"]
+    url = component["url"]
 
     dependency = Dependency.query.filter_by(name_version=name_version).first()
     if dependency:
         dependency.score = score
         return dependency, False
     else:
-        return Dependency(name_version=name_version, score=score), True
+        return Dependency(name_version=name_version, score=score, url=url), True
 
 
 def create_or_update_check(data: dict, dep_name_verison: str) \
@@ -180,5 +181,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 continue
             dependencies.append({"name_version": dependency.name_version,
                                  "score": dependency.score,
-                                 "checks": [check.to_dict() for check in dependency.checks]})
+                                 "checks": [check.to_dict() for check in dependency.checks],
+                                 "url": dependency.url})
         return jsonify(dependencies), 200
