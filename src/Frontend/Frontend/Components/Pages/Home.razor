@@ -1,0 +1,38 @@
+﻿@page "/"
+@using System.Diagnostics
+
+<PageTitle>Home</PageTitle>
+<div centered="true">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="300px" />
+
+
+<input type="file" id="file" name="file" accept=".json" />
+    <button class="btn btn-primary" @onclick="AnalyzeSBOM">Analyze SBOM</button>
+</div>
+<p role="status">result: @result</p>
+
+
+@code {
+    private string result = "no result";
+    private void AnalyzeSBOM()
+    {
+        result = "working";
+        ProcessStartInfo start = new ProcessStartInfo();
+        start.FileName = "C:/Users/lunas/Documents/testfile.py";
+        start.UseShellExecute = false;
+        start.RedirectStandardOutput = true;
+
+        using (Process process = Process.Start(start))
+        {
+            result = process.StandardOutput.ReadToEnd();
+           
+        }
+
+    }
+}
+
+
+
+
+
+
