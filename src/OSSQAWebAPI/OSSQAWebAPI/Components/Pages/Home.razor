@@ -1,0 +1,25 @@
+﻿@page "/"
+@using System.Diagnostics
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+<div centered="true">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="300px" />
+    <input type="file" id="file" name="file" accept=".json" />
+</div>
+<p role="status">result: @result</p>
+
+
+<button class="btn btn-primary" @onclick="AnalyzeSBOM">Click me</button>
+
+
+
+@code {
+    private String result = "no result";
+    private void AnalyzeSBOM()
+    {
+        result = "result";
+
+    }
+}
+

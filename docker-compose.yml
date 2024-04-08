@@ -39,6 +39,11 @@ services:
       dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
+  ossqa-frontend:
+    image: ${DOCKER_REGISTRY-}ossqa-frontend
+    build:
+      context: .
+      dockerfile: ./src/OSSQAWebAPI/Dockerfile
 
 
 
