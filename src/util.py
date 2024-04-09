@@ -16,6 +16,7 @@ from enum import StrEnum
 import os
 import requests
 
+
 class Checks(StrEnum):
     """
     Represents the checks that can be performed on a dependency.
@@ -37,7 +38,7 @@ class Checks(StrEnum):
     SECURITY_POLICY = "Security-Policy"
     SIGNED_RELEASES = "Signed-Releases"
     TOKEN_PERMISSIONS = "Token-Permissions"
-    VULNERABILITIES ="Vulnerabilities"
+    VULNERABILITIES = "Vulnerabilities"
 
     @classmethod
     def all(cls):
@@ -83,7 +84,7 @@ class UserRequirements:
             raise TypeError("input arguments are not integers")
 
         if not (0 <= self.source_risk_assessment <= 10 and
-                0 <= self.maintence <=10 and
+                0 <= self.maintence <= 10 and
                 0 <= self.build_risk_assessment <= 10 and
                 0 <= self.continuous_testing <= 10 and
                 0 <= self.code_vunerabilities <= 10):
@@ -112,6 +113,32 @@ class Dependency:
     url: str = None
     failure_reason: Exception = None
     dependency_score: dict = None
+    version: str = None
+
+    def __eq__(self, other):
+        """
+        Check if two dependencies are equal.
+
+        Args:
+            other (Dependency): The other dependency to compare with.
+
+        Returns:
+            bool: True if the dependencies are equal, False otherwise.
+        """
+        return self.platform == other.platform and self.repo_path == other.repo_path and self.version == other.version
+
+    def to_dict(self) -> dict:
+        """
+        Convert the dependency to a dictionary.
+
+        Returns:
+            dict: The dictionary representation of the dependency.
+        """
+        return {
+            "platform": self.platform,
+            "url": self.url,
+            "dependency_score": self.dependency_score
+        }
 
     def get_check(self, name: Checks) -> dict:
         """
@@ -127,6 +154,7 @@ class Dependency:
             if check["name"] == name:
                 return check
         return None
+
 
 def check_token_usage():
     """
@@ -156,7 +184,7 @@ def check_token_usage():
             "limit": user_data['X-RateLimit-Limit'],
             "used": user_data['x-ratelimit-used'],
             "remaining": user_data['X-RateLimit-Remaining']
-            }
+        }
 
     print(f"Failed to authenticate. Status code: {response.status_code}")
     return None
@@ -167,7 +195,7 @@ def contains_all_checks(scorecard_checks: list[dict]) -> bool:
     Check if the scorecard contains the required checks.
 
     Args:
-        scorecard (dict): The scorecard to be checked.
+        scorecard_checks (dict): The scorecard to be checked.
 
     Returns:
         bool: True if the scorecard contains the required checks, 
@@ -197,7 +225,7 @@ def validate_scorecard(scorecard: dict) -> bool:
         bool: True if the scorecard is valid, False otherwise.
     """
     try:
-        scorecard_checks:list[dict] = scorecard["checks"]
+        scorecard_checks: list[dict] = scorecard["checks"]
     except KeyError:
         return False
     return contains_all_checks(scorecard_checks)

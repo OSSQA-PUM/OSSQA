@@ -10,13 +10,15 @@ based on the requirements.
 - get_old_results(sbom: dict): This function calls the backend API to get 
 the old results for a given SBOM.
 """
+from typing import List
 
 import calculate_dependencies
 from final_score_calculator import calculator
 from backend_communication import get_sbom
 from util import UserRequirements
 
-def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[float]:
+
+def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, int, str]]:
     """
     This function is called by the frontend API and calls 
     for SSFAnalyser and FSC.

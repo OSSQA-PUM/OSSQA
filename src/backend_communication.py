@@ -2,14 +2,11 @@
 This module provides functions for communicating with the backend
 and managing SBOMs (Software Bill of Materials).
 """
-
-from util import Dependency
 from urllib.parse import urlparse
 import requests
+from util import Dependency
 
-
-
-
+host = "http://localhost:5080"
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
@@ -29,17 +26,19 @@ def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
     except KeyError:
         data["serialNumber"] = sbom_json["$schema"]
     data['version'] = sbom_json["version"]
-    data["name"] = sbom_json["metadata"]["name"]
-    data["repo_version"] = sbom_json["metadata"]["version"]
+    tools = sbom_json["metadata"]["tools"]
+    data["name"] = tools[0]["name"]
+    data["repo_version"] = tools[0]["version"]
 
     data["components"] = [{
         "name": dep.json_component["name"],
-        "version": dep.json_component["version"],
+        "version": dep.version,
         "score": dep.dependency_score["score"],
         "checks": dep.dependency_score["checks"],
+        "url": dep.url
     } for dep in dependencies]
 
-    r = requests.post("localhost:5080/add_SBOM", json=data, timeout=5)
+    r = requests.post(host + "/add_SBOM", json=data, timeout=5)
     return r.status_code
 
 
@@ -51,7 +50,7 @@ def get_history():
     Returns:
         list: The previous SBOMs.
     """
-    response = requests.get("localhost:5080/get_history",  timeout=5)
+    response = requests.get(host + "/get_history", timeout=5)
     return response.json()
 
 
@@ -67,7 +66,7 @@ def get_sbom(sbom_id: int):
         dict: A dictionary-representation of the SBOM.
     """
     response = requests.get(
-        "localhost:5080/get_SBOM",
+        host + "/get_SBOM",
         data={"id": sbom_id},
         timeout=5)
     return response.json()
@@ -84,29 +83,27 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         list: A list of the existing dependencies.
     """
     dependency_primary_keys = []
-    for depencency in needed_dependencies:
-        json_obj = depencency.json_component
-        dependency_primary_keys.append(
-            {'name': json_obj['name'], 'version': json_obj['version']}
-            )
+    for needed_dependency in needed_dependencies:
+        json_obj = needed_dependency.json_component
+        dependency_primary_keys.append({
+            "name": json_obj["name"],
+            "version": json_obj["version"],
+        })
 
-    all_depencencies = requests.get(
-        "localhost:5080/get_existing_dependencies",
-        data=dependency_primary_keys,
-        timeout=5
-        ).json()
-    result = []
-    for depencency in all_depencencies:
-        url_split = urlparse(depencency['name'])
+    response = requests.get(host + "/get_existing_dependencies",
+                                    json=dependency_primary_keys,
+                                    timeout=5
+                                    )
 
-        dep_obj = Dependency(
-            dependency_score = {
-                'score': depencency['score'],
-                'checks': depencency['checks']
-                },
-            platform = url_split.netloc,
-            repo_path = url_split.path,
-            url = depencency['name']
-        )
+    result: list[Dependency] = []
+    for dependency in response.json():
+        parsed_url = urlparse(dependency["url"])
+        dependency_score = {"score": dependency["score"],
+                            "checks": dependency["checks"]}
+        dep_obj = Dependency(dependency_score=dependency_score,
+                             platform=parsed_url.netloc,
+                             repo_path=parsed_url.path,
+                             url=dependency["url"],
+                             version=dependency["name_version"].split("@")[1])
         result.append(dep_obj)
     return result

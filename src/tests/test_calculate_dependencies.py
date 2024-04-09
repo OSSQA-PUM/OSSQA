@@ -103,12 +103,12 @@ def test_lookup_database():
     """Test the lookup_database function."""
     dependencies = [
         Dependency(
-            json_component={},
+            json_component={"name": "repo1", "version": "v1.0"},
             platform="github.com",
-            repo_path="/owner/repo1"
+            repo_path="/owner/repo1",
         ),
         Dependency(
-            json_component={},
+            json_component={"name": "repo2", "version": "v2.0"},
             platform="github.com",
             repo_path="/owner/repo2"
         ),

@@ -30,12 +30,6 @@ class DependencyCheck(db.Model):
     reason = db.Column(db.String(60), unique=False)
 
     def to_dict(self) -> dict:
-        """
-        Generates a dictionary-representation of the dependency check.
-
-        Returns:
-            dict: The dictionary-representation.
-        """
         return {"name": self.name,
                 "details": self.details,
                 "score": self.score,
@@ -51,6 +45,8 @@ class Dependency(db.Model):
     score = db.Column(db.Double, unique=False)
     date_added = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+    url = db.Column(db.String(120), unique=False)
+
     checks = db.relationship("DependencyCheck",
                              backref="dependency",
                              lazy=True)
@@ -60,12 +56,6 @@ class Dependency(db.Model):
                             back_populates="dependencies")
 
     def to_dict(self) -> dict:
-        """
-        Generates a dictionary-representation of the dependency.
-
-        Returns:
-            dict: The dictionary-representation.
-        """
         return {"name_version": self.name_version,
                 "score": self.score,
                 "date_added": self.date_added,
@@ -89,12 +79,6 @@ class SBOM(db.Model):
                                    back_populates="sboms")
 
     def to_dict(self) -> dict:
-        """
-        Generates a dictionary-representation of the SBOM.
-
-        Returns:
-            dict: The dictionary-representation.
-        """
         dependencies = [dep.to_dict() for dep in self.dependencies]
         return {"serialNumber": self.serial_number,
                 "version": self.version,

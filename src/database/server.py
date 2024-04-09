@@ -5,8 +5,8 @@ which is our backend and database.
 
 from flask import Flask
 
-from .models import db
-from .routes import register_endpoints
+from database.models import db
+from database.routes import register_endpoints
 
 
 def create_test_app() -> Flask:
@@ -39,7 +39,6 @@ def create_app() -> Flask:
     """
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./our.db"
-
     db.init_app(app)
 
     register_endpoints(app, db)

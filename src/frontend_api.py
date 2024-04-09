@@ -11,6 +11,7 @@ from re import match
 from mas import analyze_sbom
 from util import UserRequirements
 
+
 def check_input_arguments(requirements: UserRequirements) -> None:
     """
     Check if the input arguments meet the specified requirements.
@@ -27,6 +28,7 @@ def check_input_arguments(requirements: UserRequirements) -> None:
         raise ValueError("Input arguments are invalid") from e
     except TypeError as e:
         raise TypeError("Input arguments are not integers") from e
+
 
 def check_format_of_sbom(sbom_file) -> None:
     """
@@ -50,13 +52,13 @@ def check_format_of_sbom(sbom_file) -> None:
     if not sbom_file["bomFormat"] == "CycloneDX":
         raise SyntaxError("bomFormat missing or not CycloneDX")
 
-    if not sbom_file["specVersion"] in ["1.2","1.3","1.4","1.5"]:
+    if not sbom_file["specVersion"] in ["1.2", "1.3", "1.4", "1.5"]:
         raise IndexError("CycloneDX version missing, out of date or incorrect")
 
     if not match(
-        "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-"+
-        "[0-9a-f]{4}-[0-9a-f]{12}$",
-        sbom_file["serialNumber"]):
+            "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-" +
+            "[0-9a-f]{4}-[0-9a-f]{12}$",
+            sbom_file["serialNumber"]):
         raise SyntaxError(
             "SBOM Serial number does not match the RFC-4122 format")
 
@@ -74,6 +76,7 @@ def check_format_of_sbom(sbom_file) -> None:
 
     if name == "":
         raise ValueError("Name could not be found, non valid SBOM")
+
 
 def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
     """
