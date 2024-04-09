@@ -44,6 +44,12 @@ services:
     build:
       context: .
       dockerfile: ./src/OSSQAWebAPI/Dockerfile
+    ports:
+     - "8080:8080"
+    expose:
+    - "8080"
+
+
 
 
 

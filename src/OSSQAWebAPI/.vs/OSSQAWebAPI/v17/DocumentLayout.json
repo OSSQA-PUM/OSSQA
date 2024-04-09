@@ -3,13 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|c:\\users\\lunas\\documents\\ossqa\\src\\ossqawebapi\\ossqawebapi\\ossqawebapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|solutionrelative:ossqawebapi\\ossqawebapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|c:\\users\\lunas\\documents\\ossqa\\src\\ossqawebapi\\ossqawebapi\\ossqawebapi.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|solutionrelative:ossqawebapi\\ossqawebapi.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|c:\\users\\lunas\\documents\\ossqa\\src\\ossqawebapi\\ossqawebapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|solutionrelative:ossqawebapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\lunas\\Documents\\OSSQA\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\lunas\\Documents\\OSSQA\\src\\database\\Dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\Dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\lunas\\Documents\\OSSQA\\Dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|c:\\users\\lunas\\documents\\ossqa\\src\\ossqawebapi\\ossqawebapi\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D8B25BB1-50F1-41FA-AD80-77388661DFA3}|OSSQAWebAPI\\OSSQAWebAPI.csproj|solutionrelative:ossqawebapi\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,51 +33,83 @@
       "DocumentGroups": [
         {
           "DockedWidth": 327,
-          "SelectedChildIndex": 0,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "docker-compose.yml",
-              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\docker-compose.yml",
-              "RelativeDocumentMoniker": "..\\..\\docker-compose.yml",
-              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\docker-compose.yml",
-              "RelativeToolTip": "..\\..\\docker-compose.yml",
-              "ViewState": "AQIAAA8AAAAAAAAAAAAAAC0AAAA6AAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2024-04-08T12:53:55.904Z",
-              "EditorCaption": ""
-            }
-          ]
-        },
-        {
-          "DockedWidth": 273,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "OSSQAWebAPI",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "RelativeDocumentMoniker": "OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "RelativeToolTip": "OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-04-09T12:57:22.164Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "OSSQAWebAPI",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "RelativeDocumentMoniker": "OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "RelativeToolTip": "OSSQAWebAPI\\OSSQAWebAPI.csproj",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2024-04-09T12:40:55.449Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Dockerfile",
-              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\database\\Dockerfile",
-              "RelativeDocumentMoniker": "..\\database\\Dockerfile",
-              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\database\\Dockerfile",
-              "RelativeToolTip": "..\\database\\Dockerfile",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAhAAAA",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\Dockerfile",
+              "RelativeDocumentMoniker": "Dockerfile",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\Dockerfile",
+              "RelativeToolTip": "Dockerfile",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAA1AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-04-08T13:07:37.097Z",
+              "WhenOpened": "2024-04-09T12:39:53.422Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "App.razor",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\Components\\App.razor",
+              "RelativeDocumentMoniker": "OSSQAWebAPI\\Components\\App.razor",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\Components\\App.razor",
+              "RelativeToolTip": "OSSQAWebAPI\\Components\\App.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-04-09T12:36:37.545Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Dockerfile",
-              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\Dockerfile",
-              "RelativeDocumentMoniker": "..\\..\\Dockerfile",
-              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\Dockerfile",
-              "RelativeToolTip": "..\\..\\Dockerfile",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAOAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-04-08T13:09:38.469Z",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\Program.cs",
+              "RelativeDocumentMoniker": "OSSQAWebAPI\\Program.cs",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\Program.cs",
+              "RelativeToolTip": "OSSQAWebAPI\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-09T12:35:42.879Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "C:\\Users\\lunas\\Documents\\OSSQA\\docker-compose.yml",
+              "RelativeDocumentMoniker": "..\\..\\docker-compose.yml",
+              "ToolTip": "C:\\Users\\lunas\\Documents\\OSSQA\\docker-compose.yml",
+              "RelativeToolTip": "..\\..\\docker-compose.yml",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAAACoAAAAsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2024-04-08T12:53:55.904Z",
               "EditorCaption": ""
             }
           ]
