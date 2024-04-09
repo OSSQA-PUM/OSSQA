@@ -3,23 +3,35 @@
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
-<div centered="true">
-    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="300px" />
-    <input type="file" id="file" name="file" accept=".json" />
+<div class="d-flex justify-content-center flex-column align-items-center">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
+    <InputFile accept=".json" OnChange="GetInput"  />
 </div>
-<p role="status">result: @result</p>
+<p role="status">result: @path</p>
 
 
-<button class="btn btn-primary" @onclick="AnalyzeSBOM">Click me</button>
+<button class="btn btn-primary" @onclick="LoadFile">Click me</button>
 
 
 
 @code {
-    private String result = "no result";
-    private void AnalyzeSBOM()
+    private IBrowserFile? file;
+    private string path = "";
+    private async Task LoadFile()
     {
-        result = "result";
+        using var memoryStream = new MemoryStream();
+        if(file == null)
+        {
+            path = "No file selected";
+            return;
+        }
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+        path = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
 
+    }
+    private void GetInput(InputFileChangeEventArgs e)
+    {
+        file = e.File;
     }
 }
 

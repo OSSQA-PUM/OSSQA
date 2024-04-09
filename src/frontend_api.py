@@ -96,13 +96,23 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
         InputArgumentsError: If the input arguments are invalid.
         SBOMFormatError: If the SBOM format is invalid.
     """
-    if not requirements:
+     if not requirements:
         requirements = UserRequirements()
 
     check_input_arguments(requirements)
 
-    with open(path, encoding="utf-8") as sbom_file:
+    try:
         sbom_dict = json.load(sbom_file)
         check_format_of_sbom(sbom_dict)
         return analyze_sbom(sbom_dict, requirements=requirements)
+    
+    except:
+        with open(path, encoding="utf-8") as sbom_file:
+        sbom_dict = json.load(sbom_file)
+        check_format_of_sbom(sbom_dict)
+        return analyze_sbom(sbom_dict, requirements=requirements)
+   
+
+    
+
 # End-of-file (EOF)
