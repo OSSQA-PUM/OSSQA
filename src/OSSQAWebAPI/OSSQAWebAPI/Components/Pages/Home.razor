@@ -6,23 +6,28 @@
 @using System.Text.Json
 @using System.Net.Http.Headers
 
-<PageTitle>Home</PageTitle>
-<div class="d-flex justify-content-center flex-column align-items-center">
+<PageTitle>OSSQA</PageTitle>
+<div class="d-flex justify-content-center flex-column align-items-center m-5">
     <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
-    <InputFile accept=".json" OnChange="GetInput"  />
+    <input type="text" placeholder="Link to GitHub repository..." @onchange="OnChange">
 </div>
-<p role="status">result: @path</p>
 
+<div class="d-flex justify-content-center">
+    <InputFile accept=".json" OnChange="GetInput"  />
+    <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
+</div>
 
-<button class="btn btn-primary" @onclick="LoadFile">Click me</button>
-
-
+@if (loadedFile) {
+    <p role="status">Result: @path</p>
+}
 
 @code {
     private IBrowserFile? file;
     private string path = "";
+    private bool loadedFile = false;
     private async Task LoadFile()
     {
+        loadedFile = true;
         using var memoryStream = new MemoryStream();
         if(file == null)
         {
@@ -40,7 +45,9 @@
     private void GetInput(InputFileChangeEventArgs e)
     {
         file = e.File;
-        
+    }
+    private void OnChange(ChangeEventArgs e)
+    {
+        // TODO: check if valid link
     }
 }
-
