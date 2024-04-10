@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import requests
 from util import Dependency
 
-host = "http://localhost:5080"
+host = "http://host.docker.internal:5090"
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):

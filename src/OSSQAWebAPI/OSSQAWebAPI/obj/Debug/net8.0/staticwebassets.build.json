@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "jQKhz6UHlV1QJwrEGQRR8pfD6MgnOVslEOhbOdslOOU=",
+  "Hash": "7CorDtpFhaR/6Sq3/v4rMJKUNfqnuRr8zjpFNl+Gx7Q=",
   "Source": "OSSQAWebAPI",
   "BasePath": "_content/OSSQAWebAPI",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "OSSQAWebAPI\\wwwroot",
       "Source": "OSSQAWebAPI",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\OSSQAWebAPI.styles.css",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\OSSQAWebAPI.styles.css",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "OSSQAWebAPI.styles.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\OSSQAWebAPI.styles.css"
+      "OriginalItemSpec": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\bundle\\OSSQAWebAPI.styles.css"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "OSSQAWebAPI.bundle.scp.css",
       "AssetKind": "All",
@@ -52,13 +52,13 @@
       "AssetTraitValue": "ProjectBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css"
+      "OriginalItemSpec": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\app.css",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\app.css",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "app.css",
       "AssetKind": "All",
@@ -74,10 +74,10 @@
       "OriginalItemSpec": "wwwroot\\app.css"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "bootstrap/bootstrap.min.css",
       "AssetKind": "All",
@@ -93,10 +93,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "bootstrap/bootstrap.min.css.map",
       "AssetKind": "All",
@@ -112,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\favicon.png",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\favicon.png",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "favicon.png",
       "AssetKind": "All",
@@ -131,10 +131,10 @@
       "OriginalItemSpec": "wwwroot\\favicon.png"
     },
     {
-      "Identity": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\images\\LOGO_OSSQA.png",
+      "Identity": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\images\\LOGO_OSSQA.png",
       "SourceId": "OSSQAWebAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\",
       "BasePath": "_content/OSSQAWebAPI",
       "RelativePath": "images/LOGO_OSSQA.png",
       "AssetKind": "All",

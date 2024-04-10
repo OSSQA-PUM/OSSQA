@@ -30,9 +30,8 @@
             return;
         }
         await file.OpenReadStream().CopyToAsync(memoryStream);
-        //path = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
-
-        HttpResponseMessage result = await Http.PostAsJsonAsync("http://127.0.0.1:5080/upload", path);
+        path = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
+        HttpResponseMessage result = await Http.PostAsJsonAsync("http://host.docker.internal:98/upload", path);
         path = await result.Content.ReadAsStringAsync();
 
     }
