@@ -1,6 +1,7 @@
 {
   "Files": [
     {
+<<<<<<< HEAD
       "Id": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css",
       "PackagePath": "staticwebassets\\OSSQAWebAPI.bundle.scp.css"
     },
@@ -22,6 +23,29 @@
     },
     {
       "Id": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\images\\LOGO_OSSQA.png",
+=======
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OSSQAWebAPI.bundle.scp.css",
+      "PackagePath": "staticwebassets\\OSSQAWebAPI.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\wwwroot\\images\\LOGO_OSSQA.png",
+>>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
       "PackagePath": "staticwebassets\\images\\LOGO_OSSQA.png"
     },
     {

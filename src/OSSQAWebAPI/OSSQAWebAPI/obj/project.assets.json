@@ -100,11 +100,16 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
     "C:\\Users\\jessi\\.nuget\\packages\\": {}
+=======
+    "C:\\Users\\lunas\\.nuget\\packages\\": {}
+>>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
       "projectName": "OSSQAWebAPI",
       "projectPath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
@@ -113,6 +118,16 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\jessi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+      "projectUniqueName": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+      "projectName": "OSSQAWebAPI",
+      "projectPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+      "packagesPath": "C:\\Users\\lunas\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\lunas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

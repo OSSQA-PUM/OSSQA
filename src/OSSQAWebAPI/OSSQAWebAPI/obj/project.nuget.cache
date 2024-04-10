@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "VXVkgD0uvHyEgZ0YDWqd/vHr61yxRQHrgPZ9EnXGs68ldH/tnyx6pdDGH59BDBwrUmzKyxvu8hBI/68/UeAw1g==",
   "success": true,
   "projectFilePath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+=======
+  "dgSpecHash": "m1CrKR/MvHRvuQG7PvCwCTEDc1UjJw83frqQony8f52rrH/h+/6qWQ7v94wxUl5I27xWr4CqMd/t5ww8x0Zi+w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+>>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
   "expectedPackageFiles": [
     "C:\\Users\\jessi\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.6\\microsoft.visualstudio.azure.containers.tools.targets.1.19.6.nupkg.sha512"
   ],

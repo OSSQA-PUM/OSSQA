@@ -8,6 +8,8 @@ This file contains the API that communicates information
 import json
 
 from re import match
+from typing import List
+
 from mas import analyze_sbom
 from util import UserRequirements
 import requests
@@ -79,7 +81,7 @@ def check_format_of_sbom(sbom_file) -> None:
         raise ValueError("Name could not be found, non valid SBOM")
 
 
-def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
+def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, int, str]]:
     """
     Analyzes the software bill of materials (SBOM) stored in a JSON file and 
     returns a list of floats.
@@ -97,11 +99,18 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
         InputArgumentsError: If the input arguments are invalid.
         SBOMFormatError: If the SBOM format is invalid.
     """
-     if not requirements:
+    print(path)
+    print(requirements)
+    if not requirements:
         requirements = UserRequirements()
 
     check_input_arguments(requirements)
 
+    if not path.endswith(".json"):
+
+        sbom_dict = json.loads(path)
+        check_format_of_sbom(sbom_dict)
+        return analyze_sbom(sbom_dict, requirements=requirements)
     with open(path, encoding="utf-8") as sbom_file:
         sbom_dict = json.load(sbom_file)
         check_format_of_sbom(sbom_dict)

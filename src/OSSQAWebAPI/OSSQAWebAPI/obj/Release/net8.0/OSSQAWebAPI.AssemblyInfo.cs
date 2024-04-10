@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OSSQAWebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+43806224fc22cbd9760bb5a5b3fb228e66d2bf0f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec0aee7f5e4562f74db1530e5b8607d97c5a82d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("OSSQAWebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OSSQAWebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
