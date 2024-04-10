@@ -10,6 +10,7 @@ import json
 from re import match
 from mas import analyze_sbom
 from util import UserRequirements
+import requests
 
 
 def check_input_arguments(requirements: UserRequirements) -> None:
@@ -101,18 +102,8 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[float]:
 
     check_input_arguments(requirements)
 
-    try:
+    with open(path, encoding="utf-8") as sbom_file:
         sbom_dict = json.load(sbom_file)
         check_format_of_sbom(sbom_dict)
         return analyze_sbom(sbom_dict, requirements=requirements)
-    
-    except:
-        with open(path, encoding="utf-8") as sbom_file:
-        sbom_dict = json.load(sbom_file)
-        check_format_of_sbom(sbom_dict)
-        return analyze_sbom(sbom_dict, requirements=requirements)
-   
-
-    
-
 # End-of-file (EOF)

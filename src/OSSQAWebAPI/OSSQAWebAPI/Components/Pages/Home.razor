@@ -1,6 +1,10 @@
 ﻿@page "/"
 @using System.Diagnostics
 @rendermode InteractiveServer
+@inject HttpClient Http
+@inject HttpClient httpClient
+@using System.Text.Json
+@using System.Net.Http.Headers
 
 <PageTitle>Home</PageTitle>
 <div class="d-flex justify-content-center flex-column align-items-center">
@@ -26,12 +30,17 @@
             return;
         }
         await file.OpenReadStream().CopyToAsync(memoryStream);
-        path = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
+        //path = System.Text.Encoding.UTF8.GetString(memoryStream.ToArray());
+
+        HttpResponseMessage result = await Http.PostAsJsonAsync("http://127.0.0.1:5080/upload", path);
+        path = await result.Content.ReadAsStringAsync();
 
     }
+
     private void GetInput(InputFileChangeEventArgs e)
     {
         file = e.File;
+        
     }
 }
 

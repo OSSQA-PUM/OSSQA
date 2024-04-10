@@ -183,3 +183,12 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                                  "checks": [check.to_dict() for check in dependency.checks],
                                  "url": dependency.url})
         return jsonify(dependencies), 200
+
+    @app.route("/upload", methods=['POST'])
+    def upload():
+        data = request.get_json()
+        return "jsonify(data)"
+
+    @app.route("/hello", methods=['GET'])
+    def hello():
+        return "Hello World!"

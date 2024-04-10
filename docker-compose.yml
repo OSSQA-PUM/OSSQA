@@ -12,7 +12,7 @@ services:
     expose:
       - "5080"
 
-  ossqa:
+  ossqa-base:
     image: ossqa
     build:
       context: .
@@ -23,7 +23,7 @@ services:
     env_file: .env
     expose:
       - "5080"
-    command: ["python", "__main__.py", "&"]
+      - "8080"
 
   ossqa-prototype:
     image: ossqa-prototype
@@ -39,6 +39,19 @@ services:
       dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
+  ossqa:
+    image: ossqa
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - ossqa-database
+    network_mode: host
+    env_file: .env
+    expose:
+      - "5080"
+    command: ["python", "__main__.py", "&"]
+
   ossqa-frontend:
     image: ${DOCKER_REGISTRY-}ossqa-frontend
     build:
@@ -46,8 +59,8 @@ services:
       dockerfile: ./src/OSSQAWebAPI/Dockerfile
     ports:
      - "8080:8080"
-    expose:
-    - "8080"
+    depends_on:
+        - ossqa-database  
 
 
 
