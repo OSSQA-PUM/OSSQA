@@ -7,7 +7,7 @@ various objects in the database.
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from .models import SBOM, Dependency, DependencyCheck
+from database.models import SBOM, Dependency, DependencyCheck
 
 
 def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:
@@ -23,17 +23,18 @@ def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:
     """
     name_version = f"{component['name']}@{component['version']}"
     score = component["score"]
+    url = component["url"]
 
     dependency = Dependency.query.filter_by(name_version=name_version).first()
     if dependency:
         dependency.score = score
         return dependency, False
     else:
-        return Dependency(name_version=name_version, score=score), True
+        return Dependency(name_version=name_version, score=score, url=url), True
 
 
 def create_or_update_check(data: dict, dep_name_verison: str) \
-    -> tuple[DependencyCheck, bool]:
+        -> tuple[DependencyCheck, bool]:
     """
     Create or update a check in the database
 
@@ -50,6 +51,9 @@ def create_or_update_check(data: dict, dep_name_verison: str) \
     details = data["details"]
     reason = data["reason"]
     score = data["score"]
+
+    if isinstance(details, list):
+        details = "".join(details)
 
     check = DependencyCheck.query.filter_by(
         name=name,
@@ -78,6 +82,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         app (Flask): The flask app.
         db (SQLAlchemy): The database.
     """
+
     @app.errorhandler(404)
     def page_not_found(error):
         print("Error:", error)
@@ -105,8 +110,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (object): The added SBOM.
         """
-        # NOTE: should we really commit before the absolute end?
-        #       what if something fails?
 
         sbom = SBOM(serial_number=request.json["serialNumber"],
                     version=request.json["version"],
@@ -131,7 +134,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                     db.session.add(check)
                     dependency.checks.append(check)
                 db.session.commit()
-
+        db.session.commit()
         return jsonify(sbom.to_dict()), 201
 
     @app.route("/get_SBOM", methods=["GET"])
@@ -162,16 +165,21 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             json (array): The existing dependencies.
         """
         dep_name_versions: list[str] = []
-        for dep in request.json:
-            dep_name_versions.append(f"{dep['name']}@{dep['version']}")
+        for dependency in request.json:
+            name = dependency["name"]
+            version = dependency["version"]
+            dep_name_versions.append(f"{name}@{version}")
 
         dependencies = []
         for dep_name_version in dep_name_versions:
+            # find dependency in database
             dependency = Dependency.query.filter_by(
-                name_version=dep_name_version
-            ).first()
+                name_version=dep_name_version).first()
+            # if no match, continue
             if not dependency:
                 continue
-            dependencies.append(dependency.to_dict())
-
+            dependencies.append({"name_version": dependency.name_version,
+                                 "score": dependency.score,
+                                 "checks": [check.to_dict() for check in dependency.checks],
+                                 "url": dependency.url})
         return jsonify(dependencies), 200
