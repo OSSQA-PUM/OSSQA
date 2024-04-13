@@ -15,6 +15,7 @@ and SSF lookup.
 
 To run the unit tests, execute this file as the main module.
 """
+import pytest
 from calculate_dependencies import (
     Dependency,
     parse_git_url,
@@ -98,6 +99,7 @@ def test_try_get_from_ssf_api():
     assert scorecard is None
 
 
+@pytest.mark.skip("This is an integration test, which is to be implemented later")
 @log_test_results([])  # TODO add relevant test case
 def test_lookup_database():
     """Test the lookup_database function."""
