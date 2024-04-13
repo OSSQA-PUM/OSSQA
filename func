@@ -1,0 +1,16 @@
+Name                                       Funcs   Miss   Cover   Missing
+-------------------------------------------------------------------------
+src\backend_communication.py                   4      4      0%   12, 46, 58, 75
+src\calculate_dependencies.py                 12      4     67%   203, 296, 328, 359
+src\database\__init__.py                       0      0    100%   
+src\database\models.py                         3      0    100%   
+src\database\routes.py                         9      2     78%   92, 97
+src\database\server.py                         2      1     50%   33
+src\final_score_calculator\__init__.py         0      0    100%   
+src\final_score_calculator\calculator.py       1      0    100%   
+src\frontend_api.py                            3      1     67%   81
+src\mas.py                                     2      2      0%   21, 39
+src\util.py                                    8      3     62%   118, 130, 159
+-------------------------------------------------------------------------
+TOTAL                                         44     17     61%   
+

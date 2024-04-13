@@ -16,6 +16,7 @@ RUN chmod +x /usr/local/bin/scorecard
 COPY requirements.txt .
 COPY src .
 COPY pytest.ini .
+COPY .coveragerc .
 RUN python -m pip install -r requirements.txt
 
 
