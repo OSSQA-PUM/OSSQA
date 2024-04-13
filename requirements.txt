@@ -8,3 +8,4 @@ requests
 pytest
 tabulate
 decorator
+fun-coverage
