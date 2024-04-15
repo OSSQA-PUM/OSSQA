@@ -1,22 +1,6 @@
 {
   "format": 1,
   "restore": {
-<<<<<<< HEAD
-    "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {}
-  },
-  "projects": {
-    "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
-        "projectName": "OSSQAWebAPI",
-        "projectPath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
-        "packagesPath": "C:\\Users\\jessi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "C:\\Users\\jessi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-=======
     "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {}
   },
   "projects": {
@@ -31,7 +15,6 @@
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\lunas\\AppData\\Roaming\\NuGet\\NuGet.Config",
->>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -86,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

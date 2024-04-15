@@ -9,7 +9,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./src/OSSQAWebAPI/OSSQAWebAPI", "OSSQAWebAPI/"]
+COPY ["./src/frontend/OSSQAWebAPI/OSSQAWebAPI", "OSSQAWebAPI/"]
 RUN dotnet restore "./OSSQAWebAPI/OSSQAWebAPI.csproj"
 
 RUN dotnet build "./OSSQAWebAPI/OSSQAWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build

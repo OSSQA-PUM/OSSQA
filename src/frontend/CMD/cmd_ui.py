@@ -5,9 +5,9 @@ import glob
 import os
 from pathlib import Path
 from tabulate import tabulate
-
-import util
-import frontend_api
+import requests
+#import util
+#import frontend_api
 
 
 def get_choice():
@@ -54,7 +54,8 @@ def set_token():
     """
     print("Set a token:")
     os.environ['GITHUB_AUTH_TOKEN'] = input("Input your token: ")
-    if not util.check_token_usage():
+    if False:
+    #if not util.check_token_usage():
         os.environ['GITHUB_AUTH_TOKEN'] = ""
         print("Token was invalid")
 
@@ -68,8 +69,7 @@ def select_sbom() -> str:
     clear_console()
     print("Please select the SBOM to be searched \n")
     #Finds the SBOMS that the user has
-    sboms = list(list(glob.glob(str(Path(__file__).parent.absolute()\
-                                / 'tests' / 'sboms' / 'example-SBOM.json'))))
+    sboms = list(list(glob.glob(str(Path(__file__).parent.absolute() / 'example-SBOM.json'))))
     for i, sbom in enumerate(sboms):
         print(f"{i}: {sbom}")
     choice = "not valid"
@@ -94,8 +94,10 @@ def search_sbom(sbom):
     Returns:
         None
     """
-    dict_weighted_results:list[(str, int, str)] #(checkname, score, dependency)
-    dict_weighted_results = frontend_api.frontend_api(sbom)
+    dict_weighted_results: list[(str, int, str)] #(checkname, score, dependency)
+    #dict_weighted_results = frontend_api.frontend_api(sbom)
+    result = requests.post("http://localhost:98/analyze", sbom)
+    dict_weighted_results = result.json()
     print(tabulate(dict_weighted_results,
                    headers=["Checkname", "Score", "Dependency"]))
 

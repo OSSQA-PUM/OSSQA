@@ -5,7 +5,7 @@ services:
     image: ossqa-database
     build:
       context: .
-      dockerfile: src/database/Dockerfile
+      dockerfile: src/backend/database/Dockerfile
     env_file: .env
     ports:
       - "5090:5090"
@@ -28,30 +28,28 @@ services:
       dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
-  ossqa:
-    image: ossqa
+  ossqa-cmd:
+    image: ossqa-cmd
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: src/frontend/CMD/Dockerfile
     depends_on:
-      - ossqa-database
+      - ossqa-main
     env_file: .env
-    expose:
-      - "5090"
-    command: ["python", "__main__.py", "&"]
+    command: exclude -a delete -f
 
-  ossqa-frontend:
-    image: ${DOCKER_REGISTRY-}ossqa-frontend
+  ossqa-web:
+    image: ${DOCKER_REGISTRY-}ossqa-web
     build:
       context: .
-      dockerfile: ./src/OSSQAWebAPI/Dockerfile
+      dockerfile: src/frontend/OSSQAWebAPI/Dockerfile
     ports:
      - "8080:8080"
     depends_on:
-        - ossqa-base  
+        - ossqa-main
         
         
-  ossqa-base:
+  ossqa-main:
     image: ossqa
     build:
       context: .

@@ -12,7 +12,7 @@ from typing import List
 
 from mas import analyze_sbom
 from util import UserRequirements
-import requests
+import calculate_dependencies
 
 
 def check_input_arguments(requirements: UserRequirements) -> None:
@@ -81,6 +81,10 @@ def check_format_of_sbom(sbom_file) -> None:
         raise ValueError("Name could not be found, non valid SBOM")
 
 
+def get_updates() -> str:
+    return calculate_dependencies.current_status
+
+
 def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, int, str]]:
     """
     Analyzes the software bill of materials (SBOM) stored in a JSON file and 
@@ -107,7 +111,6 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, 
     check_input_arguments(requirements)
 
     if not path.endswith(".json"):
-
         sbom_dict = json.loads(path)
         check_format_of_sbom(sbom_dict)
         return analyze_sbom(sbom_dict, requirements=requirements)

@@ -11,15 +11,13 @@ import json
 import subprocess
 from multiprocessing import Pool
 from typing import Any
-from urllib.parse import urlparse
 
-import requests
 import tqdm
 
 from util import Dependency, validate_scorecard
 from backend_communication import *
 
-
+current_status = "not doing anything"
 def parse_git_url(url: str) -> tuple[str, str]:
     """
     Parses the git URL and returns the platform,
@@ -354,6 +352,7 @@ def analyse_multiple_scores(dependencies: list[Dependency]) -> tuple[list[Depend
     print("Successfully analyzed " \
           + f"{len(dependency_scores)}/{len(dependencies)} dependencies")
     return dependency_scores, needed_dependencies
+
 
 
 def get_dependencies(sbom: dict) -> tuple[list[Dependency], list[Dependency], dict]:

@@ -91,11 +91,14 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         })
 
     response = requests.get(host + "/get_existing_dependencies",
-                                    json=dependency_primary_keys,
-                                    timeout=5
-                                    )
+                            json=dependency_primary_keys,
+                            timeout=5
+                            )
 
     result: list[Dependency] = []
+    if response.status_code != 200:
+        print(response.request)
+        return result
     for dependency in response.json():
         parsed_url = urlparse(dependency["url"])
         dependency_score = {"score": dependency["score"],

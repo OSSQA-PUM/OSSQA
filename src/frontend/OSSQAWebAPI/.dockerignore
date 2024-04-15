@@ -12,7 +12,7 @@
 **/*.dbmdl
 **/*.jfm
 **/azds.yaml
-**/bin
+OSSQAWebAPI/bin
 **/charts
 **/docker-compose*
 **/Dockerfile*

@@ -7,7 +7,7 @@ various objects in the database.
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from database.models import SBOM, Dependency, DependencyCheck
+from models import SBOM, Dependency, DependencyCheck
 
 
 def create_or_update_dependency(component: dict) -> tuple[Dependency, bool]:
@@ -172,12 +172,11 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
 
         dependencies = []
         for dep_name_version in dep_name_versions:
-            # find dependency in database
             dependency = Dependency.query.filter_by(
                 name_version=dep_name_version).first()
-            # if no match, continue
             if not dependency:
                 continue
+            print("Dependency " + dependency.to_dict())
             dependencies.append({"name_version": dependency.name_version,
                                  "score": dependency.score,
                                  "checks": [check.to_dict() for check in dependency.checks],

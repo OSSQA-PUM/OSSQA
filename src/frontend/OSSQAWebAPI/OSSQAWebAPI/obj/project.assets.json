@@ -100,25 +100,11 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
-    "C:\\Users\\jessi\\.nuget\\packages\\": {}
-=======
     "C:\\Users\\lunas\\.nuget\\packages\\": {}
->>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
-      "projectUniqueName": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
-      "projectName": "OSSQAWebAPI",
-      "projectPath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
-      "packagesPath": "C:\\Users\\jessi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\",
-      "projectStyle": "PackageReference",
-      "configFilePaths": [
-        "C:\\Users\\jessi\\AppData\\Roaming\\NuGet\\NuGet.Config",
-=======
       "projectUniqueName": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
       "projectName": "OSSQAWebAPI",
       "projectPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
@@ -127,7 +113,6 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\lunas\\AppData\\Roaming\\NuGet\\NuGet.Config",
->>>>>>> 644cce37547dc8a28643cf662836ed9187aeadcd
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -182,8 +167,16 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

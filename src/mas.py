@@ -10,7 +10,6 @@ based on the requirements.
 - get_old_results(sbom: dict): This function calls the backend API to get 
 the old results for a given SBOM.
 """
-from typing import List
 
 import calculate_dependencies
 from final_score_calculator import calculator

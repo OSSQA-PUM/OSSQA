@@ -1,0 +1,79 @@
+﻿@page "/"
+@using System.Diagnostics
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject HttpClient httpClient
+@using System.Text.Json
+@using System.Net.Http.Headers
+
+<PageTitle>OSSQA</PageTitle>
+<div class="d-flex justify-content-center flex-column align-items-center m-5">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
+    <input type="text" placeholder="Link to GitHub repository..." @onchange="OnChange">
+    <p role="status"> @status</p>
+</div>
+
+<div class="d-flex justify-content-center">
+    <InputFile accept=".json" OnChange="GetInput"  />
+    <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
+</div>
+
+@if (loadedFile) {
+    <p role="status"> @analyzedSBOM</p>
+}
+
+@code {
+    private IBrowserFile? file;
+    private string analyzedSBOM = "";
+    private string status = "";
+    private bool loadedFile = false;
+    private SemaphoreSlim analyzing = new (1,1);
+    private async Task LoadFile()
+    {
+        loadedFile = true;
+        using var memoryStream = new MemoryStream();
+        if(file == null)
+        {
+            analyzedSBOM = "No file selected";
+            return;
+        }
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+        status = "retrieving data...";
+
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
+        analyzing.Wait();
+        _= analyzeTask.ContinueWith(async t =>
+        {
+            analyzing.Release();
+            HttpResponseMessage result = await t;
+            if (result.IsSuccessStatusCode)
+            {
+                analyzedSBOM = await result.Content.ReadAsStringAsync();
+                StateHasChanged();
+            }
+        });
+        _= PollStatus(analyzing);
+
+    }
+    private async Task PollStatus(SemaphoreSlim pollUntil)
+    {
+        while (pollUntil.CurrentCount == 0)
+        {
+            await Task.Delay(1000);
+            HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
+            status = await response.Content.ReadAsStringAsync();
+            StateHasChanged();
+        }
+        status = "Analysis complete";
+        StateHasChanged();
+    }
+
+    private void GetInput(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+    }
+    private void OnChange(ChangeEventArgs e)
+    {
+        // TODO: check if valid link
+    }
+}
