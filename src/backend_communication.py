@@ -97,7 +97,6 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
 
     result: list[Dependency] = []
     if response.status_code != 200:
-        print(response.request)
         return result
     for dependency in response.json():
         parsed_url = urlparse(dependency["url"])

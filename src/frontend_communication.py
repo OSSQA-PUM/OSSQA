@@ -8,7 +8,6 @@ app = Flask(__name__)
 def analyze():
     print("Request received")
     data = request.get_json()
-    print(data)
     result = frontend_api.frontend_api(data)
     return result
 

@@ -82,7 +82,7 @@ def check_format_of_sbom(sbom_file) -> None:
 
 
 def get_updates() -> str:
-    return calculate_dependencies.current_status
+    return calculate_dependencies.get_current_status()
 
 
 def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, int, str]]:
@@ -103,8 +103,6 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, 
         InputArgumentsError: If the input arguments are invalid.
         SBOMFormatError: If the SBOM format is invalid.
     """
-    print(path)
-    print(requirements)
     if not requirements:
         requirements = UserRequirements()
 

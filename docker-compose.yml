@@ -36,7 +36,6 @@ services:
     depends_on:
       - ossqa-main
     env_file: .env
-    command: exclude -a delete -f
 
   ossqa-web:
     image: ${DOCKER_REGISTRY-}ossqa-web
