@@ -31,3 +31,7 @@ jobs:
       run: |
         docker cp ossqa-tests-container:/app/test_logs.txt ./test_logs.txt
         echo "$(cat ./test_logs.txt)"
+    - name: Print function coverage
+      run: |
+        docker cp ossqa-tests-container:/app/.coverage.function ./.coverage.function
+        echo "$(cat ./.coverage.function)"

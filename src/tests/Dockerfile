@@ -16,6 +16,7 @@ RUN chmod +x /usr/local/bin/scorecard
 COPY requirements.txt .
 COPY src .
 COPY pytest.ini .
+COPY .coveragerc .
 RUN python -m pip install -r requirements.txt
 
 
@@ -32,4 +33,4 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-ENTRYPOINT ["pytest", "tests", "--verbose"]
+ENTRYPOINT [ "sh", "tests/run.sh" ]
