@@ -1,7 +1,7 @@
 from flask import Flask, request
-import input_analyzer
 import mas
 from util import UserRequirements
+from job_observer import JobModelSingleton, JobListerner
 
 
 def parse_user_reqs(user_reqs: str) -> UserRequirements:
@@ -37,6 +37,9 @@ def parse_user_reqs(user_reqs: str) -> UserRequirements:
 
 app = Flask(__name__)
 
+listener = JobListerner()
+job_model = JobModelSingleton()
+job_model.register_observer(listener)
 
 @app.errorhandler(415)
 def page_not_found(error):
@@ -67,7 +70,7 @@ def hello():
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
-    return input_analyzer.get_updates()
+    return job_model.__dict__()
 
 
 app.run(port=98, debug=True, host='0.0.0.0')

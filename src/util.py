@@ -201,9 +201,9 @@ def check_token_usage(git_token: str = None):
             "used": user_data['x-ratelimit-used'],
             "remaining": user_data['X-RateLimit-Remaining']
         }
-
-    print(f"Failed to authenticate. Status code: {response.status_code}")
-    return None
+    
+    raise ValueError("Failed to authenticate token. "
+                     + f"Status code: {response.status_code}")
 
 
 def contains_all_checks(scorecard_checks: list[dict]) -> bool:
