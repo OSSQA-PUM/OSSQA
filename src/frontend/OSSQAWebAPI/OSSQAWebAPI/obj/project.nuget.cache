@@ -1,17 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "m1CrKR/MvHRvuQG7PvCwCTEDc1UjJw83frqQony8f52rrH/h+/6qWQ7v94wxUl5I27xWr4CqMd/t5ww8x0Zi+w==",
+  "dgSpecHash": "pPoH4dTLOQVCyqMzAuvBPVvT9C5THfOIRk8J4Sy6MjlYWWElCS7SjDepPmDHFuKel/E1ztXMo17juKv4oyoigg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+  "projectFilePath": "C:\\Users\\jessi\\Desktop\\LiU\\VT2024\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\lunas\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.6\\microsoft.visualstudio.azure.containers.tools.targets.1.19.6.nupkg.sha512"
+    "C:\\Users\\jessi\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.6\\microsoft.visualstudio.azure.containers.tools.targets.1.19.6.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\lunas\\Documents\\OSSQA\\src\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  "logs": []
 }
