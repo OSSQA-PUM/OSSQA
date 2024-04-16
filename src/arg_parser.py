@@ -17,9 +17,10 @@ import os
 from argparse import ArgumentParser, Namespace
 from argparse import RawTextHelpFormatter
 from tabulate import tabulate
+import requests
+import json
 
 from util import UserRequirements, check_token_usage
-from frontend_api import frontend_api
 
 parser = ArgumentParser(description=
 """Open Source Security and Quality Assessment
@@ -260,11 +261,17 @@ def main():
 
     if args.analyze:
         path, requirements = parse_analyze_arguments(args)
+        sbom = json.load(open(path))
         dict_weighted_results: list[(str, int, str)] #(checkname, score, dependency)
-        dict_weighted_results = frontend_api(path, requirements)
+        dict_weighted_results = requests.post(
+            json=sbom, headers={"user_reqs": str(requirements)}, 
+            url="http://host.docker.internal:98" + "/analyze"
+        ).text
+
+        print(dict_weighted_results)
         #dict_weighted_results = result.json()
-        print(tabulate(dict_weighted_results,
-                        headers=["Checkname", "Score", "Dependency"]))
+        #print(tabulate(dict_weighted_results,
+        #                headers=["Checkname", "Score", "Dependency"]))
         return
 
     id = parse_lookup_arguments(args)
