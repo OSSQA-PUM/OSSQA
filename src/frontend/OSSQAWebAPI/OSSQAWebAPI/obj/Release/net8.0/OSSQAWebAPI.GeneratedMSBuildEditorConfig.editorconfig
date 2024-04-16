@@ -18,26 +18,26 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/App.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/App.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/Error.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/Home.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Routes.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/_Imports.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/lunas/Documents/LiU/OSSQA/src/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Layout/MainLayout.razor]
+[C:/Users/lunas/Documents/LiU/OSSQA/src/Frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-2rtzeg19f4
