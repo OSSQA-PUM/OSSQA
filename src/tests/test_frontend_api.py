@@ -5,7 +5,7 @@ Import file with code to be examined
 from pathlib import Path
 import json
 import pytest
-from frontend_api import check_input_arguments, check_format_of_sbom
+from input_analyzer import check_input_arguments, check_format_of_sbom
 from tests.decorators import log_test_results
 from util import UserRequirements
 
