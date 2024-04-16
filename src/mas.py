@@ -82,6 +82,8 @@ def get_old_results(sbom: dict):
 
 def validate_input(sbom, requirements=None):
     try:
+        print("sbom: ", sbom)
+        sbom = sbom.replace("'", '"')
         sbom_dict = json.loads(sbom)
     except TypeError:  # if the sbom is not a string it is a dict
         sbom_dict = json.loads(sbom["sbom"])
