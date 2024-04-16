@@ -207,7 +207,7 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1=None) -> dict[str, 
     return json_response
 
 
-def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
+def filter_database_dependencies(needed_dependencies: list[Dependency], database_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
     """
     Looks up the needed dependencies in the database
     and returns the dependencies with scores and the new needed dependencies.
@@ -224,15 +224,14 @@ def lookup_database(needed_dependencies: list[Dependency]) -> tuple[list[Depende
     global current_status
     current_status = "Looking up dependencies in database"
     print(current_status)
-    database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
 
     # Calculate the dependencies that are not in the database
 
     new_needed_dependencies = needed_dependencies.copy()
     success = 0
 
-    with tqdm.tqdm(total=len(database_response)) as progress_bar:
-        for response in database_response:
+    with tqdm.tqdm(total=len(database_dependencies)) as progress_bar:
+        for response in database_dependencies:
             if response in new_needed_dependencies:
                 idx = new_needed_dependencies.index(response)
                 dep = new_needed_dependencies.pop(idx)
