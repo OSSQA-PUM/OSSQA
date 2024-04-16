@@ -11,6 +11,7 @@ class JobStatus(StrEnum):
     DATABASE_FILTER = "Database Filter"
     SSF_LOOKUP = "SSF Lookup"
     ANALYZING_SCORE = "Analyzing Score"
+    FINAL_SCORE = "Final Score"
     COMPLETED = "Completed"
     FAILED = "Failed"
     CANCELLED = "Cancelled"
@@ -77,7 +78,7 @@ class JobModelSingleton:
             max_dependency_count,
             current_dependency_count):
         self._status = status
-        self._message = git message
+        self._message = message
         self._max_dependency_count = max_dependency_count
         self._current_dependency_count = current_dependency_count
         self.notify_observers()
