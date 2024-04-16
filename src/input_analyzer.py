@@ -8,9 +8,6 @@ This file contains the API that communicates information
 import json
 
 from re import match
-from typing import List
-
-from mas import analyze_sbom
 from util import UserRequirements
 import calculate_dependencies
 
@@ -83,37 +80,16 @@ def check_format_of_sbom(sbom_file) -> None:
 
 def get_updates() -> str:
     """
-    Get the current status of the analysis.
+    Get the current status of the analysis. Will be deleted and replaced by observer before final release
     """
     return calculate_dependencies.get_current_status()
 
 
-def frontend_api(sbom, requirements: UserRequirements = None) -> list[list[str, int, str]]:
-    """
-    Analyzes the software bill of materials (SBOM) stored in a JSON file and 
-    returns a list of floats.
+def validate_input(sbom_dict, requirements: UserRequirements = None) -> bool:
 
-    Args:
-        sbom (str): the sbom file.
-
-        requirements (UserRequirements, optional): 
-        User-defined requirements for the analysis. Defaults to None.
-
-    Returns:
-        list[list[str, int, str]]: A list of floats representing the analysis results.
-
-    Raises:
-        InputArgumentsError: If the input arguments are invalid.
-        SBOMFormatError: If the SBOM format is invalid.
-    """
-    if not requirements:
-        requirements = UserRequirements()
     check_input_arguments(requirements)
-    try:
-        sbom_dict = json.loads(sbom)
-    except TypeError:  # if the sbom is not a string it is a dict
-        sbom_dict = json.loads(sbom["sbom"])
+
     check_format_of_sbom(sbom_dict)
-    return analyze_sbom(sbom_dict, requirements=requirements)
+    return True
 
 # End-of-file (EOF)

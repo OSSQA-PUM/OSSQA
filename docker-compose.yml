@@ -12,8 +12,6 @@ services:
     expose:
       - "5090"
 
-
-
   ossqa-prototype:
     image: ossqa-prototype
     build:
@@ -48,8 +46,7 @@ services:
      - "8080:8080"
     depends_on:
         - ossqa-main
-        
-        
+
   ossqa-main:
     image: ossqa
     build:

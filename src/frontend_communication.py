@@ -1,5 +1,6 @@
 from flask import Flask, request
-import frontend_api
+import input_analyzer
+import mas
 
 app = Flask(__name__)
 
@@ -14,7 +15,7 @@ def page_not_found(error):
 def analyze():
     print("Request received")
     data = request.get_json()
-    result = frontend_api.frontend_api(data)
+    result = mas.validate_input(data)
     return result
 
 
@@ -25,7 +26,7 @@ def hello():
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
-    return frontend_api.get_updates()
+    return input_analyzer.get_updates()
 
 
 app.run(port=98, debug=True, host='0.0.0.0')

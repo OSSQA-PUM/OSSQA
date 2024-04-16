@@ -15,6 +15,8 @@ import calculate_dependencies
 from final_score_calculator import calculator
 from backend_communication import get_sbom
 from util import UserRequirements
+import input_analyzer
+import json
 
 
 def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, int, str]]:
@@ -49,3 +51,16 @@ def get_old_results(sbom: dict):
     name = sbom['metadata']['name'] + sbom['metadata']['version']
     old_results = get_sbom(name)
     return old_results
+
+
+def validate_input(sbom, requirements=None):
+    try:
+        sbom_dict = json.loads(sbom)
+    except TypeError:  # if the sbom is not a string it is a dict
+        sbom_dict = json.loads(sbom["sbom"])
+    if requirements is None:
+        requirements = UserRequirements()
+    valid = input_analyzer.validate_input(sbom_dict, requirements)
+    if valid:
+        result = analyze_sbom(sbom_dict, requirements)
+        return result
