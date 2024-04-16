@@ -11,10 +11,10 @@ based on the requirements.
 the old results for a given SBOM.
 """
 
-import calculate_dependencies
+from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, analyse_multiple_scores 
 from final_score_calculator import calculator
-from backend_communication import get_sbom
-from util import UserRequirements
+from backend_communication import get_sbom, add_sbom, get_existing_dependencies
+from util import UserRequirements, Dependency
 import input_analyzer
 import json
 
@@ -32,10 +32,37 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
     Returns:
         list[float]: The final scores.
     """
-    scored = calculate_dependencies.get_dependencies(sbom)[0]
-    scores = calculator.calculate_final_scores(scored, requirements)
-    return scores
 
+    needed_dependencies, failures, failure_reason = parse_sbom(sbom=sbom)
+    total_dependency_count = len(needed_dependencies)
+
+    scores = []
+
+    new_scores, needed_dependencies = lookup_multiple_ssf(
+        needed_dependencies=needed_dependencies)
+    scores += new_scores
+
+    database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
+
+
+    new_scores, needed_dependencies = filter_database_dependencies(
+        needed_dependencies, database_response)
+    scores += new_scores
+
+    analyzed_scores, needed_dependencies = analyse_multiple_scores(
+        dependencies=needed_dependencies)
+    scores += analyzed_scores
+
+    # TODO send data that was downloaded internally
+    add_sbom(sbom, scores)
+    current_status = "Successfully got scores for " + f"{len(scores)}/" f"{total_dependency_count} dependencies. \n" \
+                                                      f"{len(failures)}" + "dependencies failed to be parsed. \n" \
+                                                                           f"{len(needed_dependencies)} dependencies could not be scored."
+    print(current_status)
+
+
+    scores = calculator.calculate_final_scores(scores, requirements)
+    return scores
 
 def get_old_results(sbom: dict):
     """
