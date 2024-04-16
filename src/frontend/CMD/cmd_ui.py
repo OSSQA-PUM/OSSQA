@@ -6,8 +6,11 @@ import os
 from pathlib import Path
 from tabulate import tabulate
 import requests
-#import util
-#import frontend_api
+import json
+
+
+# import util
+# import frontend_api
 
 
 def get_choice():
@@ -54,10 +57,10 @@ def set_token():
     """
     print("Set a token:")
     os.environ['GITHUB_AUTH_TOKEN'] = input("Input your token: ")
-    if False:
-    #if not util.check_token_usage():
-        os.environ['GITHUB_AUTH_TOKEN'] = ""
-        print("Token was invalid")
+
+    # if not util.check_token_usage():
+    #     os.environ['GITHUB_AUTH_TOKEN'] = ""
+    #     print("Token was invalid")
 
 
 def select_sbom() -> str:
@@ -68,14 +71,14 @@ def select_sbom() -> str:
     """
     clear_console()
     print("Please select the SBOM to be searched \n")
-    #Finds the SBOMS that the user has
+    # Finds the SBOMS that the user has
     sboms = list(list(glob.glob(str(Path(__file__).parent.absolute() / 'example-SBOM.json'))))
     for i, sbom in enumerate(sboms):
         print(f"{i}: {sbom}")
     choice = "not valid"
     while not choice.isdigit():
         choice = get_choice()
-    #Checks that the choice is valid
+    # Checks that the choice is valid
     if int(choice) < 0 or int(choice) > len(sboms):
         print("Invalid choice")
         return select_sbom()
@@ -94,9 +97,15 @@ def search_sbom(sbom):
     Returns:
         None
     """
-    dict_weighted_results: list[(str, int, str)] #(checkname, score, dependency)
-    #dict_weighted_results = frontend_api.frontend_api(sbom)
-    result = requests.post("http://localhost:98/analyze", sbom)
+    dict_weighted_results: list[(str, int, str)]  # (checkname, score, dependency)
+    with open(sbom, encoding="utf-8") as sbom_file:
+        sbom_dict = json.load(sbom_file)
+
+    result = requests.post("http://host.docker.internal:98/analyze", json={"sbom": json.dumps(sbom_dict)})
+    if result.status_code != 200:
+        print("Error in the request")
+        print(result.reason)
+        return
     dict_weighted_results = result.json()
     print(tabulate(dict_weighted_results,
                    headers=["Checkname", "Score", "Dependency"]))
@@ -153,6 +162,15 @@ def search_files():
     files = [f for f in glob.glob("*.txt")]
     print(files)
     return files
+
+
+def print_current_status():
+    """
+    Function for printing the current status of the analysis
+
+    Returns:
+        None
+    """
 
 
 if __name__ == "__main__":

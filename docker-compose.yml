@@ -36,6 +36,8 @@ services:
     depends_on:
       - ossqa-main
     env_file: .env
+    stdin_open: true
+    tty: true
 
   ossqa-web:
     image: ${DOCKER_REGISTRY-}ossqa-web

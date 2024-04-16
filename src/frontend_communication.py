@@ -4,6 +4,12 @@ import frontend_api
 app = Flask(__name__)
 
 
+@app.errorhandler(415)
+def page_not_found(error):
+    print("Error:", error)
+    return "Not found", 415
+
+
 @app.route("/analyze", methods=['POST'])
 def analyze():
     print("Request received")

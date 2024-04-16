@@ -82,22 +82,25 @@ def check_format_of_sbom(sbom_file) -> None:
 
 
 def get_updates() -> str:
+    """
+    Get the current status of the analysis.
+    """
     return calculate_dependencies.get_current_status()
 
 
-def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, int, str]]:
+def frontend_api(sbom, requirements: UserRequirements = None) -> list[list[str, int, str]]:
     """
     Analyzes the software bill of materials (SBOM) stored in a JSON file and 
     returns a list of floats.
 
     Args:
-        path (str): The file path to the SBOM JSON file.
+        sbom (str): the sbom file.
 
         requirements (UserRequirements, optional): 
         User-defined requirements for the analysis. Defaults to None.
 
     Returns:
-        list[float]: A list of floats representing the analysis results.
+        list[list[str, int, str]]: A list of floats representing the analysis results.
 
     Raises:
         InputArgumentsError: If the input arguments are invalid.
@@ -105,15 +108,12 @@ def frontend_api(path, requirements: UserRequirements = None) -> list[list[str, 
     """
     if not requirements:
         requirements = UserRequirements()
-
     check_input_arguments(requirements)
+    try:
+        sbom_dict = json.loads(sbom)
+    except TypeError:  # if the sbom is not a string it is a dict
+        sbom_dict = json.loads(sbom["sbom"])
+    check_format_of_sbom(sbom_dict)
+    return analyze_sbom(sbom_dict, requirements=requirements)
 
-    if not path.endswith(".json"):
-        sbom_dict = json.loads(path)
-        check_format_of_sbom(sbom_dict)
-        return analyze_sbom(sbom_dict, requirements=requirements)
-    with open(path, encoding="utf-8") as sbom_file:
-        sbom_dict = json.load(sbom_file)
-        check_format_of_sbom(sbom_dict)
-        return analyze_sbom(sbom_dict, requirements=requirements)
 # End-of-file (EOF)
