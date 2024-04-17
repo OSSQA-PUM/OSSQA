@@ -87,11 +87,11 @@ def get_old_results(sbom: dict):
 
 def validate_input(sbom, requirements=None):
     try:
-        print("sbom: ", sbom)
+        sbom = sbom.replace("'", '"')
+        sbom_dict = json.loads(sbom)["sbom"]
+    except KeyError:  # if the sbom is not a string it is a dict
         sbom = sbom.replace("'", '"')
         sbom_dict = json.loads(sbom)
-    except TypeError:  # if the sbom is not a string it is a dict
-        sbom_dict = json.loads(sbom["sbom"])
     if requirements is None:
         requirements = UserRequirements()
     valid = input_analyzer.validate_input(sbom_dict, requirements)

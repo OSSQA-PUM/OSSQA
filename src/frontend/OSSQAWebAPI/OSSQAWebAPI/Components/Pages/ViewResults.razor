@@ -1,0 +1,28 @@
+﻿@if (SbomResult != null)
+{
+    <div class="d-flex flex-wrap justify-content-evenly">
+        @foreach (var test in Tests)
+        {
+            <div style=" min-width:0.3vw; margin-bottom:3em;">
+                <h3>@test</h3>
+                @if (SbomResult.ContainsKey(test))
+                {
+                    List<String[]> values = SbomResult[test];
+                    values.Sort((x, y) => int.Parse(x[0]).CompareTo(int.Parse(y[0])));
+                    foreach (var scoreUrl in values)
+                    {
+                        <p>Score: @scoreUrl[0]/10 URL: <a href="@scoreUrl[1]"> @scoreUrl[1]</a> </p>
+                    }
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Dictionary<string, List<string[]>> SbomResult { get; set; }
+    [Parameter]
+    public string[] Tests { get; set; }
+
+}

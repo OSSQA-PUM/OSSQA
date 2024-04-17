@@ -11,6 +11,7 @@
    
     <InputFile accept=".json" OnChange="GetInput" />
     <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
+    <p>@analyzedSBOM</p>
 </div>
 
 
@@ -19,7 +20,6 @@
     private string analyzedSBOM = "";
     private string status = " ";
     private bool loadedFile = false;
-
     private SemaphoreSlim analyzing = new(1, 1);
     [Parameter]
     public Dictionary<string, List<string[]>> SbomResult { get; set; }
@@ -48,7 +48,7 @@
             {
                 var SBOMString = await result.Content.ReadAsStringAsync();
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
-
+                analyzedSBOM = SBOMString;
                 DisplaySBOM(jsonobj ?? new List<List<string>>());
                 Analyzed = true;
                 StateHasChanged();

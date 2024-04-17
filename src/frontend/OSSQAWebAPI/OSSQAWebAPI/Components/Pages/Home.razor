@@ -6,7 +6,14 @@
 
 <PageTitle>OSSQA</PageTitle>
 
-
+<div class="d-flex justify-content-evenly">
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 0;}">home</button>
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 1;}">code vulnerabilities</button>
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 2;}">maintenance</button>
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 3;}">continuous testing</button>
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 4;}">source risk assessment</button>
+    <button class="btn btn-primary" @onclick="()=>{displayPage = 5;}">build risk assessment</button>
+</div>
 
 
 <div class="d-flex justify-content-center flex-column align-items-center m-5">
@@ -14,43 +21,34 @@
     
 </div>
 
-@if (true)
-{
-    <div class="d-flex justify-content-evenly">
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 0;}">home</button>
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 1;}">code vulnerabilities</button>
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 2;}">maintenance</button>
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 3;}">continuous testing</button>
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 4;}">source risk assessment</button>
-        <button class="btn btn-primary" @onclick="()=>{displayPage = 5;}">build risk assessment</button>
-    </div>
-}
+
+
+
 
 
 @switch(displayPage){
     case 0:
-        <SbomAnalysis SbomResult="SbomResult" Analyzed="Analyzed"/>
+        <SbomAnalysis SbomResult="SbomResult"  />
         break;
     case 1:
-        <CodeVulnerability SbomResult="SbomResult"/>
+        <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
         break;
     case 2:
-        <Maintenance SbomResult="SbomResult"/>
+        <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
         break;
     case 3:
-        <ContinuousTesting SbomResult="SbomResult"/>
+        <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
         break;
     case 4:
-        <SourceRiskAssessment SbomResult="SbomResult"/>
+        <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
         break;
     case 5:
-        <BuildRiskAssessment SbomResult="SbomResult"/>
+        <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
         break;
 }
 
 @code{
     private int displayPage = 0;
     private Dictionary<string, List<string[]>> SbomResult = new ();
-    private bool Analyzed = false;
 
 }
