@@ -176,7 +176,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 name_version=dep_name_version).first()
             if not dependency:
                 continue
-            print("Dependency " + dependency.to_dict())
             dependencies.append({"name_version": dependency.name_version,
                                  "score": dependency.score,
                                  "checks": [check.to_dict() for check in dependency.checks],

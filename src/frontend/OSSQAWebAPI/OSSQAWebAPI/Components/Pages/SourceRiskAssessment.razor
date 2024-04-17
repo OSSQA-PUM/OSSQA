@@ -1,0 +1,23 @@
+﻿
+
+@if (SbomResult != null)
+{
+    foreach (var test in tests)
+    {
+        <h3>@test</h3>
+        if (SbomResult.ContainsKey(test))
+        {
+            foreach (var scoreUrl in SbomResult[test])
+            {
+                <p>Score: @scoreUrl[0] URL: @scoreUrl[1]</p>
+            }
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public Dictionary<string, List<string[]>> SbomResult { get; set; }
+    private string[] tests = ["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"];
+
+}

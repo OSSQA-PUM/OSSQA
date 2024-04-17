@@ -11,7 +11,8 @@ based on the requirements.
 the old results for a given SBOM.
 """
 
-from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, analyse_multiple_scores 
+from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, \
+    analyse_multiple_scores
 from final_score_calculator import calculator
 from backend_communication import get_sbom, add_sbom, get_existing_dependencies
 from util import UserRequirements, Dependency
@@ -44,7 +45,6 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
 
     database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
 
-
     new_scores, needed_dependencies = filter_database_dependencies(
         needed_dependencies, database_response)
     scores += new_scores
@@ -60,9 +60,12 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
                                                                            f"{len(needed_dependencies)} dependencies could not be scored."
     print(current_status)
 
-
     scores = calculator.calculate_final_scores(scores, requirements)
+    for i in range(len(scores)):
+        for j in range(len(scores[0])):
+            scores[i][j] = str(scores[i][j])
     return scores
+
 
 def get_old_results(sbom: dict):
     """

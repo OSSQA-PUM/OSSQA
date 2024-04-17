@@ -1,89 +1,56 @@
 ﻿@page "/"
+
 @using System.Diagnostics
 @rendermode InteractiveServer
-@inject HttpClient Http
-@inject HttpClient httpClient
-@using System.Text.Json
-@using System.Net.Http.Headers
+
 
 <PageTitle>OSSQA</PageTitle>
+
+
+
+
 <div class="d-flex justify-content-center flex-column align-items-center m-5">
     <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
-    <p role="status"> @status</p>
+    
 </div>
 
-<div class="d-flex justify-content-center">
-    <InputFile accept=".json" OnChange="GetInput"  />
-    <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
-</div>
-
-@if (loadedFile) {
-    <p role="status"> @analyzedSBOM</p>
+@if (true)
+{
+    <div class="d-flex justify-content-evenly">
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 0;}">home</button>
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 1;}">code vulnerabilities</button>
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 2;}">maintenance</button>
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 3;}">continuous testing</button>
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 4;}">source risk assessment</button>
+        <button class="btn btn-primary" @onclick="()=>{displayPage = 5;}">build risk assessment</button>
+    </div>
 }
 
-@code {
-    private IBrowserFile? file;
-    private string analyzedSBOM = "";
-    private string status = "";
-    private bool loadedFile = false;
-    private SemaphoreSlim analyzing = new (1,1);
-    private async Task LoadFile()
-    {
-        loadedFile = true;
-        using var memoryStream = new MemoryStream();
-        if(file == null)
-        {
-            analyzedSBOM = "No file selected";
-            return;
-        }
-        await file.OpenReadStream().CopyToAsync(memoryStream);
-        status = "retrieving data...";
 
-        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
-        analyzing.Wait();
-        _= analyzeTask.ContinueWith(async t =>
-        {
-            analyzing.Release();
-            HttpResponseMessage result = await t;
-            if (result.IsSuccessStatusCode)
-            {
-                var SBOMString = await result.Content.ReadAsStringAsync();
-                DisplaySBOM(SBOMString);
-                StateHasChanged();
-            }
-        });
-        _= PollStatus(analyzing);
+@switch(displayPage){
+    case 0:
+        <SbomAnalysis SbomResult="SbomResult" Analyzed="Analyzed"/>
+        break;
+    case 1:
+        <CodeVulnerability SbomResult="SbomResult"/>
+        break;
+    case 2:
+        <Maintenance SbomResult="SbomResult"/>
+        break;
+    case 3:
+        <ContinuousTesting SbomResult="SbomResult"/>
+        break;
+    case 4:
+        <SourceRiskAssessment SbomResult="SbomResult"/>
+        break;
+    case 5:
+        <BuildRiskAssessment SbomResult="SbomResult"/>
+        break;
+}
 
-    }
-    private void DisplaySBOM(string SBOM)
-    {
-        Dictionary<string, string> ageMap = new Dictionary<string, string>();
+@code{
+    private int displayPage = 0;
+    private Dictionary<string, List<string[]>> SbomResult = new ();
+    private bool Analyzed = false;
 
-        string[] stringSplit = SBOM.Split("[");
-
-        Console.WriteLine(stringSplit);
-        analyzedSBOM = "debug";
-
-    }
-    private async Task PollStatus(SemaphoreSlim pollUntil)
-    {
-        while (pollUntil.CurrentCount == 0)
-        {
-            await Task.Delay(1000);
-            HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
-            status = await response.Content.ReadAsStringAsync();
-            StateHasChanged();
-        }
-        status = "Analysis complete";
-        StateHasChanged();
-    }
-
-    private void GetInput(InputFileChangeEventArgs e)
-    {
-        file = e.File;
-    }
-    private void OnChange(ChangeEventArgs e)
-    {
-        // TODO: check if valid link
-    }
 }
