@@ -62,8 +62,3 @@ services:
       - "8080"
       - "98" 
     command: ["python", "frontend_communication.py", "&"]
-
-
-
-
-

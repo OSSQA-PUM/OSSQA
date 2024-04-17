@@ -30,58 +30,79 @@ class JobModelSingleton:
         self._status: JobStatus = JobStatus.INACTIVE
         self._message = ""
         self._max_dependency_count = 0
-        self._current_dependency_count = 0
+        self._success_dependency_count = 0
+
+        self._subjob_max_dependency_count = 0
+        self._subjob_success_dependency_count = 0
+
         self._observers = []
+        self._callbacks = []
 
     @property
     def status(self):
         return self._status
     
     @status.setter
-    def status(self, status: JobStatus):
-        if not isinstance(status, JobStatus):
-            raise ValueError("job_status must be an instance of JobStatus")
-        self._status = status
-        self.notify_observers()
-
+    def status(self, value):
+        self._status = value
+        self.updated()
+    
     @property
     def message(self):
         return self._message
     
     @message.setter
-    def message(self, message):
-        self._message = message
-        self.notify_observers()
+    def message(self, value):
+        self._message = value
+        self.updated()
 
     @property
     def max_dependency_count(self):
         return self._max_dependency_count
     
     @max_dependency_count.setter
-    def max_dependency_count(self, max_dependency_count):
-        self._max_dependency_count = max_dependency_count
-        self.notify_observers()
+    def max_dependency_count(self, value):
+        self._max_dependency_count = value
+        self.updated()
 
     @property
-    def current_dependency_count(self):
-        return self._current_dependency_count
+    def success_dependency_count(self):
+        return self._success_dependency_count
     
-    @current_dependency_count.setter
-    def current_dependency_count(self, current_dependency_count):
-        self._current_dependency_count = current_dependency_count
-        self.notify_observers()
+    @success_dependency_count.setter
+    def success_dependency_count(self, value):
+        self._success_dependency_count = value
+        self.updated()
 
-    def set_attributes(
-            self,
-            status,
-            message,
-            max_dependency_count,
-            current_dependency_count):
-        self._status = status
-        self._message = message
-        self._max_dependency_count = max_dependency_count
-        self._current_dependency_count = current_dependency_count
-        self.notify_observers()
+    @property
+    def subjob_max_dependency_count(self):
+        return self._subjob_max_dependency_count
+    
+    @subjob_max_dependency_count.setter
+    def subjob_max_dependency_count(self, value):
+        self._subjob_max_dependency_count = value
+        self.updated()
+
+    @property
+    def subjob_success_dependency_count(self):
+        return self._subjob_success_dependency_count
+    
+    @subjob_success_dependency_count.setter
+    def subjob_success_dependency_count(self, value):
+        self._subjob_success_dependency_count = value
+        self.updated()
+
+    def increment_success(self):
+        self._success_dependency_count += 1
+        self._subjob_success_dependency_count += 1
+        self.updated()
+
+    def set_attributes(self, **kwargs):
+        for key, value in kwargs.items():
+            key = "_" + key
+            if hasattr(self, key):
+                setattr(self, key, value)
+        self.updated()
         
     def notify_observers(self):
         for observer in self._observers:
@@ -90,15 +111,35 @@ class JobModelSingleton:
     def register_observer(self, observer):
         self._observers.append(observer)
 
-    def __dict__(self):
+    def unregister_observer(self, observer):
+        self._observers.remove(observer)
+
+    def notify_callbacks(self):
+        for callback in self._callbacks:
+            callback(self.as_dict())
+
+    def register_callback(self, callback):
+        self._callbacks.append(callback)
+    
+    def unregister_callback(self, callback):
+        self._callbacks.remove(callback)
+
+    def updated(self):
+        self.notify_callbacks()
+        self.notify_observers()
+
+    def as_dict(self):
         return {
             "job_status": self._status.value,
             "job_message": self._message,
             "max_dependency_count": self._max_dependency_count,
-            "current_dependency_count": self._current_dependency_count
+            "success_dependency_count": self._success_dependency_count,
+            "subjob_max_dependency_count": self._subjob_max_dependency_count,
+            "subjob_success_dependency_count":
+                self._subjob_success_dependency_count
         }
 
 
 class JobListerner:
     def update(self, job_model):
-        print(job_model.__dict__())
+        print(job_model.as_dict())

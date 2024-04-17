@@ -70,7 +70,7 @@ def hello():
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
-    return job_model.__dict__()
+    return job_model.as_dict()
 
 
 app.run(port=98, debug=True, host='0.0.0.0')
