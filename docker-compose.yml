@@ -12,8 +12,6 @@ services:
     expose:
       - "5090"
 
-
-
   ossqa-prototype:
     image: ossqa-prototype
     build:
@@ -36,6 +34,8 @@ services:
     depends_on:
       - ossqa-main
     env_file: .env
+    stdin_open: true
+    tty: true
 
   ossqa-web:
     image: ${DOCKER_REGISTRY-}ossqa-web
@@ -46,8 +46,7 @@ services:
      - "8080:8080"
     depends_on:
         - ossqa-main
-        
-        
+
   ossqa-main:
     image: ossqa
     build:

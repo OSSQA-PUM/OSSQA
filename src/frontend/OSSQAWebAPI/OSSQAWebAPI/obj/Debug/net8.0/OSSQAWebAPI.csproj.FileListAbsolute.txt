@@ -88,3 +88,12 @@ c:\Users\jessi\Desktop\LiU\VT2024\OSSQA\src\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\ne
 c:\Users\jessi\Desktop\LiU\VT2024\OSSQA\src\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.pdb
 c:\Users\jessi\Desktop\LiU\VT2024\OSSQA\src\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.genruntimeconfig.cache
 c:\Users\jessi\Desktop\LiU\VT2024\OSSQA\src\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\ref\OSSQAWebAPI.dll
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.AssemblyInfoInputs.cache
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.AssemblyInfo.cs
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.csproj.CoreCompileInputs.cache
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.sourcelink.json
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.dll
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\refint\OSSQAWebAPI.dll
+C:\Users\lunas\Documents\LiU\OSSQA\src\frontend\OSSQAWebAPI\OSSQAWebAPI\obj\Debug\net8.0\OSSQAWebAPI.pdb

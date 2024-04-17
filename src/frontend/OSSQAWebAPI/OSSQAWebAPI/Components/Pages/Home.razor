@@ -47,11 +47,22 @@
             HttpResponseMessage result = await t;
             if (result.IsSuccessStatusCode)
             {
-                analyzedSBOM = await result.Content.ReadAsStringAsync();
+                var SBOMString = await result.Content.ReadAsStringAsync();
+                DisplaySBOM(SBOMString);
                 StateHasChanged();
             }
         });
         _= PollStatus(analyzing);
+
+    }
+    private void DisplaySBOM(string SBOM)
+    {
+        Dictionary<string, string> ageMap = new Dictionary<string, string>();
+
+        string[] stringSplit = SBOM.Split("[");
+
+        Console.WriteLine(stringSplit);
+        analyzedSBOM = "debug";
 
     }
     private async Task PollStatus(SemaphoreSlim pollUntil)
