@@ -285,7 +285,8 @@ def main():
 
     if args.analyze:
         path, requirements = parse_analyze_arguments(args)
-        sbom = dict(json.load(open(path)))
+        with open(path) as f:
+            sbom:str = f.read()
         dict_weighted_results: list[(str, int, str)] #(checkname, score, dependency)
         print(str(requirements))
         dict_weighted_results = requests.post(
