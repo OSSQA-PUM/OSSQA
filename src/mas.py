@@ -11,14 +11,16 @@ based on the requirements.
 the old results for a given SBOM.
 """
 
-from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, \
-    analyse_multiple_scores
+
+import json
+from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, analyse_multiple_scores 
 from final_score_calculator import calculator
 from backend_communication import get_sbom, add_sbom, get_existing_dependencies
 from util import UserRequirements, Dependency
+from job_observer import JobModelSingleton
 import input_analyzer
-import json
 
+job_model = JobModelSingleton()
 
 def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, int, str]]:
     """
@@ -58,7 +60,7 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
     current_status = "Successfully got scores for " + f"{len(scores)}/" f"{total_dependency_count} dependencies. \n" \
                                                       f"{len(failures)}" + "dependencies failed to be parsed. \n" \
                                                                            f"{len(needed_dependencies)} dependencies could not be scored."
-    print(current_status)
+    job_model.set_attributes(message=current_status)
 
     scores = calculator.calculate_final_scores(scores, requirements)
     for i in range(len(scores)):

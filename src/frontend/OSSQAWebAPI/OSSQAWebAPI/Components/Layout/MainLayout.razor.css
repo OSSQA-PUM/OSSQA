@@ -10,12 +10,15 @@ main {
     flex: 1;
 }
 
-a {
-    color: #d6d5d5;
+svg {
+    color: #2b3137;
+    display: flex;
+    width: 32px; 
+    height: 32px;
 }
 
 .top-row {
-    background-color:#165368;
+    background-color: #82b9e8;
     border-bottom: 1px solid #d6d5d5;
     justify-content: flex-end;
     height: 3.5rem;
