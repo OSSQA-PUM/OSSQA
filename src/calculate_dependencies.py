@@ -11,12 +11,13 @@ import json
 import subprocess
 from multiprocessing import Pool
 from typing import Any
+from urllib.parse import urlparse
+import requests
 
 import tqdm
 
 from util import Dependency, validate_scorecard
 from job_observer import JobModelSingleton, JobStatus
-from backend_communication import *
 
 job_model = JobModelSingleton()
 
@@ -103,7 +104,9 @@ def parse_component(component: dict) -> Dependency:
     dependency: Dependency = Dependency(json_component=component)
     try:
         dependency.url = get_component_url(component=component)
-        dependency.platform, dependency.repo_path = parse_git_url(dependency.url)
+        dependency.platform, dependency.repo_path = parse_git_url(
+                                                        dependency.url
+                                                        )
         dependency.version = component["version"]
     except (ConnectionError, KeyError, NameError, ValueError) as e:
         dependency.failure_reason = e
@@ -180,7 +183,8 @@ def get_git_sha1_number(dependency: Dependency) -> str:
     return ""
 
 
-def try_get_from_ssf_api(dependency: Dependency, commit_sha1=None) -> dict[str, str] | None:
+def try_get_from_ssf_api(dependency: Dependency, commit_sha1=None)\
+        -> dict[str, str] | None:
     """
     Retrieves the scorecard of a dependency
     from the SSF (Security Scorecards) API.
@@ -213,7 +217,10 @@ def try_get_from_ssf_api(dependency: Dependency, commit_sha1=None) -> dict[str, 
     return json_response
 
 
-def filter_database_dependencies(needed_dependencies: list[Dependency], database_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
+def filter_database_dependencies(
+        needed_dependencies: list[Dependency],
+        database_dependencies: list[Dependency])\
+            -> tuple[list[Dependency], list[Dependency]]:
     """
     Looks up the needed dependencies in the database
     and returns the dependencies with scores and the new needed dependencies.
@@ -277,7 +284,8 @@ def lookup_ssf(dependency: Dependency) -> dict[str, str] | None:
     return scorecard_score
 
 
-def lookup_multiple_ssf(needed_dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
+def lookup_multiple_ssf(needed_dependencies: list[Dependency])\
+        -> tuple[list[Dependency], list[Dependency]]:
     """
     Looks up the needed dependencies in the SSF (Security Scorecards) API
     and returns the dependencies with scores and the new needed dependencies.
@@ -319,7 +327,7 @@ def lookup_multiple_ssf(needed_dependencies: list[Dependency]) -> tuple[list[Dep
         "Successfully looked up "
         f"{job_model.subjob_success_dependency_count}/"
         f"{job_model.max_dependency_count} dependencies in the SSF API.")
-    
+
     return dependencies_with_scores, new_needed_dependencies
 
 
@@ -355,7 +363,8 @@ def analyse_score(dependency: Dependency):
     return json_output
 
 
-def analyse_multiple_scores(dependencies: list[Dependency]) -> tuple[list[Dependency], list[Dependency]]:
+def analyse_multiple_scores(dependencies: list[Dependency])\
+        -> tuple[list[Dependency], list[Dependency]]:
     """
     Analyzes multiple scores for a list of dependencies.
 
@@ -379,7 +388,9 @@ def analyse_multiple_scores(dependencies: list[Dependency]) -> tuple[list[Depend
         # A json serialized object is returned from analyze_score()
         dependency_score: Any
         for dependency, dependency_score in zip(
-                dependencies, pool.imap_unordered(analyse_score, dependencies)):
+                dependencies, pool.imap_unordered(
+                                                analyse_score, dependencies
+                                                )):
             if dependency_score is None:
                 needed_dependencies.append(dependency)
                 progress_bar.update(1)

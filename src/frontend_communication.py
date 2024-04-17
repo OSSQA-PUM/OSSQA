@@ -42,6 +42,7 @@ listener = JobListerner()
 job_model = JobModelSingleton()
 job_model.register_observer(listener)
 
+
 @app.errorhandler(415)
 def page_not_found(error):
     print("Error:", error)
