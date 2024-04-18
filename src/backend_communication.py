@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import requests
 from util import Dependency
 
-host = "http://localhost:5080"
+host = "http://host.docker.internal:5090"
 
 
 def add_sbom(sbom_json: dict, dependencies: list[Dependency]):
@@ -91,11 +91,13 @@ def get_existing_dependencies(needed_dependencies: list[Dependency]):
         })
 
     response = requests.get(host + "/get_existing_dependencies",
-                                    json=dependency_primary_keys,
-                                    timeout=5
-                                    )
+                            json=dependency_primary_keys,
+                            timeout=5
+                            )
 
     result: list[Dependency] = []
+    if response.status_code != 200:
+        return result
     for dependency in response.json():
         parsed_url = urlparse(dependency["url"])
         dependency_score = {"score": dependency["score"],

@@ -10,12 +10,17 @@ based on the requirements.
 - get_old_results(sbom: dict): This function calls the backend API to get 
 the old results for a given SBOM.
 """
-from typing import List
 
-import calculate_dependencies
+import json
+from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, \
+    analyse_multiple_scores
 from final_score_calculator import calculator
-from backend_communication import get_sbom
-from util import UserRequirements
+from backend_communication import get_sbom, add_sbom, get_existing_dependencies
+from util import UserRequirements, Dependency
+from job_observer import JobModelSingleton
+import input_analyzer
+
+job_model = JobModelSingleton()
 
 
 def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, int, str]]:
@@ -31,8 +36,37 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
     Returns:
         list[float]: The final scores.
     """
-    scored = calculate_dependencies.get_dependencies(sbom)[0]
-    scores = calculator.calculate_final_scores(scored, requirements)
+
+    needed_dependencies, failures, failure_reason = parse_sbom(sbom=sbom)
+    total_dependency_count = len(needed_dependencies)
+
+    scores = []
+
+    new_scores, needed_dependencies = lookup_multiple_ssf(
+        needed_dependencies=needed_dependencies)
+    scores += new_scores
+
+    database_response: list[Dependency] = get_existing_dependencies(needed_dependencies)
+
+    new_scores, needed_dependencies = filter_database_dependencies(
+        needed_dependencies, database_response)
+    scores += new_scores
+
+    analyzed_scores, needed_dependencies = analyse_multiple_scores(
+        dependencies=needed_dependencies)
+    scores += analyzed_scores
+
+    # TODO send data that was downloaded internally
+    add_sbom(sbom, scores)
+    current_status = "Successfully got scores for " + f"{len(scores)}/" f"{total_dependency_count} dependencies. \n" \
+                                                      f"{len(failures)}" + "dependencies failed to be parsed. \n" \
+                                                                           f"{len(needed_dependencies)} dependencies could not be scored."
+    job_model.set_attributes(message=current_status)
+
+    scores = calculator.calculate_final_scores(scores, requirements)
+    for i in range(len(scores)):
+        for j in range(len(scores[0])):
+            scores[i][j] = str(scores[i][j])
     return scores
 
 
@@ -50,3 +84,14 @@ def get_old_results(sbom: dict):
     name = sbom['metadata']['name'] + sbom['metadata']['version']
     old_results = get_sbom(name)
     return old_results
+
+
+def validate_input(sbom, requirements=None):
+    sbom_dict = json.loads(sbom["sbom"])
+    print(sbom_dict)
+    if requirements is None:
+        requirements = UserRequirements()
+    valid = input_analyzer.validate_input(sbom_dict, requirements)
+    if valid:
+        result = analyze_sbom(sbom_dict, requirements)
+        return result

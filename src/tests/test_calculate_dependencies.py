@@ -24,7 +24,7 @@ from calculate_dependencies import (
     parse_sbom,
     get_git_sha1_number,
     try_get_from_ssf_api,
-    lookup_database,
+    filter_database_dependencies,
     lookup_ssf,
     lookup_multiple_ssf,
 )
@@ -115,9 +115,16 @@ def test_lookup_database():
             repo_path="/owner/repo2"
         ),
     ]
-    dependencies_with_scores, new_needed_dependencies = lookup_database(dependencies)
-    assert len(dependencies_with_scores) == 0
-    assert len(new_needed_dependencies) == 2
+    database_response = [
+        Dependency(
+            json_component={"name": "repo1", "version": "v1.0"},
+            platform="github.com",
+            repo_path="/owner/repo1"
+        )
+    ]
+    dependencies_with_scores, new_needed_dependencies = filter_database_dependencies(dependencies, database_response)
+    assert len(dependencies_with_scores) == 1
+    assert len(new_needed_dependencies) == 1
 
 
 @log_test_results([])  # TODO add relevant test case

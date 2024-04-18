@@ -10,10 +10,7 @@ FinalScore = list[str, int, str]  # (name, score, repository)
 Score = list[str, int]  # (name, score)
 
 
-def calculate_final_scores(
-        dependencies: list[Dependency],
-        requirements: UserRequirements = None
-        ) -> list[FinalScore]:
+def calculate_final_scores(dependencies: list[Dependency], requirements: UserRequirements = None) -> list[FinalScore]:
     """
     Calculates final scores based on the scores of dependencies.
     Each final score is the minimum of the dependency scores of the same type.
@@ -37,19 +34,8 @@ def calculate_final_scores(
     if not dependencies:
         return scores
 
-    baseline: Dependency = dependencies[0]
-    for check in Checks.all():
-        current_baseline_check = baseline.get_check(check)
-        scores.append([check.value,
-                       current_baseline_check["score"],
-                       baseline.url])
-
     for dependency in dependencies:
-        for score in scores:
-            current_depency_score = dependency.get_check(score[0])["score"]
-            if score[1] > current_depency_score:
-                # Replace current minimum score with dependency score
-                score[1] = current_depency_score
-                score[2] = dependency.url
-
+        dependency: Dependency
+        for check in dependency.dependency_score["checks"]:
+            scores.append([check["name"], int(check["score"]), str(dependency.url)])
     return scores

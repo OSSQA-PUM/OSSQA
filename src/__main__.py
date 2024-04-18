@@ -1,7 +1,7 @@
 """
 Main module of the program
 """
-from cmd_ui import main as cmd_ui_main
+from frontend.CMD.cmd_ui import main as cmd_ui_main
 
 
 def main():

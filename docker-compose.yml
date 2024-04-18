@@ -5,25 +5,12 @@ services:
     image: ossqa-database
     build:
       context: .
-      dockerfile: src/database/Dockerfile
+      dockerfile: src/backend/database/Dockerfile
     env_file: .env
     ports:
-      - "5080:5080"
+      - "5090:5090"
     expose:
-      - "5080"
-
-  ossqa:
-    image: ossqa
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    depends_on:
-      - ossqa-database
-    network_mode: host
-    env_file: .env
-    expose:
-      - "5080"
-    command: ["python", "__main__.py", "&"]
+      - "5090"
 
   ossqa-prototype:
     image: ossqa-prototype
@@ -39,6 +26,39 @@ services:
       dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
+  ossqa-cmd:
+    image: ossqa-cmd
+    build:
+      context: .
+      dockerfile: src/frontend/CMD/Dockerfile
+    depends_on:
+      - ossqa-main
+    env_file: .env
+    stdin_open: true
+    tty: true
 
+  ossqa-web:
+    image: ${DOCKER_REGISTRY-}ossqa-web
+    build:
+      context: .
+      dockerfile: src/frontend/OSSQAWebAPI/Dockerfile
+    ports:
+     - "8080:8080"
+    depends_on:
+        - ossqa-main
 
-
+  ossqa-main:
+    image: ossqa
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - ossqa-database
+    env_file: .env
+    ports:
+      - "98:98"
+    expose:
+      - "5090"
+      - "8080"
+      - "98" 
+    command: ["python", "frontend_communication.py", "&"]
