@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3iybv7bAwCh9SdIzALEW2LrP8E8ZGkItSWpM4TX/+kvfDiSDSFxTtGk6fvWMcNb02/laxGxVPeHkBC+iZBKsjw==",
+  "dgSpecHash": "9QxMqg2cMibMRQWOIia8tHw0I6I0qdlsGAd7kTeBXcesXaF1QIgTJIxhSr+43L/0vI3PsUuQxCS3hKoaOzLbDA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+  "projectFilePath": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lunas\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.19.6\\microsoft.visualstudio.azure.containers.tools.targets.1.19.6.nupkg.sha512"
   ],

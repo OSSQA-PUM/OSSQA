@@ -5,8 +5,6 @@ This file contains the API that communicates information
  from the commandline interface or webinterface to the main 
  application structure
 """
-import json
-
 from re import match
 from util import UserRequirements
 import calculate_dependencies
@@ -76,13 +74,6 @@ def check_format_of_sbom(sbom_file) -> None:
 
     if name == "":
         raise ValueError("Name could not be found, non valid SBOM")
-
-
-def get_updates() -> str:
-    """
-    Get the current status of the analysis. Will be deleted and replaced by observer before final release
-    """
-    return calculate_dependencies.get_current_status()
 
 
 def validate_input(sbom_dict, requirements: UserRequirements = None) -> bool:

@@ -17,9 +17,15 @@
         }
         else
         {
-            <p>
-                @statusInfo["job_message"]
-            </p>
+            string[] message = statusInfo["job_message"].Split(".");
+            foreach (string m in message)
+            {
+                <p>
+                    @m
+                </p>
+                
+            }
+            <p>Click buttons above to view </p>
         }
 
          
