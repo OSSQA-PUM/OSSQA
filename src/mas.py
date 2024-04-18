@@ -11,9 +11,9 @@ based on the requirements.
 the old results for a given SBOM.
 """
 
-
 import json
-from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, analyse_multiple_scores 
+from calculate_dependencies import parse_sbom, lookup_multiple_ssf, filter_database_dependencies, \
+    analyse_multiple_scores
 from final_score_calculator import calculator
 from backend_communication import get_sbom, add_sbom, get_existing_dependencies
 from util import UserRequirements, Dependency
@@ -21,6 +21,7 @@ from job_observer import JobModelSingleton
 import input_analyzer
 
 job_model = JobModelSingleton()
+
 
 def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, int, str]]:
     """
@@ -86,12 +87,8 @@ def get_old_results(sbom: dict):
 
 
 def validate_input(sbom, requirements=None):
-    try:
-        sbom = sbom.replace("'", '"')
-        sbom_dict = json.loads(sbom)["sbom"]
-    except KeyError:  # if the sbom is not a string it is a dict
-        sbom = sbom.replace("'", '"')
-        sbom_dict = json.loads(sbom)
+    sbom_dict = json.loads(sbom["sbom"])
+    print(sbom_dict)
     if requirements is None:
         requirements = UserRequirements()
     valid = input_analyzer.validate_input(sbom_dict, requirements)

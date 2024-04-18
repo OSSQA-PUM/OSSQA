@@ -141,7 +141,7 @@ def parse_sbom(sbom: dict) -> tuple[list[Dependency], list[Dependency], dict]:
     success = 0
 
     with Pool() as pool, tqdm.tqdm(total=len(components)) as progress_bar:
-        for dependency in pool.imap_unordered(parse_component, components):
+        for dependency in pool.imap(parse_component, components):
             if dependency.failure_reason:
                 exception_type = type(dependency.failure_reason)
                 failed_components.append(dependency.json_component)
@@ -226,6 +226,7 @@ def filter_database_dependencies(
     and returns the dependencies with scores and the new needed dependencies.
 
     Args:
+        database_dependencies:
         needed_dependencies (list[Dependency]):
         The list of needed dependencies.
 

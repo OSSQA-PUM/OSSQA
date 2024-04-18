@@ -56,12 +56,10 @@ def analyze():
         user_reqs_param = request.headers.get('user_reqs')
     except KeyError:
         user_reqs_param = "[10,10,10,10,10]"
-    
-    print("User reqs:", user_reqs_param)
+
     user_reqs: UserRequirements = parse_user_reqs(user_reqs_param)
     data = request.get_json()
-    print(data)
-    result = mas.validate_input(str(data), user_reqs)
+    result = mas.validate_input(data, user_reqs)
     return json.dumps(result)
 
 

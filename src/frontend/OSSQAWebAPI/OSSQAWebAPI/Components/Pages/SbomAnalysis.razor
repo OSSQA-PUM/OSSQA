@@ -18,9 +18,15 @@
         }
         else
         {
-            <p>
-                @statusInfo["job_message"]
-            </p>
+            string[] message = statusInfo["job_message"].Split(".");
+            foreach (string m in message)
+            {
+                <p>
+                    @m
+                </p>
+                
+            }
+            <p>Click buttons above to view </p>
         }
 
          
@@ -47,6 +53,7 @@
     [Parameter]
     public bool Analyzed { get; set; }
     private Dictionary<string,string> statusInfo = new();
+    private Dictionary<string, string> postData = new();
 
     private async Task LoadFile()
     {
@@ -59,8 +66,10 @@
         }
         await file.OpenReadStream().CopyToAsync(memoryStream);
         status = "Connecting to port 98...";
+        postData.Add("sbom", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
 
-        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", postData);
+
         analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
         {
