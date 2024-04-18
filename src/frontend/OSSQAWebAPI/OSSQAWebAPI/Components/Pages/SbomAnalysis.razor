@@ -11,6 +11,7 @@
     <div class="d-flex justify-content-center">
         @if(!statusInfo["job_message"].StartsWith("Successfully")) 
         {
+            <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
             <p>
                 @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"])
             </p>
