@@ -168,3 +168,7 @@ test_logs.txt
 
 **/OSSQAWebAPI/**/Debug/
 **/.vs/
+**/*.cache
+*.nuget.props
+
+**/OSSQAWebAPI/**/obj/
