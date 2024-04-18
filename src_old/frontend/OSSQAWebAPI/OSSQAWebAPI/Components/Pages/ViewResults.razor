@@ -1,5 +1,6 @@
-﻿<div class="d-flex">
-    <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these results mean?</a>
+﻿<div class="d-flex justify-content-center flex-column align-items-center m-5">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
+
 </div>
 
 @if (SbomResult != null && SbomResult.Count>0)
@@ -21,7 +22,14 @@
             </div>
         }
     </div>
+    <div class="d-flex bottom-0">
+        <a href="https://securityscorecards.dev/#the-checks"> What do these results mean?</a>
 
+    </div>
+}
+else
+{
+    <p class="d-flex justify-content-center"> No results available. Analyze SBOM to view result. </p>
 }
 
 
