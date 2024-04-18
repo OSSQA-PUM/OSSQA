@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {}
+    "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {
+    "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
         "projectName": "OSSQAWebAPI",
-        "projectPath": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+        "projectPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
         "packagesPath": "C:\\Users\\lunas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\",
+        "outputPath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
           "C:\\Users\\lunas\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

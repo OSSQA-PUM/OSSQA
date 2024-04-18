@@ -166,5 +166,5 @@ cython_debug/
 # Generated files
 test_logs.txt
 
-**/OSSQAWebAPI/obj/Debug/
+**/OSSQAWebAPI/**/Debug/
 **/.vs/
