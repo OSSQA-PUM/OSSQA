@@ -1,4 +1,9 @@
-﻿@if (SbomResult != null && SbomResult.Count>0)
+﻿<div class="d-flex justify-content-center flex-column align-items-center m-5">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
+
+</div>
+
+@if (SbomResult != null && SbomResult.Count>0)
 {
     <div class="d-flex flex-wrap justify-content-evenly">
         @foreach (var test in Tests)
@@ -24,7 +29,7 @@
 }
 else
 {
-    <p> No results available. Analyze SBOM to view result </p>
+    <p class="d-flex justify-content-center"> No results available. Analyze SBOM to view result. </p>
 }
 
 
