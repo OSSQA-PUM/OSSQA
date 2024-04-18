@@ -1,12 +1,8 @@
 {
   "version": 2,
-<<<<<<< HEAD:src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/obj/project.nuget.cache
-  "dgSpecHash": "9QxMqg2cMibMRQWOIia8tHw0I6I0qdlsGAd7kTeBXcesXaF1QIgTJIxhSr+43L/0vI3PsUuQxCS3hKoaOzLbDA==",
-=======
   "dgSpecHash": "VMjm93WLNepxdHQ2kYltUtdiBFZ7LEgLjNHrgzQrALftbFgzjtOw2B3R2h5XxyoTTn0Cf9qMJgF9VLhH4GK1+Q==",
->>>>>>> f593561 (load bar):src/frontend/OSSQAWebAPI/OSSQAWebAPI/obj/project.nuget.cache
   "success": true,
-  "projectFilePath": "C:\\Users\\lunas\\Documents\\LiU\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
+  "projectFilePath": "C:\\Users\\lunas\\Documents\\OSSQA\\src\\frontend\\OSSQAWebAPI\\OSSQAWebAPI\\OSSQAWebAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lunas\\.nuget\\packages\\matblazor\\2.10.0\\matblazor.2.10.0.nupkg.sha512",
     "C:\\Users\\lunas\\.nuget\\packages\\microsoft.aspnetcore.authorization\\6.0.14\\microsoft.aspnetcore.authorization.6.0.14.nupkg.sha512",
