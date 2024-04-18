@@ -53,8 +53,8 @@ else
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
-    private Action StateHasChangedCallback =>()=> 
-    { 
+    private Action StateHasChangedCallback =>()=>
+    {
         UpdateTab();
         InvokeAsync(StateHasChanged);
     };
