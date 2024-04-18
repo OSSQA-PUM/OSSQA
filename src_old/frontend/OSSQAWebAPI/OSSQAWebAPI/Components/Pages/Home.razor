@@ -6,45 +6,45 @@
 
 <PageTitle>OSSQA</PageTitle>
 
-<div class="d-flex justify-content-evenly">
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 0;}">Home</button>
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 1;}">Code Vulnerabilities</button>
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 2;}">Maintenance</button>
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 3;}">Continuous Testing</button>
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 4;}">Source Risk Assessment</button>
-    <button class="btn btn-primary" @onclick="()=>{displayPage = 5;}">Build Risk Assessment</button>
-</div>
+
+<MatThemeProvider Theme="@theme">
+<MatTabGroup>
+    <MatTab Label="Home">
+        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
+    </MatTab>
+    @if(Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
+    {
+        <MatTab Label="Code Vulnerabilities">
+            <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
+        </MatTab>
+        <MatTab Label="Maintenance">
+            <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
+        </MatTab>
+        <MatTab Label="Continuous Testing">
+            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
+        </MatTab>
+        <MatTab Label="Source Risk Assessment">
+            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
+        </MatTab>
+        <MatTab Label="Build Risk Assessment">
+            <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
+        </MatTab>
+    }
+</MatTabGroup>
+</MatThemeProvider>
 
 
-<div class="d-flex justify-content-center flex-column align-items-center m-5">
-    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
-    
-</div>
 
-
-@switch(displayPage){
-    case 0:
-        <SbomAnalysis SbomResult="SbomResult"  />
-        break;
-    case 1:
-        <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
-        break;
-    case 2:
-        <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
-        break;
-    case 3:
-        <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
-        break;
-    case 4:
-        <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
-        break;
-    case 5:
-        <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
-        break;
-}
-
-@code{
-    private int displayPage = 0;
-    private Dictionary<string, List<string[]>> SbomResult = new ();
+@code {
+    private Dictionary<string, List<string[]>> SbomResult = new();
+    private SemaphoreSlim Analyzing = new(1, 1);
+    private Action StateHasChangedCallback =>()=>InvokeAsync(StateHasChanged);
+    MatTheme theme = new MatTheme()
+        {
+            Primary = "#88bcec",
+            Secondary = MatThemeColors.BlueGrey._500.Value, 
+            Surface = "#88bcec",
+            OnPrimary = MatThemeColors.BlueGrey._500.Value
+        };
 
 }

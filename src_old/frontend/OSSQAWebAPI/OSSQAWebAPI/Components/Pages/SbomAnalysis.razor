@@ -1,14 +1,19 @@
-﻿
-@using System.Diagnostics
+﻿@using System.Diagnostics
 @inject HttpClient Http
 @inject HttpClient httpClient
 @using System.Text.Json
 @using System.Text;
 @using System.Net.Http.Headers
 
+<div class="d-flex justify-content-center flex-column align-items-center m-5">
+    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="500px" />
+    
+</div>
+
+
 @if (statusInfo is not null && statusInfo.Count > 0)
 {
-    <div class="d-flex justify-content-center">
+    <div class="d-flex flex-column align-items-center justify-content-center">
         @if(!statusInfo["job_message"].StartsWith("Successfully")) 
         {
             <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
@@ -21,21 +26,23 @@
             string[] message = statusInfo["job_message"].Split(".");
             foreach (string m in message)
             {
-                <p>
-                    @m
-                </p>
-                
+                if(m.Length > 0)
+                {
+                    <p style="margin:0 0 0.5em 0; padding:0;">
+                        @m.
+                    </p>
+                }
+
             }
-            <p>Click buttons above to view </p>
+            <p style="font-size:x-large">Score: @score/10 </p>
         }
 
          
     </div>
 }
-<div class="d-flex justify-content-center">
-   
-    <InputFile accept=".json" OnChange="GetInput" />
-    <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
+<div class="d-flex flex-column justify-content-center align-items-center" >
+    <MatFileUpload OnChange="GetInput" Label=@fileLabel Style="width:50vw;margin-bottom:2em;"></MatFileUpload>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;" @onclick="LoadFile">Analyze</MatButton>
     <p>@analyzedSBOM</p>
 </div>
 
@@ -43,49 +50,54 @@
 
 
 @code {
-    private IBrowserFile? file;
+    private IMatFileUploadEntry? file;
+    private string fileLabel = "Drop file here or browse";
     private string analyzedSBOM = "";
     private string status = " ";
+    private float score = 0;
     private bool loadedFile = false;
-    private SemaphoreSlim analyzing = new(1, 1);
+    [Parameter]
+    public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
     public Dictionary<string, List<string[]>> SbomResult { get; set; }
-    [Parameter]
-    public bool Analyzed { get; set; }
     private Dictionary<string,string> statusInfo = new();
     private Dictionary<string, string> postData = new();
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
 
     private async Task LoadFile()
     {
         loadedFile = true;
         using var memoryStream = new MemoryStream();
-        if (file == null || analyzing.CurrentCount == 0)
+        if (file == null || Analyzing.CurrentCount == 0)
         {
             status = "No file selected";
             return;
         }
-        await file.OpenReadStream().CopyToAsync(memoryStream);
+        await file.WriteToStreamAsync(memoryStream);
         status = "Connecting to port 98...";
+        postData.Clear();
         postData.Add("sbom", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
 
         var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", postData);
 
-        analyzing.Wait();
+        Analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
         {
-            analyzing.Release();
+            Analyzing.Release();
             HttpResponseMessage result = await t;
             if (result.IsSuccessStatusCode)
             {
+                SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
                 DisplaySBOM(jsonobj ?? new List<List<string>>());
-                Analyzed = true;
                 status = "Analysis complete";
-                StateHasChanged();
+                StateHasChangedCallback.Invoke();
+                score = GetScore();
             }
         });
-        _ = PollStatus(analyzing);
+        _ = PollStatus(Analyzing);
 
     }
     private void DisplaySBOM(List<List<string>> SBOMjson)
@@ -104,6 +116,20 @@
         }
 
     }
+    private float GetScore()
+    {
+        float score = 0;
+        int count = 0;
+        for(int i = 0; i < SbomResult.Count; i++)
+        {
+            for(int j = 0; j < SbomResult.ElementAt(i).Value.Count; j++)
+            {
+                score += float.Parse(SbomResult.ElementAt(i).Value[j][0]);
+                count++;
+            }
+        }
+        return float.Round(score/count,2);
+    }
 
     private async Task PollStatus(SemaphoreSlim pollUntil)
     {
@@ -119,8 +145,12 @@
         StateHasChanged();
     }
 
-    private void GetInput(InputFileChangeEventArgs e)
+    private void GetInput(IMatFileUploadEntry[] files)
     {
-        file = e.File;
+        foreach (var f in files)
+        {
+            file = f;
+        }
+        fileLabel = file?.Name ?? "Drop file here or browse";
     }
 }
