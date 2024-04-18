@@ -1,83 +1,94 @@
-﻿@using System.Diagnostics
+﻿
+@using System.Diagnostics
 @inject HttpClient Http
 @inject HttpClient httpClient
 @using System.Text.Json
 @using System.Text;
 @using System.Net.Http.Headers
-@inject NavigationManager _navigationManager
-
-<ViewLogo />
 
 @if (statusInfo is not null && statusInfo.Count > 0)
 {
-    <div class="d-flex flex-column align-items-center justify-content-center">
+    <div class="d-flex justify-content-center">
         @if(!statusInfo["job_message"].StartsWith("Successfully")) 
         {
             <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
-            <p> @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"]) </p>
+            <p>
+                @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"])
+            </p>
         }
         else
         {
             string[] message = statusInfo["job_message"].Split(".");
             foreach (string m in message)
             {
-                if(m.Length > 0) {<p style="margin:0 0 0.5em 0; padding:0;"> @m. </p>}
+                <p>
+                    @m
+                </p>
+                
             }
-            @if (Analyzing.CurrentCount == 1)
-            {
-                <p style="font-size:x-large">Score: @GetScore()/10 </p>
-                <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
-            }
-
+            <p>Click buttons above to view </p>
         }
 
-            
+         
     </div>
 }
+<div class="d-flex justify-content-center">
+   
+    <InputFile accept=".json" OnChange="GetInput" />
+    <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
+    <p>@analyzedSBOM</p>
+</div>
+
 
 
 
 @code {
+    private IBrowserFile? file;
+    private string analyzedSBOM = "";
     private string status = " ";
-    private string requirements = "";
-    private float score = 0;
-    [Parameter]
-    public SemaphoreSlim Analyzing { get; set; }
+    private bool loadedFile = false;
+    private SemaphoreSlim analyzing = new(1, 1);
     [Parameter]
     public Dictionary<string, List<string[]>> SbomResult { get; set; }
+    [Parameter]
+    public bool Analyzed { get; set; }
     private Dictionary<string,string> statusInfo = new();
-    [Parameter]
-    public Dictionary<string, string> PostData { get; set;}
-    [Parameter]
-    public Action StateHasChangedCallback { get; set; }
-    protected override void OnParametersSet()
-    {
-        Analyze();
-    }
-    private async Task Analyze()
-    {
-        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
+    private Dictionary<string, string> postData = new();
 
-        Analyzing.Wait();
+    private async Task LoadFile()
+    {
+        loadedFile = true;
+        using var memoryStream = new MemoryStream();
+        if (file == null || analyzing.CurrentCount == 0)
+        {
+            status = "No file selected";
+            return;
+        }
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+        status = "Connecting to port 98...";
+        postData.Add("sbom", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
+
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", postData);
+
+        analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
         {
-            Analyzing.Release();
+            analyzing.Release();
             HttpResponseMessage result = await t;
             if (result.IsSuccessStatusCode)
             {
-                SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
-                AddToDict(jsonobj ?? new List<List<string>>());
+                DisplaySBOM(jsonobj ?? new List<List<string>>());
+                Analyzed = true;
                 status = "Analysis complete";
-                StateHasChangedCallback.Invoke();
                 StateHasChanged();
             }
         });
-        _ = PollStatus(Analyzing);
+        _ = PollStatus(analyzing);
 
     }
-    private void AddToDict(List<List<string>> SBOMjson)
+    private void DisplaySBOM(List<List<string>> SBOMjson)
     {
         foreach (List<string> component in SBOMjson)
         {
@@ -92,20 +103,6 @@
             }
         }
 
-    }
-    private float GetScore()
-    {
-        float score = 0;
-        int count = 0;
-        for(int i = 0; i < SbomResult.Count; i++)
-        {
-            for(int j = 0; j < SbomResult.ElementAt(i).Value.Count; j++)
-            {
-                score += float.Parse(SbomResult.ElementAt(i).Value[j][0]);
-                count++;
-            }
-        }
-        return float.Round(score/count,2);
     }
 
     private async Task PollStatus(SemaphoreSlim pollUntil)
@@ -122,5 +119,8 @@
         StateHasChanged();
     }
 
-
+    private void GetInput(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+    }
 }
