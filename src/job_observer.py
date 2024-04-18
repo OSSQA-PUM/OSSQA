@@ -99,50 +99,50 @@ class JobModelSingleton:
         self.updated()
 
     @property
-    def max_dependency_count(self) -> int:
+    def max_dependency_count(self) -> str:
         """
         Returns the maximum dependency count for the job.
         """
-        return self._max_dependency_count
+        return str(self._max_dependency_count)
 
     @max_dependency_count.setter
-    def max_dependency_count(self, value: int) -> None:
+    def max_dependency_count(self, value: str) -> None:
         self._max_dependency_count = value
         self.updated()
 
     @property
-    def success_dependency_count(self) -> int:
+    def success_dependency_count(self) -> str:
         """
         Returns the count of successfully completed dependencies for the job.
         """
-        return self._success_dependency_count
+        return str(self._success_dependency_count)
 
     @success_dependency_count.setter
-    def success_dependency_count(self, value: int) -> None:
+    def success_dependency_count(self, value: str) -> None:
         self._success_dependency_count = value
         self.updated()
 
     @property
-    def subjob_max_dependency_count(self) -> int:
+    def subjob_max_dependency_count(self) -> str:
         """
         Returns the maximum dependency count for subjobs.
         """
-        return self._subjob_max_dependency_count
+        return str(self._subjob_max_dependency_count)
 
     @subjob_max_dependency_count.setter
-    def subjob_max_dependency_count(self, value: int) -> None:
+    def subjob_max_dependency_count(self, value: str) -> None:
         self._subjob_max_dependency_count = value
         self.updated()
 
     @property
-    def subjob_success_dependency_count(self) -> int:
+    def subjob_success_dependency_count(self) -> str:
         """
         Returns the count of successfully completed dependencies for subjobs.
         """
-        return self._subjob_success_dependency_count
+        return str(self._subjob_success_dependency_count)
 
     @subjob_success_dependency_count.setter
-    def subjob_success_dependency_count(self, value: int) -> None:
+    def subjob_success_dependency_count(self, value: str) -> None:
         self._subjob_success_dependency_count = value
         self.updated()
 

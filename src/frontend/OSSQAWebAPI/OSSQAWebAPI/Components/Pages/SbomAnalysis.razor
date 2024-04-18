@@ -6,13 +6,33 @@
 @using System.Text;
 @using System.Net.Http.Headers
 
-<p class="d-flex justify-content-center" role="status"> @status</p>
+@if (statusInfo is not null && statusInfo.Count > 0)
+{
+    <div class="d-flex justify-content-center">
+        @if(!statusInfo["job_message"].StartsWith("Successfully")) 
+        {
+            <p>
+                @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"])
+            </p>
+        }
+        else
+        {
+            <p>
+                @statusInfo["job_message"]
+            </p>
+        }
+
+         
+    </div>
+}
 <div class="d-flex justify-content-center">
    
     <InputFile accept=".json" OnChange="GetInput" />
     <button class="btn btn-primary" @onclick="LoadFile">Start scan</button>
     <p>@analyzedSBOM</p>
 </div>
+
+
 
 
 @code {
@@ -25,6 +45,7 @@
     public Dictionary<string, List<string[]>> SbomResult { get; set; }
     [Parameter]
     public bool Analyzed { get; set; }
+    private Dictionary<string,string> statusInfo = new();
 
     private async Task LoadFile()
     {
@@ -48,9 +69,9 @@
             {
                 var SBOMString = await result.Content.ReadAsStringAsync();
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
-                analyzedSBOM = SBOMString;
                 DisplaySBOM(jsonobj ?? new List<List<string>>());
                 Analyzed = true;
+                status = "Analysis complete";
                 StateHasChanged();
             }
         });
@@ -81,6 +102,7 @@
             await Task.Delay(1000);
             HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
             status = await response.Content.ReadAsStringAsync();
+            statusInfo = JsonSerializer.Deserialize<Dictionary<string, string>>(status);
             StateHasChanged();
         }
         status = "Analysis complete";

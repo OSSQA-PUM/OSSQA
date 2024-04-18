@@ -72,7 +72,10 @@ def hello():
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
-    return job_model.as_dict()
+    string_dict = {}
+    for key, value in job_model.as_dict().items():
+        string_dict[key] = str(value)
+    return string_dict
 
 
 app.run(port=98, debug=True, host='0.0.0.0')

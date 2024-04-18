@@ -36,8 +36,9 @@ def calculate_final_scores(dependencies: list[Dependency], requirements: UserReq
 
     baseline: Dependency = dependencies[0]
     for dependency in dependencies:
-        for check in Checks.all():
-            scores.append([check, int(dependency.dependency_score["score"]), str(dependency.url)])
+        dependency:Dependency
+        for check in dependency.dependency_score["checks"]:
+            scores.append([check["name"], int(check["score"]), str(dependency.url)])
 
     # for check in Checks.all():
     #     current_baseline_check = baseline.get_check(check)
