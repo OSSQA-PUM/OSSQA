@@ -33,8 +33,6 @@
 </MatTabGroup>
 </MatThemeProvider>
 
-
-
 @code {
     private Dictionary<string, List<string[]>> SbomResult = new();
     private SemaphoreSlim Analyzing = new(1, 1);
@@ -42,9 +40,8 @@
     MatTheme theme = new MatTheme()
         {
             Primary = "#88bcec",
-            Secondary = MatThemeColors.BlueGrey._500.Value, 
+            Secondary = MatThemeColors.BlueGrey._500.Value,
             Surface = "#88bcec",
             OnPrimary = MatThemeColors.BlueGrey._500.Value
         };
-
 }
