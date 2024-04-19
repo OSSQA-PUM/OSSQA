@@ -40,11 +40,32 @@
          
     </div>
 }
-<div class="d-flex flex-column justify-content-center align-items-center" >
-    <MatFileUpload OnChange="GetInput" Label=@fileLabel Style="width:50vw;margin-bottom:2em;"></MatFileUpload>
-    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;" @onclick="LoadFile">Analyze</MatButton>
-    <p>@analyzedSBOM</p>
+<div class="d-flex justify-content-center align-items-center" style="width:30vw; margin-bottom:2em;">
+    <MatFileUpload OnChange="GetInput" Label=@fileLabel></MatFileUpload>
+    <MatAccordion>
+        <MatExpansionPanel>
+            <MatExpansionPanelSummary>
+                <MatExpansionPanelHeader>Requirements</MatExpansionPanelHeader>
+            </MatExpansionPanelSummary>
+            <MatExpansionPanelDetails>
+                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Vulnerability</MatSlider>
+                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Maintenance</MatSlider>
+                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Continuous Testing</MatSlider>
+                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Source Risk Assessment</MatSlider>
+                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Build Risk Assessment</MatSlider>
+
+            </MatExpansionPanelDetails>
+        </MatExpansionPanel>
+    </MatAccordion>
+   
+
 </div>
+<div class="d-flex flex-column justify-content-center">
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="LoadFile">Analyze</MatButton>
+</div>
+
+
+
 
 
 
@@ -52,8 +73,8 @@
 @code {
     private IMatFileUploadEntry? file;
     private string fileLabel = "Drop file here or browse";
-    private string analyzedSBOM = "";
     private string status = " ";
+    private string requirements = "";
     private float score = 0;
     private bool loadedFile = false;
     [Parameter]
@@ -64,6 +85,17 @@
     private Dictionary<string, string> postData = new();
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
+    public int Val3
+    {
+        get => _val3;
+        set
+        {
+            _val3 = value;
+            this.StateHasChanged();
+        }
+    }
+
+    private int _val3 = 0;
 
     private async Task LoadFile()
     {
@@ -91,7 +123,7 @@
                 SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
-                DisplaySBOM(jsonobj ?? new List<List<string>>());
+                AddToDict(jsonobj ?? new List<List<string>>());
                 status = "Analysis complete";
                 StateHasChangedCallback.Invoke();
                 score = GetScore();
@@ -100,7 +132,7 @@
         _ = PollStatus(Analyzing);
 
     }
-    private void DisplaySBOM(List<List<string>> SBOMjson)
+    private void AddToDict(List<List<string>> SBOMjson)
     {
         foreach (List<string> component in SBOMjson)
         {
