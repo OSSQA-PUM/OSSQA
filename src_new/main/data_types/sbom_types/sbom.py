@@ -8,9 +8,9 @@ Classes:
 
 from re import match
 from urllib.parse import urlparse
+from data_types.sbom_types.dependency_manager import DependencyManager
+from data_types.sbom_types.dependency import Dependency
 import requests
-from sbom_types.dependency_manager import DependencyManager
-from sbom_types.dependency import Dependency
 
 class Sbom:
     """
@@ -41,6 +41,23 @@ class Sbom:
         self.version: str = sbom["version"]
         self.repo_name: str = sbom["metadata"]["component"]["name"]
         self.repo_version: str = sbom["metadata"]["component"]["version"]
+
+    def to_dict(self) -> dict:
+        """
+        Converts the SBOM object to a dictionary.
+
+        Returns:
+            dict: The SBOM object as a dictionary.
+        """
+        return {
+            "serialNumber": self.serial_number,
+            "version": self.version,
+            "repo_name": self.repo_name,
+            "repo_version": self.repo_version,
+            "dependencies": [
+                self.dependency_manager.to_dict()
+            ]
+        }
 
     def _check_format_of_sbom(self, sbom_file: dict) -> None:
         """

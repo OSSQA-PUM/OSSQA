@@ -2,7 +2,7 @@
 Represents a dependency manager that manages dependencies for a project.
 """
 from typing import Callable
-from sbom_types.dependency import Dependency
+from data_types.sbom_types.dependency import Dependency
 
 
 class DependencyManager:
@@ -108,14 +108,3 @@ class DependencyManager:
                 [dependency.to_dict() for dependency
                     in self.get_failed_dependencies()]
         }
-
-
-test_list = [1,2,3,4,5]
-
-try:
-    index = test_list.index(2)
-    test_list[index] = 6
-except ValueError:
-    test_list.append(6)
-
-print(list(filter(lambda x: x > 3, test_list)))
