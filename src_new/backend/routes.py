@@ -9,6 +9,14 @@ from flask_sqlalchemy import SQLAlchemy
 from models import SBOM, Dependency
 
 
+def create_or_update_sbom(data: dict) -> tuple[SBOM, bool]:
+    return None, True # TODO
+
+
+def create_or_update_dep(data: dict) -> tuple[Dependency, bool]:
+    return None, True # TODO
+
+
 def register_endpoints(app: Flask, db: SQLAlchemy):
     """
     Registers all endpoints with a flask app and its database.
@@ -29,6 +37,21 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
              json (object): Object containing the SBOM data.
         """
         return "NOT IMPLEMENTED YET", 501 # TODO implement
+        sbom_json = request.json
+
+        sbom, sbom_created = create_or_update_sbom(sbom_json)
+        if sbom_created:
+            db.session.add(sbom)
+
+        for dep_json in sbom_json["dependencies"]["scored_dependencies"]:
+            dep, dep_created = create_or_update_dep(dep_json)
+            if dep_created:
+                db.session.add(dep)
+                sbom.dependencies.append(dep)
+
+
+
+
 
     @app.route("/sbom", methods=["GET"])
     def get_sbom_names():
@@ -59,7 +82,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
         return jsonify(sbom_dicts), 200
 
-    @app.route("dependency/existing", methods=["GET"])
+    @app.route("/dependency/existing", methods=["GET"])
     def get_existing_dependencies():
         """
         Gets a list of dependencies, based on the specified primary

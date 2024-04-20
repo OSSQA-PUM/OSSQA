@@ -5,12 +5,12 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-dependency_sbom = db.Table("dependency_sbom", 
-                           db.Column("dependency_id", db.Integer, 
-                                     db.ForeignKey("dependency.id"), 
+dependency_sbom = db.Table("dependency_sbom",
+                           db.Column("dependency_id", db.Integer,
+                                     db.ForeignKey("dependency.id"),
                                      primary_key=True),
-                           db.Column("sbom_id", db.Integer, 
-                                     db.ForeignKey("sbom.id"), 
+                           db.Column("sbom_id", db.Integer,
+                                     db.ForeignKey("sbom.id"),
                                      primary_key=True))
 
 
@@ -44,11 +44,11 @@ class Scorecard(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     date = db.Column(db.String(10), unique=False)
     aggregate_score = db.Column(db.Double, unique=False)
-    
+
     checks = db.relationship("Check", backref="scorecard", lazy=True)
-    dependency_id = db.Column(db.Integer, db.ForeignKey("depdendency.id"),
+    dependency_id = db.Column(db.Integer, db.ForeignKey("dependency.id"),
                               nullable=False)
-    
+
     def to_dict(self) -> dict:
         return {
             "date": self.date,
@@ -61,15 +61,15 @@ class Dependency(db.Model):
     """
     A dependency with a score from OpenSSF Scorecard.
     """
-    id = db.Integer(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(255), unique=False)
     version = db.Column(db.String(255), unique=False)
-    
+
     scorecard = db.relationship("Scorecard", backref="dependency", lazy=True,
                                 uselist=False)
     sboms = db.relationship("SBOM", secondary=dependency_sbom, lazy="subquery",
-                            backpopulates="dependencies")
-    
+                            back_populates="dependencies")
+
     def to_dict(self) -> dict:
         """
         Represent the dependency as a dict resembling its original json format.
@@ -96,7 +96,7 @@ class SBOM(db.Model):
 
     dependencies = db.relationship("Dependency", secondary=dependency_sbom,
                                    lazy="subquery", back_populates="sboms")
-    
+
     def to_dict(self) -> dict:
         """
         Represent the SBOM as a dict resembling its original json format.
