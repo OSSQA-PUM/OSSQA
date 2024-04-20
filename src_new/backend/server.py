@@ -19,7 +19,6 @@ def create_test_app() -> Flask:
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./test.db"
     app.config["TESTING"] = True
-
     db.init_app(app)
 
     register_endpoints(app, db)
@@ -44,7 +43,6 @@ def create_app() -> Flask:
     register_endpoints(app, db)
 
     app.app_context().push()
-    db.drop_all()
     db.create_all()
 
     return app
