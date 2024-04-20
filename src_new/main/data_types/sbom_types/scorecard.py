@@ -65,12 +65,15 @@ class Check:
     Represents a check on a dependency.
 
     Attributes:
+        name (str): The name of the check.
         score (int): The score of the check.
         reason (str): The reason for the score.
+        details (list[str]): The details of the check.
     """
+    name: str
     score: int
     reason: str
-
+    details: list[str]
 
 @dataclass
 class Scorecard:
@@ -78,7 +81,80 @@ class Scorecard:
     Represents a scorecard for a dependency.
     https://securityscorecards.dev/#the-checks
     """
-    binary_artifacts: Check
+    date: str
+    score: float
+    checks: list[Check]
+
+    def __init__(self, ssf_scorecard: dict):
+        """
+        Initializes the scorecard.
+
+        Args:
+            ssf_scorecard (dict): The SSF scorecard.
+        """
+        self._validate(ssf_scorecard)
+        self.date = ssf_scorecard["date"]
+        self.score = ssf_scorecard["score"]
+        self.checks = []
+        for check in ssf_scorecard["checks"]:
+            name = check["name"]
+            score = check["score"]
+            reason = check["reason"]
+            details = check["details"]
+            self.checks.append(Check(name, score, reason, details))
+
+    def _validate(self, ssf_scorecard: dict) -> None:
+        """
+        Validates the scorecard.
+
+        Returns:
+            bool: True if the scorecard is valid, False otherwise.
+        """
+        if not isinstance(ssf_scorecard, dict):
+            raise TypeError("Scorecard must be a dictionary.")
+        
+        if "date" not in ssf_scorecard:
+            raise KeyError("Scorecard must contain a date.")
+        
+        if "score" not in ssf_scorecard:
+            raise KeyError("Scorecard must contain a score.")
+        score = ssf_scorecard.get("score")
+        if not 0 <= score <= 10:
+            raise ValueError("Score must be between 0 and 10.")
+        
+        if "checks" not in ssf_scorecard:
+            raise KeyError("Scorecard must contain checks.")
+        checks = ssf_scorecard.get("checks")
+        for check in checks:
+            if not isinstance(check, dict):
+                raise TypeError("Check must be a dictionary.")
+            
+            if "name" not in check:
+                raise KeyError("Check must contain a name.")
+            
+            if "score" not in check:
+                raise KeyError("Check must contain a score.")
+            if not -1 <= check.get("score") <= 10:
+                raise ValueError("Check score must be between -1 and 10.")
+            
+            if "reason" not in check:
+                raise KeyError("Check must contain a reason.")
+            
+            if "details" not in check:
+                raise KeyError("Check must contain details.")
+
+    def to_dict(self) -> dict:
+        """
+        Converts the scorecard to a dictionary.
+
+        Returns:
+            dict: The scorecard as a dictionary.
+        """
+        return asdict(self)
+
+
+"""
+binary_artifacts: Check
     branch_protection: Check
     ci_tests: Check
     cii_best_practices: Check
@@ -97,26 +173,4 @@ class Scorecard:
     token_permissions: Check
     vulnerabilities: Check
 
-    def __init__(self, ssf_scorecard: dict):
-        """
-        Initializes the scorecard.
-
-        Args:
-            ssf_scorecard (dict): The SSF scorecard.
-        """
-        for check in ssf_scorecard["checks"]:
-            setattr(self, ScorecardChecks.title_hyphen_to_snake(check["name"]),
-                    Check(check["score"], check["reason"]))
-
-    def to_dict(self) -> dict:
-        """
-        Converts the scorecard to a dictionary.
-
-        Returns:
-            dict: The scorecard as a dictionary.
-        """
-        return {
-            check.value: asdict(
-                getattr(self, ScorecardChecks.title_hyphen_to_snake(check))
-                ) for check in ScorecardChecks.all()
-            }
+"""

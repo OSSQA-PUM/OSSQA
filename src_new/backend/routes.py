@@ -1,5 +1,12 @@
-from flask import Flask
+"""
+This module handles the endpoints that the backend communication interface
+interfaces with. It also handles functionality for creating and updating
+various objects in the database.
+"""
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
+
+from models import SBOM, Dependency
 
 
 def register_endpoints(app: Flask, db: SQLAlchemy):
@@ -21,7 +28,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Args:
              json (object): Object containing the SBOM data.
         """
-        pass
+        return "NOT IMPLEMENTED YET", 501 # TODO implement
 
     @app.route("/sbom", methods=["GET"])
     def get_sbom_names():
@@ -31,7 +38,11 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (array): The list of SBOM names.
         """
-        pass
+        names = set()
+        for sbom in SBOM.query.all():
+            names.add(sbom.name)
+        return jsonify(list(names)), 200
+
 
     @app.route("/sbom/<name>", methods=["GET"])
     def get_sboms_by_name(name: str):
@@ -44,7 +55,9 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (array): The list of SBOMs.
         """
-        pass
+        sboms = SBOM.query.filter_by(name=name).all()
+        sbom_dicts = [sbom.to_dict() for sbom in sboms]
+        return jsonify(sbom_dicts), 200
 
     @app.route("dependency/existing", methods=["GET"])
     def get_existing_dependencies():
@@ -53,9 +66,15 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         keys.
 
         Args:
-            json (array): The primary keys of the dependencies.
+            json (array): A list containing tuples with the name and version
+                of each dependency.
 
         Returns:
             json (array): The list of dependecies.
         """
-        pass
+        dependencies = []
+        for name, version in request.json:
+            dependency = Dependency.query.filter_by(name=name, version=version).first()
+            if dependency:
+                dependencies.append(dependency.to_dict())
+        return jsonify(dependencies), 200
