@@ -1,4 +1,5 @@
 from pathlib import Path
+from data_types.sbom_types.scorecard import ScorecardChecks
 
 DIRECTORY = Path(__file__).parent
 
@@ -14,19 +15,19 @@ UNPARSABLE_SCORECARDS = [
         "date": "2021-10-10",
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.BINARY_ARTIFACTS,
                 "score": 0,
                 "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.BRANCH_PROTECTION,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.CI_TESTS,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -37,42 +38,19 @@ UNPARSABLE_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.CONTRIBUTORS,
                 "score": 0,
                 "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.DANGEROUS_WORKFLOW,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
-                "score": 0,
-                "reason": "reason3",
-                "details": []
-            }
-        ]
-    },
-    {
-        "date": "2021-10-10",
-        "score": 0,
-        "checks": [
-            {
-                "score": 0,
-                "reason": "reason1",
-                "details": []
-            },
-            {
-                "name": "check2",
-                "score": 0,
-                "reason": "reason2",
-                "details": []
-            },
-            {
-                "name": "check3",
+                "name": ScorecardChecks.DEPENDENCY_UPDATE_TOOL,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -84,18 +62,18 @@ UNPARSABLE_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
+                "score": 0,
                 "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.VULNERABILITIES,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.SAST,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -107,18 +85,18 @@ UNPARSABLE_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
-                "score": 0,
+                "name": ScorecardChecks.SECURITY_POLICY,
+                "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.SIGNED_RELEASES,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.TOKEN_PERMISSIONS,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -130,18 +108,41 @@ UNPARSABLE_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.VULNERABILITIES,
                 "score": 0,
-                "reason": "reason1",
+                "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.BINARY_ARTIFACTS,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.CODE_REVIEW,
+                "score": 0,
+                "reason": "reason3",
+                "details": []
+            }
+        ]
+    },
+    {
+        "date": "2021-10-10",
+        "score": 0,
+        "checks": [
+            {
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
+                "score": 0,
+                "reason": "reason1",
+            },
+            {
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
+                "score": 0,
+                "reason": "reason2",
+                "details": []
+            },
+            {
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -161,19 +162,19 @@ OUT_OF_BOUNDS_SCORECARDS = [
         "score": -1,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -185,19 +186,19 @@ OUT_OF_BOUNDS_SCORECARDS = [
         "score": 11,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason1",
                 "details": []
             },
             {
-                "name": "check2",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason2",
                 "details": []
             },
             {
-                "name": "check3",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 0,
                 "reason": "reason3",
                 "details": []
@@ -209,7 +210,7 @@ OUT_OF_BOUNDS_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": -2,
                 "reason": "reason1",
                 "details": []
@@ -221,7 +222,7 @@ OUT_OF_BOUNDS_SCORECARDS = [
         "score": 0,
         "checks": [
             {
-                "name": "check1",
+                "name": ScorecardChecks.CII_BEST_PRACTICES,
                 "score": 11,
                 "reason": "reason1",
                 "details": []
