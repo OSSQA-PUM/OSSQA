@@ -34,6 +34,7 @@ class ScorecardChecks(StrEnum):
     SIGNED_RELEASES = "Signed-Releases"
     TOKEN_PERMISSIONS = "Token-Permissions"
     VULNERABILITIES = "Vulnerabilities"
+    WEBHOOKS = "Webhooks"
 
     @classmethod
     def all(cls):
@@ -131,6 +132,10 @@ class Scorecard:
             
             if "name" not in check:
                 raise KeyError("Check must contain a name.")
+            if check.get("name") not in ScorecardChecks.all():
+                raise ValueError(
+                    f"Check name \'{check.get("name")}\' not a valid check."
+                    )
             
             if "score" not in check:
                 raise KeyError("Check must contain a score.")
