@@ -6,11 +6,11 @@ Functions:
 - analyze: Analyzes the scores for multiple dependencies.
 """
 from abc import ABC, abstractmethod
+from typing import Any, Callable
 from dataclasses import dataclass
 from data_types.sbom_types.dependency import Dependency
 from data_types.sbom_types.scorecard import Scorecard
 from data_types.event import Event
-
 
 
 @dataclass
@@ -22,6 +22,8 @@ class StepResponse:
     completed_items: int
     successful_items: int
     failed_items: int
+    message: str = ""
+
 
 class DependencyScorer(ABC):
     """
@@ -29,9 +31,10 @@ class DependencyScorer(ABC):
     """
     on_step_complete: Event[StepResponse]
 
-    def __init__(self) -> None:
+    def __init__(self, callback: Callable[[StepResponse], Any]) -> None:
         super().__init__()
         self.on_step_complete = Event[StepResponse]()
+        self.on_step_complete.subscribe(callback)
 
     @abstractmethod
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
@@ -40,7 +43,7 @@ class DependencyScorer(ABC):
 
         Args:
             dependencies (list[Dependency]): The dependencies to score.
-        
+
         Returns:
             list[Dependency]: The scored dependencies.
         """
@@ -52,12 +55,12 @@ class SSFAPIFetcher(DependencyScorer):
     """
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
-        Scores a list of dependencies by fetching stored scores with 
+        Scores a list of dependencies by fetching stored scores with
         the OpenSSF Scorecard API.
 
         Args:
             dependencies (list[Dependency]): The dependencies to score.
-        
+
         Returns:
             list[Dependency]: The scored dependencies.
         """
@@ -67,7 +70,8 @@ class SSFAPIFetcher(DependencyScorer):
         new_dependencies = []
 
         for index, dependency in enumerate(dependencies):
-            new_dependency = self._request_ssf_api(dependency) # Process dependency
+            # Process dependency
+            new_dependency = self._request_ssf_api(dependency)
             new_dependencies.append(new_dependency)
             self.on_step_complete.invoke(
                 StepResponse(
@@ -106,10 +110,10 @@ class ScorecardAnalyzer(DependencyScorer):
         """
         Scores a list of dependencies by analyzing the scores of the
         OpenSSF Scorecard.
-        
+
         Args:
             dependencies (list[Dependency]): The dependencies to score.
-        
+
         Returns:
             list[Dependency]: The scored dependencies.
         """
@@ -135,13 +139,13 @@ class ScorecardAnalyzer(DependencyScorer):
 
     def _execute_scorecard(self, git_url: str, version: str) -> Scorecard:
         """
-        Executes the OpenSSF Scorecard binary 
+        Executes the OpenSSF Scorecard binary
         on a specific version of a dependency.
-        
+
         Args:
             git_url (str): The Git URL of the dependency.
             version (str): The version of the dependency.
-        
+
         Returns:
             Scorecard: The scorecard of the dependency.
         """

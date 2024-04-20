@@ -1,5 +1,5 @@
 """
-This module contains the Dependency class which represents a dependency for 
+This module contains the Dependency class which represents a dependency for
 a project.
 """
 
@@ -13,16 +13,14 @@ class Dependency:
     Represents a dependency for a project.
 
     Attributes:
-        platform (str): The platform on which the dependency is used.
-        repo_path (str): The path to the repo
-        url (str): The URL of the dependency.
-        failure_reason (Exception): The reason for any failure 
-                                    related to the dependency.
+        name (str): The name of the dependency, corresponds to the URL in
+                    CycloneDX format.
+        version (str): The version of the dependency.
         dependency_score (Scorecard): The scorecard related to the dependency.
+        failure_reason (Exception): The reason for any failure
+                                    related to the dependency.
     """
-    platform: str = None
-    repo_path: str = None
-    url: str = None
+    name: str = None
     version: str = None
     dependency_score: Scorecard = None
     failure_reason: Exception = None
@@ -37,8 +35,37 @@ class Dependency:
         Returns:
             bool: True if the dependencies are equal, False otherwise.
         """
-        return self.platform == other.platform and \
-        self.repo_path == other.repo_path and self.version == other.version
+        return self.name == other.name and self.version == other.version
+
+    @property
+    def platform(self) -> str:
+        """
+        Get the platform of the dependency.
+
+        Returns:
+            str: The platform of the dependency.
+        """
+        return self.name.split("/", maxsplit=1)[0]
+
+    @property
+    def repo_path(self) -> str:
+        """
+        Get the repo path of the dependency.
+
+        Returns:
+            str: The repo path of the dependency.
+        """
+        return self.name.split("/", maxsplit=1)[1]
+
+    @property
+    def url(self) -> str:
+        """
+        Get the URL of the dependency.
+
+        Returns:
+            str: The URL of the dependency.
+        """
+        return f"https://{self.name}"
 
     def to_dict(self) -> dict:
         """
@@ -48,13 +75,11 @@ class Dependency:
             dict: The dictionary representation of the dependency.
         """
         return {
-            "platform": self.platform,
-            "url": self.url,
-            "repo_path": self.repo_path,
+            "name": self.name,
             "version": self.version,
-            "dependency_score": self.dependency_score.to_dict() \
-                if self.dependency_score else "",
+            "dependency_score": self.dependency_score.to_dict()
+            if self.dependency_score else "",
 
-            "failure_reason": self.failure_reason \
-                if self.failure_reason else ""
+            "failure_reason": self.failure_reason
+            if self.failure_reason else ""
         }

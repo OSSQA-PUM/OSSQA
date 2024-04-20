@@ -9,7 +9,6 @@ Classes:
 
 from dataclasses import dataclass, asdict
 from enum import StrEnum
-import json
 
 
 class ScorecardChecks(StrEnum):
@@ -53,7 +52,7 @@ class ScorecardChecks(StrEnum):
 
         Args:
             title (str): The title to convert.
-        
+
         Returns:
             str: The title in snake case.
         """
@@ -121,13 +120,3 @@ class Scorecard:
                 getattr(self, ScorecardChecks.title_hyphen_to_snake(check))
                 ) for check in ScorecardChecks.all()
             }
-
-
-if __name__== "__main__":
-    default_check: Check = Check(10, "reason")
-    with open("src/sbom/example_response.json") as f:
-        example = json.loads(f.read())
-
-
-    scorecard: Scorecard = Scorecard(example)
-    print(scorecard)

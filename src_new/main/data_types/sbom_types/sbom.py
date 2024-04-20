@@ -1,5 +1,5 @@
 """
-This module contains the Sbom class, which represents a 
+This module contains the Sbom class, which represents a
 Software Bill of Materials (SBOM) object.
 
 Classes:
@@ -12,12 +12,13 @@ from data_types.sbom_types.dependency_manager import DependencyManager
 from data_types.sbom_types.dependency import Dependency
 import requests
 
+
 class Sbom:
     """
     Represents a Software Bill of Materials (SBOM) object.
 
     Attributes:
-        dependency_manager (DependencyManager): The dependency manager for the 
+        dependency_manager (DependencyManager): The dependency manager for the
                                                 SBOM.
         serial_number (str): The serial number of the SBOM.
         version (str): The version of the SBOM.
@@ -69,14 +70,17 @@ class Sbom:
         Raises:
             SyntaxError: If the 'bomFormat' is missing or not 'CycloneDX'.
 
-            IndexError: If the 'specVersion' is missing, out of date, or incorrect.
+            IndexError: If the 'specVersion' is missing, out of date, or
+                        incorrect.
 
-            SyntaxError: If the 'serialNumber' does not match the RFC-4122 format.
+            SyntaxError: If the 'serialNumber' does not match the RFC-4122
+                         format.
 
             IndexError: If the 'version' of SBOM is lower than 1
             or not a proper integer.
 
-            ValueError: If the name could not be found, indicating a non-valid SBOM.
+            ValueError: If the name could not be found, indicating a non-valid
+                        SBOM.
         """
         if not sbom_file["bomFormat"] == "CycloneDX":
             raise SyntaxError("bomFormat missing or not CycloneDX")
@@ -136,16 +140,15 @@ class Sbom:
         """
         dependency: Dependency = Dependency()
         try:
-            dependency.url = self._get_component_url(component=component)
-            dependency.platform, dependency.repo_path = self._parse_git_url(
-                                                            dependency.url
-                                                            )
+            dependency.name = self._parse_git_url(
+                self._get_component_url(component=component)
+                )
             dependency.version = component["version"]
         except (ConnectionError, KeyError, NameError, ValueError) as e:
             dependency.failure_reason = e
         return dependency
 
-    def _parse_git_url(self, url: str) -> tuple[str, str]:
+    def _parse_git_url(self, url: str) -> str:
         """
         Parses the git URL and returns the platform,
         repository owner, and repository name.
@@ -154,8 +157,7 @@ class Sbom:
             url (str): The git URL.
 
         Returns:
-            tuple[str, str, str]: The platform, repository owner,
-            and repository name.
+            str: The dependency name
 
         Raises:
             ValueError: If the platform is not supported.
@@ -166,9 +168,8 @@ class Sbom:
         if platform != "github.com":
             raise ValueError("Platform not supported")
 
-        repo_path = url_split.path
-
-        return platform, repo_path
+        name = platform + url_split.path
+        return name
 
     def _get_component_url(self, component: dict) -> str:
         """

@@ -1,17 +1,22 @@
 """
-This module contains the SBOM processor class, which is responsible for processing SBOMs.
+This module contains the SBOM processor class, which is responsible for
+processing SBOMs.
 
 Classes:
-- SbomProcessor: Represents an SBOM processor that defines the process of analyzing SBOMs.
+- SbomProcessor: Represents an SBOM processor that defines the process of
+                 analyzing SBOMs.
 - SbomProcessorStatus: Represents the status of the SBOM processor.
 """
+import json
 from enum import StrEnum
 from dataclasses import dataclass
 from data_types.sbom_types.sbom import Sbom
 from data_types.event import Event
 from data_types.dependency_scorer import StepResponse
-from data_types.dependency_scorer import SSFAPIFetcher, DependencyScorer, ScorecardAnalyzer
-from backend_communication import add_sbom, get_sboms_by_name, get_sbom_names, BackendFetcher
+from data_types.dependency_scorer import (SSFAPIFetcher,
+                                          DependencyScorer,
+                                          ScorecardAnalyzer)
+from backend_communication import BackendCommunication
 
 
 class SbomProcessorStates(StrEnum):
@@ -52,8 +57,10 @@ class SbomProcessor:
         Initializes an SBOM processor.
         """
         self.on_status_update = Event[SbomProcessorStatus]()
-        self.sbom_processor_status = SbomProcessorStatus(SbomProcessorStates.INITIALIZING)
-
+        self.sbom_processor_status = SbomProcessorStatus(
+            SbomProcessorStates.INITIALIZING
+            )
+        self.backend_communication = BackendCommunication(self._event_callback)
 
     def _event_callback(self, step_response: StepResponse) -> None:
         """
@@ -75,7 +82,9 @@ class SbomProcessor:
         self.sbom_processor_status.current_state = state
         self.on_status_update.invoke(self.sbom_processor_status)
 
-    def _run_dependency_scorer(self, sbom: Sbom, dependency_scorer: DependencyScorer) -> None:
+    def _run_dependency_scorer(
+            self, sbom: Sbom, dependency_scorer: DependencyScorer
+            ) -> None:
         """
         Runs a dependency scorer.
 
@@ -83,9 +92,11 @@ class SbomProcessor:
             sbom (Sbom): The SBOM to analyze.
             dependency_scorer (DependencyScorer): The dependency scorer to run.
         """
-        dependency_scorer.on_step_complete.subscribe(self._event_callback)
-        current_unscored_dependencies = sbom.dependency_manager.get_unscored_dependencies()
-        new_dependencies = dependency_scorer.score(current_unscored_dependencies)
+        current_unscored_dependencies = \
+            sbom.dependency_manager.get_unscored_dependencies()
+        new_dependencies = dependency_scorer.score(
+            current_unscored_dependencies
+            )
         sbom.dependency_manager.update(new_dependencies)
 
     def analyze_sbom(self, sbom: Sbom) -> Sbom:
@@ -98,16 +109,22 @@ class SbomProcessor:
         # TODO
         # 1. Get score from BackendScorer
         self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
-        self._run_dependency_scorer(sbom, BackendFetcher())
+        self._run_dependency_scorer(
+            sbom, self.backend_communication.backend_fetcher
+            )
         # 2. Get score from SSFAPIScorer
         self._set_event_state(SbomProcessorStates.SSF_LOOKUP)
-        self._run_dependency_scorer(sbom, SSFAPIFetcher())
+        self._run_dependency_scorer(
+            sbom, SSFAPIFetcher(self._event_callback)
+            )
         # 3. Get score from ScorecardAnalyzer
         self._set_event_state(SbomProcessorStates.ANALYZING_SCORE)
-        self._run_dependency_scorer(sbom, ScorecardAnalyzer())
+        self._run_dependency_scorer(
+            sbom, ScorecardAnalyzer(self._event_callback)
+            )
         # 4. Update database with new scores
         self._set_event_state(SbomProcessorStates.COMPLETED)
-        add_sbom(sbom)
+        self.backend_communication.add_sbom(sbom)
         return sbom
 
     def lookup_stored_sboms(self) -> list[str]:
@@ -118,7 +135,7 @@ class SbomProcessor:
             list[str]: The list of the SBOM names
         """
         # Look up stored SBOMs
-        return get_sbom_names()
+        return self.backend_communication.get_sbom_names()
 
     def lookup_previous_sboms(self, name: str) -> list[Sbom]:
         """
@@ -126,8 +143,21 @@ class SbomProcessor:
 
         Args:
             name (str): The name of the SBOM to look up.
-        
+
         Returns:
             list[dict]: The list of the SBOMs with the same name.
         """
-        return get_sboms_by_name(name)
+        return self.backend_communication.get_sboms_by_name(name)
+
+
+if __name__ == "__main__":
+    with open("src_new/main/example-SBOM.json", "r") as file:
+        sbom = Sbom(json.load(file))
+        print(sbom.to_dict())
+        for dep in sbom.dependency_manager.get_unscored_dependencies():
+            print(dep.platform, dep.repo_path)
+        sbom_processor = SbomProcessor()
+        sbom_processor.on_status_update.subscribe(
+            lambda status: print(status)
+            )
+        print(sbom_processor.analyze_sbom(sbom).to_dict())
