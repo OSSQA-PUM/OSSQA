@@ -1,19 +1,13 @@
 ﻿@using System.Text.Json
 <ViewLogo />
 <div class="d-flex justify-content-center align-items-center flex-column">
-    <h2 style="margin-bottom:1em;">Specify requirement weights</h2>
-    <MatDivider></MatDivider>
-    @for(int i = 0; i < requirementCategories.Length; i++)
-    {
-        int j = i; // Required to avoid issue where every bind occurs on i instead of a new integer
-        <h3>@requirementCategories[j]</h3>
-        <div class="d-flex justify-content-center">
-            <MatTextField @bind-Value="@Requirements[j]" Style="max-width:4em; margin-right:2em;" Label="Input" OnFocusOut="()=>SetRequirement()"></MatTextField>
-            <MatSlider @bind-Value="@Requirements[j]" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10" Style="width:30vw;"></MatSlider>
-        </div>
-    }
+     <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10" Style="width:30vw;"></MatSlider>
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=>{ValidateReqs();}">Analyze</MatButton>
 </div>
+@if (ready)
+{
+    StateHasChangedCallback.Invoke();
+}
 
 @code {
     [Parameter]
@@ -22,7 +16,6 @@
     public Action StateHasChangedCallback { get; set; }
     [Parameter]
     public Dictionary<string, string> PostData { get; set; }
-    private string[] requirementCategories = ["Vulnerabilities", "Maintenance", "Continuous Testing", "Source Risk Assessment", "Build Risk Assessments"];
 
     public int Val3
     {
@@ -30,43 +23,29 @@
         set
         {
             _val3 = value;
-            Requirements.Add(value);
+            requirements.Add(value);
             this.StateHasChanged();
         }
     }
     private int _val3 = 0;
-    [Parameter]
-    public List<int> Requirements { get; set; }
+    private bool ready = false;
+    private List<int> requirements = new() { -1, -1, -1, -1, -1 };
 
     private void ValidateReqs()
     {
-        for (int i = 0; i < Requirements.Count; i++)
+        for(int i = 0; i < requirements.Count; i++)
         {
             List<string> requirementsString = new();
-            if (Requirements[i] == -1)
+            if(requirements[i] == -1)
             {
-                Requirements[i] = 0;
+                requirements[i] = 0;
             }
-            requirementsString.Add(Requirements[i].ToString());
+            requirementsString.Add(requirements[i].ToString());
         }
-        PostData["requirements"] = JsonSerializer.Serialize(Requirements);
+        ready = true;
+        PostData["requirements"] = JsonSerializer.Serialize(requirements);
         StateHasChanged();
         StateHasChangedCallback.Invoke();
     }
-    private void SetRequirement()
-    {
-        for (int i = 0; i < Requirements.Count; i++)
-        {
-            if (Requirements[i] > 10)
-            {
-                Requirements[i] = 10;
-            }
-            if (Requirements[i] < 0)
-            {
-                Requirements[i] = 0;
-            }
-        }
-
-    }
-
+    
 }
