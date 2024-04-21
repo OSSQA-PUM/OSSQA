@@ -1,7 +1,4 @@
-﻿<div class="d-flex justify-content-center flex-column align-items-center m-5">
-    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="250px" />
-
-</div>
+﻿<ViewLogo />
 
 @if (SbomResult != null && SbomResult.Count>0)
 {
@@ -9,6 +6,7 @@
         @foreach (var test in Tests)
         {
             <div style=" min-width:0.3vw; margin-bottom:3em;">
+            <MatPaper Elevation="3" Rounded="true" Outlined="true">
                 <h3>@test</h3>
                 @if (SbomResult.ContainsKey(test))
                 {
@@ -19,6 +17,7 @@
                         <p>Score: @scoreUrl[0]/10 URL: <a href="@scoreUrl[1]"> @scoreUrl[1]</a> </p>
                     }
                 }
+             </MatPaper>
             </div>
         }
     </div>

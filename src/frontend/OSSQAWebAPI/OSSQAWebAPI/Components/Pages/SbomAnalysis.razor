@@ -5,10 +5,7 @@
 @using System.Text;
 @using System.Net.Http.Headers
 
-<div class="d-flex justify-content-center flex-column align-items-center m-5">
-    <img src="/images/LOGO_OSSQA.png" asp-append-version="true" width="250px" />
-    
-</div>
+<ViewLogo />
 
 
 @if (statusInfo is not null && statusInfo.Count > 0)
@@ -17,101 +14,37 @@
         @if(!statusInfo["job_message"].StartsWith("Successfully")) 
         {
             <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
-            <p>
-                @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"])
-            </p>
+            <p> @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"]) </p>
         }
         else
         {
             string[] message = statusInfo["job_message"].Split(".");
             foreach (string m in message)
             {
-                if(m.Length > 0)
-                {
-                    <p style="margin:0 0 0.5em 0; padding:0;">
-                        @m.
-                    </p>
-                }
-
+                if(m.Length > 0) {<p style="margin:0 0 0.5em 0; padding:0;"> @m. </p>}
             }
             <p style="font-size:x-large">Score: @score/10 </p>
         }
-
-         
     </div>
 }
-<div class="d-flex justify-content-center align-items-center" style="width:30vw; margin-bottom:2em;">
-    <MatFileUpload OnChange="GetInput" Label=@fileLabel></MatFileUpload>
-    <MatAccordion>
-        <MatExpansionPanel>
-            <MatExpansionPanelSummary>
-                <MatExpansionPanelHeader>Requirements</MatExpansionPanelHeader>
-            </MatExpansionPanelSummary>
-            <MatExpansionPanelDetails>
-                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Vulnerability</MatSlider>
-                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Maintenance</MatSlider>
-                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Continuous Testing</MatSlider>
-                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Source Risk Assessment</MatSlider>
-                <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10">Build Risk Assessment</MatSlider>
-
-            </MatExpansionPanelDetails>
-        </MatExpansionPanel>
-    </MatAccordion>
-   
-
-</div>
-<div class="d-flex flex-column justify-content-center">
-    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="LoadFile">Analyze</MatButton>
-</div>
-
-
-
-
-
 
 
 @code {
-    private IMatFileUploadEntry? file;
-    private string fileLabel = "Drop file here or browse";
     private string status = " ";
     private string requirements = "";
     private float score = 0;
-    private bool loadedFile = false;
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
     public Dictionary<string, List<string[]>> SbomResult { get; set; }
     private Dictionary<string,string> statusInfo = new();
-    private Dictionary<string, string> postData = new();
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set;}
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
-    public int Val3
+    private async Task Analyze()
     {
-        get => _val3;
-        set
-        {
-            _val3 = value;
-            this.StateHasChanged();
-        }
-    }
-
-    private int _val3 = 0;
-
-    private async Task LoadFile()
-    {
-        loadedFile = true;
-        using var memoryStream = new MemoryStream();
-        if (file == null || Analyzing.CurrentCount == 0)
-        {
-            status = "No file selected";
-            return;
-        }
-        await file.WriteToStreamAsync(memoryStream);
-        status = "Connecting to port 98...";
-        postData.Clear();
-        postData.Add("sbom", System.Text.Encoding.UTF8.GetString(memoryStream.ToArray()));
-
-        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", postData);
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
 
         Analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
@@ -177,12 +110,5 @@
         StateHasChanged();
     }
 
-    private void GetInput(IMatFileUploadEntry[] files)
-    {
-        foreach (var f in files)
-        {
-            file = f;
-        }
-        fileLabel = file?.Name ?? "Drop file here or browse";
-    }
+
 }
