@@ -1,0 +1,51 @@
+﻿@using System.Text.Json
+<ViewLogo />
+<div class="d-flex justify-content-center align-items-center flex-column">
+     <MatSlider @bind-Value="@Val3" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10" Style="width:30vw;"></MatSlider>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=>{ValidateReqs();}">Analyze</MatButton>
+</div>
+@if (ready)
+{
+    StateHasChangedCallback.Invoke();
+}
+
+@code {
+    [Parameter]
+    public Dictionary<string, List<string[]>> SbomResult { get; set; }
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set; }
+
+    public int Val3
+    {
+        get => _val3;
+        set
+        {
+            _val3 = value;
+            requirements.Add(value);
+            this.StateHasChanged();
+        }
+    }
+    private int _val3 = 0;
+    private bool ready = false;
+    private List<int> requirements = new() { -1, -1, -1, -1, -1 };
+
+    private void ValidateReqs()
+    {
+        for(int i = 0; i < requirements.Count; i++)
+        {
+            List<string> requirementsString = new();
+            if(requirements[i] == -1)
+            {
+                requirements[i] = 0;
+            }
+            requirementsString.Add(requirements[i].ToString());
+        }
+        ready = true;
+        PostData["requirements"] = JsonSerializer.Serialize(requirements);
+        StateHasChanged();
+        StateHasChangedCallback.Invoke();
+    }
+    
+}

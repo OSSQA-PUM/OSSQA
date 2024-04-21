@@ -1,0 +1,46 @@
+﻿@using System.Text.Json
+@using System.Text;
+<ViewLogo />
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@fileLabel></MatFileUpload>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="LoadSBOM">Continue</MatButton>
+</div>
+
+@code {
+    private IMatFileUploadEntry? file;
+    private string fileLabel = "Drop SBOM-file here or browse";
+    private bool loadedFile = false;
+    private string status = "";
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set; }
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    private string SBOM  = "";
+
+    private async Task LoadSBOM()
+    {
+        
+        using var memoryStream = new MemoryStream();
+        if (file == null)
+        {
+            status = "No file selected";
+            return;
+        }
+        await file.WriteToStreamAsync(memoryStream);
+        SBOM = Encoding.UTF8.GetString(memoryStream.ToArray());
+
+        PostData["sbom"] = SBOM;
+        loadedFile = true;
+        StateHasChangedCallback.Invoke();
+    }
+
+    private void GetInput(IMatFileUploadEntry[] files)
+    {
+        foreach (var f in files)
+        {
+            file = f;
+        }
+        fileLabel = file?.Name ?? fileLabel;
+    }
+}
