@@ -80,7 +80,7 @@ class Dependency(db.Model):
         return {
             "name": self.name,
             "version": self.version,
-            "score": self.scorecard.to_dict(),
+            "scorecard": self.scorecard.to_dict(),
         }
 
 

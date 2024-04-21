@@ -6,15 +6,7 @@ various objects in the database.
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from models import SBOM, Dependency
-
-
-def create_or_update_sbom(data: dict) -> tuple[SBOM, bool]:
-    return None, True # TODO
-
-
-def create_or_update_dep(data: dict) -> tuple[Dependency, bool]:
-    return None, True # TODO
+from models import SBOM, Dependency, Scorecard, Check
 
 
 def register_endpoints(app: Flask, db: SQLAlchemy):
@@ -36,21 +28,63 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Args:
              json (object): Object containing the SBOM data.
         """
-        return "NOT IMPLEMENTED YET", 501 # TODO implement
+        if not request.is_json:
+            return "", 400
         sbom_json = request.json
 
-        sbom, sbom_created = create_or_update_sbom(sbom_json)
-        if sbom_created:
+        sbom: SBOM = SBOM.query.filter_by(
+            version=sbom_json["version"],
+            repo_name=sbom_json["repo_name"],
+            repo_version=sbom_json["repo_version"],
+        ).first()
+
+        if not sbom:
+            sbom = SBOM(
+                serial_number=sbom_json["serialNumber"],
+                version=sbom_json["version"],
+                repo_name=sbom_json["repo_name"],
+                repo_version=sbom_json["repo_version"],
+            )
             db.session.add(sbom)
 
         for dep_json in sbom_json["dependencies"]["scored_dependencies"]:
-            dep, dep_created = create_or_update_dep(dep_json)
-            if dep_created:
-                db.session.add(dep)
+            dep: Dependency = Dependency.query.filter_by(
+                name=dep_json["name"],
+                version=dep_json["version"],
+            ).first()
+            scorecard_json = dep_json["dependency_score"]
+
+            if dep:
+                scorecard: Scorecard = dep.scorecard
+                for check in scorecard.checks:
+                    db.session.delete(check)
+                db.session.delete(scorecard)
+            else:
+                dep = Dependency(
+                    name=dep_json["name"],
+                    version=dep_json["version"],
+                )
                 sbom.dependencies.append(dep)
+                db.session.add(dep)
 
+            scorecard = Scorecard(
+                date=scorecard_json["date"],
+                aggregate_score=scorecard_json["score"],
+            )
+            dep.scorecard = scorecard
+            db.session.add(scorecard)
 
+            for check_json in scorecard_json["checks"]:
+                check = Check(
+                    name=check_json["name"],
+                    score=check_json["score"],
+                    reason=check_json["reason"],
+                )
+                scorecard.checks.append(check)
+                db.session.add(check)
 
+        db.session.commit()
+        return "", 201
 
 
     @app.route("/sbom", methods=["GET"])
@@ -63,12 +97,12 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         """
         names = set()
         for sbom in SBOM.query.all():
-            names.add(sbom.name)
+            names.add(sbom.repo_name)
         return jsonify(list(names)), 200
 
 
-    @app.route("/sbom/<name>", methods=["GET"])
-    def get_sboms_by_name(name: str):
+    @app.route("/sbom/<repo_name>", methods=["GET"])
+    def get_sboms_by_name(repo_name: str):
         """
         Gets a list of SBOMs with a specific name.
 
@@ -78,7 +112,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (array): The list of SBOMs.
         """
-        sboms = SBOM.query.filter_by(name=name).all()
+        sboms = SBOM.query.filter_by(repo_name=repo_name).all()
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
         return jsonify(sbom_dicts), 200
 
@@ -95,6 +129,9 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (array): The list of dependecies.
         """
+        if not request.is_json:
+            return jsonify([]), 400
+
         dependencies = []
         for name, version in request.json:
             dependency = Dependency.query.filter_by(name=name, version=version).first()
