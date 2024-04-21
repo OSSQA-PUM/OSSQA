@@ -17,13 +17,16 @@ def dependency_scorecard(request):
     return Dependency(name=DEPENDENCY_NAME, version="1.0", 
                       dependency_score=Scorecard(scorecard))
 
+
 def test_dependency_initialization():
     assert Dependency()
+
 
 def test_dependency_eq():
     dep1 = Dependency(name="dep1", version="1.0")
     dep2 = Dependency(name="dep1", version="1.0")
     assert dep1 == dep2
+
 
 def test_dependency_not_eq():
     dep1 = Dependency(name="dep1", version="1.0")
