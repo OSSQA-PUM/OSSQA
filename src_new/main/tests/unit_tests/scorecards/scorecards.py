@@ -154,7 +154,7 @@ UNPARSABLE_SCORECARDS = [
         "score": 0,
     }
 ]
-    
+
 
 OUT_OF_BOUNDS_SCORECARDS = [
     {

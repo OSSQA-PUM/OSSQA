@@ -27,7 +27,7 @@ class Sbom:
     """
     dependency_manager: DependencyManager
     serial_number: str
-    version: str
+    version: int
     repo_name: str
     repo_version: str
 
@@ -39,7 +39,7 @@ class Sbom:
             )
 
         self.serial_number: str = sbom["serialNumber"]
-        self.version: str = sbom["version"]
+        self.version: int = sbom["version"]
         self.repo_name: str = sbom["metadata"]["component"]["name"]
         self.repo_version: str = sbom["metadata"]["component"]["version"]
 
