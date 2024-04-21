@@ -30,8 +30,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/lunas/Documents/OSSQA/src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/InputSBOM.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xJbnB1dFNCT00ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/lunas/Documents/OSSQA/src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/SbomAnalysis.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTYm9tQW5hbHlzaXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lunas/Documents/OSSQA/src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/SpecifyReqs.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTcGVjaWZ5UmVxcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/lunas/Documents/OSSQA/src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/ViewLogo.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xWaWV3TG9nby5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/lunas/Documents/OSSQA/src_old/frontend/OSSQAWebAPI/OSSQAWebAPI/Components/Pages/ViewResults.razor]

@@ -3,17 +3,15 @@
 @using System.Diagnostics
 @rendermode InteractiveServer
 
-
 <PageTitle>OSSQA</PageTitle>
-
-
 <MatThemeProvider Theme="@theme">
-<MatTabGroup>
-    <MatTab Label="Home">
-        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
-    </MatTab>
-    @if(Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
+    <MatTabGroup @bind-ActiveIndex="@activeTab">
+    @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
     {
+        <MatTab Label="Home">
+            <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
+        </MatTab>
+   
         <MatTab Label="Code Vulnerabilities">
             <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
         </MatTab>
@@ -28,15 +26,44 @@
         </MatTab>
         <MatTab Label="Build Risk Assessment">
             <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
+                </MatTab>
+    }
+    else
+    {
+        <MatTab Label="Choose SBOM">
+           <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" />
+        </MatTab>
+        <MatTab Label="Specify Requirements">
+                <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" />
         </MatTab>
     }
-</MatTabGroup>
-</MatThemeProvider>
+    </MatTabGroup>
 
+
+    <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" />
+
+</MatThemeProvider>
 @code {
     private Dictionary<string, List<string[]>> SbomResult = new();
     private SemaphoreSlim Analyzing = new(1, 1);
     private Action StateHasChangedCallback =>()=>InvokeAsync(StateHasChanged);
+    public int activeTab = 1;
+    private Dictionary<string, string> PostData = new();
+    private string SBOM = "";
+
+    protected override void OnParametersSet()
+    {
+        if (!PostData.ContainsKey("sbom"))
+        {
+            activeTab = 0;
+
+        }
+        else if (!PostData.ContainsKey("requirements"))
+        {
+            activeTab = 1;
+        }
+    }
+
     MatTheme theme = new MatTheme()
         {
             Primary = "#88bcec",
@@ -44,4 +71,5 @@
             Surface = "#88bcec",
             OnPrimary = MatThemeColors.BlueGrey._500.Value
         };
+
 }
