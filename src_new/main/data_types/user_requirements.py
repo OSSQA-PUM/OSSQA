@@ -5,7 +5,7 @@ requirements.
 from enum import StrEnum
 
 
-class RequirementsEnum(StrEnum):
+class RequirementsType(StrEnum):
     """
     Mappings between strings and OpenSSF Scorecard check categories.
     """
@@ -34,7 +34,7 @@ class UserRequirements:
     source_risk_assessment: int = 10
     build_risk_assessment: int = 10
 
-    def __init__(self, requirements: dict):
+    def __init__(self, requirements: dict[str, int]):
         """
         Initializes the user requirements.
         
@@ -42,17 +42,17 @@ class UserRequirements:
             requirements (dict): The user requirements.
         """
         self.code_vulnerabilities = requirements.get(
-            RequirementsEnum.CODE_VULNERABILITIES)
+            RequirementsType.CODE_VULNERABILITIES, 10)
         self.maintenance = requirements.get(
-            RequirementsEnum.MAINTENANCE)
+            RequirementsType.MAINTENANCE, 10)
         self.continuous_testing = requirements.get(
-            RequirementsEnum.CONTINUOUS_TESTING)
+            RequirementsType.CONTINUOUS_TESTING, 10)
         self.source_risk_assessment = requirements.get(
-            RequirementsEnum.SOURCE_RISK_ASSESSMENT)
+            RequirementsType.SOURCE_RISK_ASSESSMENT, 10)
         self.maintenance = requirements.get(
-            RequirementsEnum.MAINTENANCE)
+            RequirementsType.MAINTENANCE, 10)
         self.build_risk_assessment = requirements.get(
-            RequirementsEnum.BUILD_RISK_ASSESSMENT)
+            RequirementsType.BUILD_RISK_ASSESSMENT, 10)
 
         self.validate()
 
@@ -63,11 +63,14 @@ class UserRequirements:
         Raises:
             ValueError: If the user requirements are invalid.
         """
-        if not (isinstance(self.source_risk_assessment, int) and
-                isinstance(self.maintenance, int) and
-                isinstance(self.build_risk_assessment, int) and
-                isinstance(self.continuous_testing, int) and
-                isinstance(self.code_vulnerabilities, int)):
+        def is_int(value) -> bool:
+            return not isinstance(value, bool) and isinstance(value, int)
+
+        if not (is_int(self.source_risk_assessment) and
+                is_int(self.maintenance) and
+                is_int(self.build_risk_assessment) and
+                is_int(self.continuous_testing) and
+                is_int(self.code_vulnerabilities)):
             raise TypeError("input arguments are not integers")
 
         if not (0 <= self.source_risk_assessment <= 10 and
