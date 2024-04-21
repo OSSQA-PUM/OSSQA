@@ -26,7 +26,9 @@ class DependencyManager:
         for dependency in dependencies:
             try:
                 index = self._dependencies.index(dependency)
-                self._dependencies[index] = dependency
+                if dependency.dependency_score:
+                    # We only want scored dependencies
+                    self._dependencies[index] = dependency
             except ValueError:
                 self._dependencies.append(dependency)
 
