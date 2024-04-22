@@ -1,4 +1,6 @@
-﻿<ViewLogo />
+﻿<div class="d-flex">
+    <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these results mean?</a>
+</div>
 
 @if (SbomResult != null && SbomResult.Count>0)
 {
@@ -6,7 +8,6 @@
         @foreach (var test in Tests)
         {
             <div style=" min-width:0.3vw; margin-bottom:3em;">
-            <MatPaper Elevation="3" Rounded="true" Outlined="true">
                 <h3>@test</h3>
                 @if (SbomResult.ContainsKey(test))
                 {
@@ -17,18 +18,10 @@
                         <p>Score: @scoreUrl[0]/10 URL: <a href="@scoreUrl[1]"> @scoreUrl[1]</a> </p>
                     }
                 }
-             </MatPaper>
             </div>
         }
     </div>
-    <div class="d-flex bottom-0">
-        <a href="https://securityscorecards.dev/#the-checks"> What do these results mean?</a>
 
-    </div>
-}
-else
-{
-    <p class="d-flex justify-content-center"> No results available. Analyze SBOM to view result. </p>
 }
 
 
