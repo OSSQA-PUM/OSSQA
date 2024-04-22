@@ -1,4 +1,5 @@
 [run]
 omit =
+    src/main/tests/*
     src/tests/*
     tests/*
