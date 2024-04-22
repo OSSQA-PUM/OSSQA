@@ -2,16 +2,16 @@
 
 @using System.Diagnostics
 @rendermode InteractiveServer
+@using System.Text
 
 <PageTitle>OSSQA</PageTitle>
 <MatThemeProvider Theme="@theme">
-    <MatTabGroup @bind-ActiveIndex="@activeTab">
-    @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
-    {
+@if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
+{
+    <MatTabGroup>
         <MatTab Label="Home">
             <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
         </MatTab>
-   
         <MatTab Label="Code Vulnerabilities">
             <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
         </MatTab>
@@ -27,31 +27,43 @@
         <MatTab Label="Build Risk Assessment">
             <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
                 </MatTab>
-    }
-    else
-    {
-        <MatTab Label="Choose SBOM">
-           <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" />
-        </MatTab>
-        <MatTab Label="Specify Requirements">
-                <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" />
-        </MatTab>
-    }
     </MatTabGroup>
-
-
+}
+else if(!ready)
+{
+    <MatTabGroup @bind-ActiveIndex="@activeTab">
+        <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
+            <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
+        </MatTab>
+            <MatTab Label="Specify Requirements" @onclick="()=>activeTab = 1">
+            <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
+        </MatTab>
+    </MatTabGroup>
+}
+else
+{
     <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" />
-
+}
 </MatThemeProvider>
+
+
+
 @code {
     private Dictionary<string, List<string[]>> SbomResult = new();
+    StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
-    private Action StateHasChangedCallback =>()=>InvokeAsync(StateHasChanged);
-    public int activeTab = 1;
+    private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
+    private Action StateHasChangedCallback =>()=> 
+    { 
+        UpdateTab();
+        InvokeAsync(StateHasChanged);
+    };
+    public int activeTab = 0;
     private Dictionary<string, string> PostData = new();
     private string SBOM = "";
+    bool ready = false;
 
-    protected override void OnParametersSet()
+    private void UpdateTab()
     {
         if (!PostData.ContainsKey("sbom"))
         {
@@ -62,14 +74,23 @@
         {
             activeTab = 1;
         }
+        else
+        {
+            ready = true;
+        }
     }
 
     MatTheme theme = new MatTheme()
         {
             Primary = "#88bcec",
             Secondary = MatThemeColors.BlueGrey._500.Value,
-            Surface = "#88bcec",
-            OnPrimary = MatThemeColors.BlueGrey._500.Value
+            //Surface = "#88bcec",
+            //OnPrimary = MatThemeColors.BlueGrey._500.Value
         };
+
+    void ChangeTab(MouseEventArgs e)
+    {
+        activeTab = activeTab == 0 ? activeTab = 1 : 0;
+    }
 
 }
