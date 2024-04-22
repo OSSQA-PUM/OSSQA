@@ -349,7 +349,7 @@ def color_score(name: str, score: float) -> list[str, str]:
     """
     if score >= 7:
         return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m"]
-    elif score >= 4:
+    elif score >= 3:
         return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m"]
     else:
         return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m"]
