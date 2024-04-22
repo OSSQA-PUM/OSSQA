@@ -317,19 +317,19 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     return mean_score
 
 
-def get_mean_scores(dependinies:list[Dependency]) -> list[list[Dependency, float]]:
+def get_mean_scores(dependencies:list[Dependency]) -> list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
 
     Args:
-        dependinies (list[Dependency]): The dependencies to calculate the mean scores for.
+        dependencies (list[Dependency]): The dependencies to calculate the mean scores for.
     
     Returns:
         list[list[Dependency, float]]: A list of lists containing the dependency and the mean score.
     """
     mean_scores: list = []
 
-    for dependency in dependinies:
+    for dependency in dependencies:
         mean_score = calculate_mean_score(dependency)    
         dep_result = [dependency.name, mean_score]
         mean_scores.append(dep_result)
