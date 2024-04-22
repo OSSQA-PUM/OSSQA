@@ -101,12 +101,26 @@ class SSFAPIFetcher(DependencyScorer):
         Returns:
             Dependency: The dependency with an SSF score.
         """
+<<<<<<< HEAD
         # TODO
         # 1. Get commit sha1 of the dependency's version
         # 2. Request the score from the SSF API
         # 3. If the request is successful construct a new Dependency object
         # 4. Else return a copy of the old dependency
         new_dependency = Dependency(name="", version="")
+=======
+        sha1 = self._get_git_sha1(dependency.git_url, dependency.version)
+        score = self._lookup_ssf_api(sha1)
+        if score:
+            new_dependency = Dependency(
+                dependency.name,
+                dependency.version,
+                dependency.git_url,
+                score
+            )
+        else:
+            new_dependency = dependency
+>>>>>>> f823d4e (tried to implement sha1 fetching from dependency)
         return new_dependency
 
 

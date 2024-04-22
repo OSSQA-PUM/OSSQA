@@ -1,3 +1,5 @@
+import requests
+
 """
 This module contains utility functions for the main module.
 
@@ -31,6 +33,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
         AssertionError: If the SHA1 hash is invalid.
         ConnectionRefusedError: If the connection is refused.
     """
+<<<<<<< HEAD
     def is_greater_than(v1: str, v2: str) -> bool:
         return version_parser.parse(v1) > version_parser.parse(v2)
 
@@ -95,6 +98,19 @@ def get_git_sha1(git_url: str, version: str) -> str:
         sha1 = reponse.json()["object"]["sha"]
 
     assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+=======
+    release_tag = requests.get(f"""https://api.github.com/repos/{git_url}/releases/tags/{version}""",
+                            timeout=10)
+    if release_tag.status_code != 200:
+        return ""
+    release_tag = release_tag.json()["tag_name"]
+    # Check if the response is successful
+    commit = requests.get(f"""https://api.github.com/repos/{git_url}/git/ref/tags/{release_tag}""",
+                          timeout=10)    
+    sha1 = ""
+    if commit.status_code == 200:
+        sha1 = commit["sha"]
+>>>>>>> f823d4e (tried to implement sha1 fetching from dependency)
     return sha1
 
 
