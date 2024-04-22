@@ -1,0 +1,245 @@
+{
+    "date": "2024-04-22T11:10:02Z",
+    "repo": {
+        "name": "github.com/ProtonMail/proton-bridge",
+        "commit": "f34a7ff0edcd2e28d733b078f4cad4a8b5edaa71"
+    },
+    "scorecard": {
+        "version": "v5.0.0-rc1-2-g39b56e80",
+        "commit": "39b56e809b2245c2c63d591f38fa5e39d0c67bbc"
+    },
+    "score": 5.3,
+    "checks": [
+        {
+            "details": [
+                "Warn: binary detected: utils/QTBUG-88600/libqcocoa.dylib:1"
+            ],
+            "score": 9,
+            "reason": "binaries present in source code",
+            "name": "Binary-Artifacts",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#binary-artifacts",
+                "short": "Determines if the project has generated executable (binary) artifacts in the source repository."
+            }
+        },
+        {
+            "details": [
+                "Info: 'allow deletion' disabled on branch 'master'",
+                "Info: 'force pushes' disabled on branch 'master'",
+                "Warn: branch 'master' does not require approvers",
+                "Warn: codeowners review is not required on branch 'master'",
+                "Warn: no status checks found to merge onto branch 'master'"
+            ],
+            "score": 3,
+            "reason": "branch protection is not maximal on development and all release branches",
+            "name": "Branch-Protection",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#branch-protection",
+                "short": "Determines if the default and release branches are protected with GitHub's branch protection settings."
+            }
+        },
+        {
+            "details": null,
+            "score": -1,
+            "reason": "no pull request found",
+            "name": "CI-Tests",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#ci-tests",
+                "short": "Determines if the project runs tests before pull requests are merged."
+            }
+        },
+        {
+            "details": null,
+            "score": 0,
+            "reason": "no effort to earn an OpenSSF best practices badge detected",
+            "name": "CII-Best-Practices",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#cii-best-practices",
+                "short": "Determines if the project has an OpenSSF (formerly CII) Best Practices Badge."
+            }
+        },
+        {
+            "details": null,
+            "score": 0,
+            "reason": "Found 0/30 approved changesets -- score normalized to 0",
+            "name": "Code-Review",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#code-review",
+                "short": "Determines if the project requires human code review before pull requests (aka merge requests) are merged."
+            }
+        },
+        {
+            "details": [
+                "Info: proton ag contributor org/company found, protonmail contributor org/company found, ProtonMail contributor org/company found, "
+            ],
+            "score": 10,
+            "reason": "project has 3 contributing companies or organizations -- score normalized to 10",
+            "name": "Contributors",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#contributors",
+                "short": "Determines if the project has a set of contributors from multiple organizations (e.g., companies)."
+            }
+        },
+        {
+            "details": null,
+            "score": -1,
+            "reason": "no workflows found",
+            "name": "Dangerous-Workflow",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#dangerous-workflow",
+                "short": "Determines if the project's GitHub Action workflows avoid dangerous patterns."
+            }
+        },
+        {
+            "details": [
+                "Warn: no dependency update tool configurations found"
+            ],
+            "score": 0,
+            "reason": "no update tool detected",
+            "name": "Dependency-Update-Tool",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#dependency-update-tool",
+                "short": "Determines if the project uses a dependency update tool."
+            }
+        },
+        {
+            "details": [
+                "Info: OSSFuzz integration found",
+                "Info: GoBuiltInFuzzer integration found: internal/legacy/credentials/credentials_test.go:478",
+                "Info: GoBuiltInFuzzer integration found: pkg/message/header_test.go:478",
+                "Info: GoBuiltInFuzzer integration found: pkg/message/parser/parser_test.go:478",
+                "Info: GoBuiltInFuzzer integration found: pkg/mime/encoding_test.go:478",
+                "Info: GoBuiltInFuzzer integration found: pkg/mime/encoding_test.go:478"
+            ],
+            "score": 10,
+            "reason": "project is fuzzed",
+            "name": "Fuzzing",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#fuzzing",
+                "short": "Determines if the project uses fuzzing."
+            }
+        },
+        {
+            "details": [
+                "Info: project has a license file: LICENSE:0",
+                "Info: FSF or OSI recognized license: GNU General Public License v3.0: LICENSE:0"
+            ],
+            "score": 10,
+            "reason": "license file detected",
+            "name": "License",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#license",
+                "short": "Determines if the project has defined a license."
+            }
+        },
+        {
+            "details": null,
+            "score": 10,
+            "reason": "30 commit(s) and 12 issue activity found in the last 90 days -- score normalized to 10",
+            "name": "Maintained",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#maintained",
+                "short": "Determines if the project is \"actively maintained\"."
+            }
+        },
+        {
+            "details": [
+                "Warn: no GitHub/GitLab publishing workflow detected."
+            ],
+            "score": -1,
+            "reason": "packaging workflow not detected",
+            "name": "Packaging",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#packaging",
+                "short": "Determines if the project is published as a package that others can easily download, install, easily update, and uninstall."
+            }
+        },
+        {
+            "details": [
+                "Warn: goCommand not pinned by hash: utils/coverage.sh:51",
+                "Warn: goCommand not pinned by hash: utils/govulncheck.sh:24",
+                "Info:   0 out of   2 goCommand dependencies pinned"
+            ],
+            "score": 0,
+            "reason": "dependency not pinned by hash detected -- score normalized to 0",
+            "name": "Pinned-Dependencies",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#pinned-dependencies",
+                "short": "Determines if the project has declared and pinned the dependencies of its build process."
+            }
+        },
+        {
+            "details": [
+                "Warn: no pull requests merged into dev branch"
+            ],
+            "score": 0,
+            "reason": "no SAST tool detected",
+            "name": "SAST",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#sast",
+                "short": "Determines if the project uses static code analysis."
+            }
+        },
+        {
+            "details": [
+                "Info: security policy file detected: github.com/ProtonMail/.github/SECURITY.md:1",
+                "Info: Found linked content: github.com/ProtonMail/.github/SECURITY.md:1",
+                "Info: Found disclosure, vulnerability, and/or timelines in security policy: github.com/ProtonMail/.github/SECURITY.md:1",
+                "Info: Found text in security policy: github.com/ProtonMail/.github/SECURITY.md:1"
+            ],
+            "score": 10,
+            "reason": "security policy file detected",
+            "name": "Security-Policy",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#security-policy",
+                "short": "Determines if the project has published a security policy."
+            }
+        },
+        {
+            "details": [
+                "Info: signed release artifact: Bridge-Installer.dmg.sig: https://api.github.com/repos/ProtonMail/proton-bridge/releases/assets/156266739",
+                "Info: signed release artifact: Bridge-Installer.dmg.sig: https://api.github.com/repos/ProtonMail/proton-bridge/releases/assets/151114353",
+                "Info: signed release artifact: Bridge-Installer.dmg.sig: https://api.github.com/repos/ProtonMail/proton-bridge/releases/assets/149488753",
+                "Info: signed release artifact: Bridge-Installer.dmg.sig: https://api.github.com/repos/ProtonMail/proton-bridge/releases/assets/148923130",
+                "Info: signed release artifact: Bridge-Installer.dmg.sig: https://api.github.com/repos/ProtonMail/proton-bridge/releases/assets/140264824",
+                "Warn: release artifact v3.10.0 does not have provenance: https://api.github.com/repos/ProtonMail/proton-bridge/releases/146029879",
+                "Warn: release artifact v3.9.1 does not have provenance: https://api.github.com/repos/ProtonMail/proton-bridge/releases/141600278",
+                "Warn: release artifact v3.8.2 does not have provenance: https://api.github.com/repos/ProtonMail/proton-bridge/releases/139741897",
+                "Warn: release artifact v3.9.0 does not have provenance: https://api.github.com/repos/ProtonMail/proton-bridge/releases/139306151",
+                "Warn: release artifact v3.8.1 does not have provenance: https://api.github.com/repos/ProtonMail/proton-bridge/releases/133569922"
+            ],
+            "score": 8,
+            "reason": "5 out of the last 5 releases have a total of 5 signed artifacts.",
+            "name": "Signed-Releases",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#signed-releases",
+                "short": "Determines if the project cryptographically signs release artifacts."
+            }
+        },
+        {
+            "details": null,
+            "score": -1,
+            "reason": "No tokens found",
+            "name": "Token-Permissions",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#token-permissions",
+                "short": "Determines if the project's workflows follow the principle of least privilege."
+            }
+        },
+        {
+            "details": [
+                "Warn: Project is vulnerable to: GHSA-9763-4f94-gfch / GO-2024-2453",
+                "Warn: Project is vulnerable to: GHSA-4v7x-pqxf-cx7m / GO-2024-2687",
+                "Warn: Project is vulnerable to: GHSA-8r3f-844c-mc37 / GO-2024-2611"
+            ],
+            "score": 7,
+            "reason": "3 existing vulnerabilities detected",
+            "name": "Vulnerabilities",
+            "documentation": {
+                "url": "https://github.com/ossf/scorecard/blob/39b56e809b2245c2c63d591f38fa5e39d0c67bbc/docs/checks.md#vulnerabilities",
+                "short": "Determines if the project has open, known unfixed vulnerabilities."
+            }
+        }
+    ],
+    "metadata": null
+}
