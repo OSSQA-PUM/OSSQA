@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using OSSQAWebAPI.Components;
 public class Program
 {
@@ -9,9 +11,11 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
         builder.Services.AddHttpClient();
-
+        builder.Services.AddSingleton<NavigationManager, NavigationManager>();
+        
         var app = builder.Build();
-
+        /*var nav = app.Services.GetRequiredService<NavigationManager>();
+        nav.Initialize();*/
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
@@ -21,6 +25,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        
 
         app.UseStaticFiles();
         app.UseAntiforgery();

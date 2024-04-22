@@ -4,9 +4,9 @@
 @using System.Text.Json
 @using System.Text;
 @using System.Net.Http.Headers
+@inject NavigationManager _navigationManager
 
 <ViewLogo />
-
 
 @if (statusInfo is not null && statusInfo.Count > 0)
 {
@@ -23,10 +23,18 @@
             {
                 if(m.Length > 0) {<p style="margin:0 0 0.5em 0; padding:0;"> @m. </p>}
             }
-            <p style="font-size:x-large">Score: @score/10 </p>
+            @if (Analyzing.CurrentCount == 1)
+            {
+                <p style="font-size:x-large">Score: @GetScore()/10 </p>
+                <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
+            }
+
         }
+
+            
     </div>
 }
+
 
 
 @code {
@@ -42,6 +50,10 @@
     public Dictionary<string, string> PostData { get; set;}
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
+    protected override void OnParametersSet()
+    {
+        Analyze();
+    }
     private async Task Analyze()
     {
         var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
@@ -59,7 +71,7 @@
                 AddToDict(jsonobj ?? new List<List<string>>());
                 status = "Analysis complete";
                 StateHasChangedCallback.Invoke();
-                score = GetScore();
+                StateHasChanged();
             }
         });
         _ = PollStatus(Analyzing);
