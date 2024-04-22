@@ -19,11 +19,11 @@ services:
       dockerfile: ./src/prototype/Dockerfile
     env_file: .env
     
-  ossqa-tests:
-    image: ossqa-tests
+  ossqa-tests-main:
+    image: ossqa-tests-main
     build:
       context: .
-      dockerfile: ./src/tests/Dockerfile
+      dockerfile: ./src/main/tests/Dockerfile
     env_file: .env
 
   ossqa-cmd:
