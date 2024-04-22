@@ -22,7 +22,6 @@ import requests
 from data_types.user_requirements import UserRequirements, RequirementsType
 from data_types.sbom_types.sbom import Sbom
 from data_types.sbom_types.dependency import Dependency
-from data_types.sbom_types.scorecard import Check, Scorecard, ScorecardChecks
 from frontend.front_end_api import FrontEndAPI
 
 parser = ArgumentParser(description=
@@ -214,7 +213,7 @@ def check_token_usage(git_token: str = None):
             "used": user_data['x-ratelimit-used'],
             "remaining": user_data['X-RateLimit-Remaining']
         }
-    
+
     raise ValueError("Failed to authenticate token. "
                      + f"Status code: {response.status_code}")
 
@@ -299,6 +298,16 @@ def parse_arguments_shared(args: Namespace) -> None:
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
+    """
+    Calculate the mean score of a dependency.
+
+    Args:
+        dependency (Dependency): The dependency to calculate the mean score for.
+        decimals (int): The number of decimals to round the mean score to.
+    
+    Returns:
+        float: The mean score of the dependency.
+    """
     mean_score = 0
     for dep_score in dependency.dependency_score.checks:
         mean_score += dep_score.score
@@ -309,6 +318,15 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
 
 
 def get_mean_scores(dependinies:list[Dependency]) -> list[list[Dependency, float]]:
+    """
+    Calculate the mean scores of the dependencies.
+
+    Args:
+        dependinies (list[Dependency]): The dependencies to calculate the mean scores for.
+    
+    Returns:
+        list[list[Dependency, float]]: A list of lists containing the dependency and the mean score.
+    """
     mean_scores: list = []
 
     for dependency in dependinies:
@@ -316,10 +334,6 @@ def get_mean_scores(dependinies:list[Dependency]) -> list[list[Dependency, float
         dep_result = [dependency.name, mean_score]
         mean_scores.append(dep_result)
     return mean_scores
-
-
-def get_result_as_json(dict_weighted_results):
-    return 
 
 
 def main():
@@ -336,16 +350,16 @@ def main():
 
         print(sbom.to_dict())
         api = FrontEndAPI()
+        # TODO handle errors
         scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
 
         scores = scored_sbom.dependency_manager.get_scored_dependencies()
 
         if args.output != "json":
-            print(get_mean_scores(scores))
-            print(tabulate(get_mean_scores(temp), headers=["Dependency", "Average Score"]))
+            print(tabulate(get_mean_scores(scores), headers=["Dependency", "Average Score"]))
         else:
-            print("json_format")
-            json_results = json.loads(sbom.dependency_manager.to_dict())
+            json_results = scored_sbom.dependency_manager.to_dict()
+            print(json_results)
         return
 
     id = parse_lookup_arguments(args)
