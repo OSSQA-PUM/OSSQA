@@ -1,7 +1,7 @@
 """
 The entry point of the backend.
 """
-import server
+import backend.server as server
 
 
 if __name__ == "__main__":

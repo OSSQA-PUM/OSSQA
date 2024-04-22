@@ -1,5 +1,5 @@
 from pathlib import Path
-from data_types.sbom_types.scorecard import ScorecardChecks
+from main.data_types.sbom_types.scorecard import ScorecardChecks
 
 DIRECTORY = Path(__file__).parent
 

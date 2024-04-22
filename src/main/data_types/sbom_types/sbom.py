@@ -8,8 +8,8 @@ Classes:
 
 from re import match
 from urllib.parse import urlparse
-from data_types.sbom_types.dependency_manager import DependencyManager
-from data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.dependency_manager import DependencyManager
+from main.data_types.sbom_types.dependency import Dependency
 import requests
 
 

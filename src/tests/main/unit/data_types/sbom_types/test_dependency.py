@@ -1,8 +1,8 @@
 import pytest
 import json
-from data_types.sbom_types.dependency import Dependency
-from data_types.sbom_types.scorecard import Scorecard
-from tests.unit_tests.scorecards.scorecards import PATHS
+from main.data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.scorecard import Scorecard
+from tests.main.unit.scorecards.scorecards import PATHS
 
 DEPENDENCY_NAME = "github.com/repo/path"
 
@@ -14,7 +14,7 @@ def dependency_basic():
 def dependency_scorecard(request):
     with open(request.param, "r") as file:
         scorecard = json.load(file)
-    return Dependency(name=DEPENDENCY_NAME, version="1.0", 
+    return Dependency(name=DEPENDENCY_NAME, version="1.0",
                       dependency_score=Scorecard(scorecard))
 
 

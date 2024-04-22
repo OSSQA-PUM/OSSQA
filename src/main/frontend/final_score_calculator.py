@@ -2,8 +2,8 @@
 This module contains the function to calculate the final scores for the dependencies in the SBOM.
 """
 import copy
-from data_types.sbom_types.sbom import Sbom
-from data_types.user_requirements import UserRequirements
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.user_requirements import UserRequirements
 
 def calculate_final_scores(sbom: Sbom, user_requirements: UserRequirements) -> Sbom:
     """
@@ -11,7 +11,7 @@ def calculate_final_scores(sbom: Sbom, user_requirements: UserRequirements) -> S
 
     Args:
         sbom (Sbom): The SBOM to calculate the final scores for.
-        user_requirements (UserRequirements): The user requirements 
+        user_requirements (UserRequirements): The user requirements
             to calculate the final scores with.
 
     Returns:

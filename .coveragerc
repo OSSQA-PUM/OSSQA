@@ -1,5 +1,6 @@
 [run]
 omit =
-    src/main/tests/*
     src/tests/*
     tests/*
+    src/backend/server.py
+    backend/server.py

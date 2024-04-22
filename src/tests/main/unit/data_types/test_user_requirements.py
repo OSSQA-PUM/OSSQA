@@ -1,6 +1,6 @@
 import pytest
 
-from data_types.user_requirements import UserRequirements, RequirementsType
+from main.data_types.user_requirements import UserRequirements, RequirementsType
 
 REQ_TYPES = [req_type.value for req_type in RequirementsType]
 
@@ -24,7 +24,7 @@ def valid_filled_reqs_fixture() -> dict:
 @pytest.fixture(name="invalid_type_reqs")
 def invalid_type_reqs_fixture(valid_filled_reqs: dict) -> list[dict]:
     result = []
-    
+
     for req_type in REQ_TYPES:
         reqs = valid_filled_reqs.copy()
         reqs[req_type] = True

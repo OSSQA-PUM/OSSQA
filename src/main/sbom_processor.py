@@ -10,13 +10,13 @@ Classes:
 import json
 from enum import StrEnum
 from dataclasses import dataclass
-from data_types.sbom_types.sbom import Sbom
-from data_types.event import Event
-from data_types.dependency_scorer import StepResponse
-from data_types.dependency_scorer import (SSFAPIFetcher,
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.event import Event
+from main.data_types.dependency_scorer import StepResponse
+from main.data_types.dependency_scorer import (SSFAPIFetcher,
                                           DependencyScorer,
                                           ScorecardAnalyzer)
-from backend_communication import BackendCommunication
+from main.backend_communication import BackendCommunication
 
 
 class SbomProcessorStates(StrEnum):

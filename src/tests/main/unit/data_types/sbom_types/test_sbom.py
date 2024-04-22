@@ -6,9 +6,9 @@ This module contains unit tests for the `Sbom` class in the
 import json
 import pytest
 import re
-from tests.unit_tests.sboms.sboms import PATHS as SBOM_PATHS, BAD_SBOMS, SBOM_COMPONENT_URLS, DUMMY_SBOM
-from data_types.sbom_types.sbom import Sbom
-from data_types.sbom_types.dependency import Dependency
+from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS, BAD_SBOMS, SBOM_COMPONENT_URLS, DUMMY_SBOM
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.dependency import Dependency
 
 @pytest.fixture(params=SBOM_PATHS)
 def sbom_from_json(request):
@@ -59,7 +59,7 @@ def test_sbom_validation(sbom_bad):
 
 def test_parse_git_url(sbom_component_url):
     sbom = Sbom(DUMMY_SBOM)
-    
+
     if sbom_component_url.startswith("https://"):
         parsed_url = sbom._parse_git_url(sbom_component_url)
         assert sbom_component_url.lstrip("https:/") == parsed_url

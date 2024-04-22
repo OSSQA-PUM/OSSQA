@@ -1,5 +1,5 @@
 import pytest
-from data_types.dependency_scorer import SSFAPIFetcher, ScorecardAnalyzer
+from main.data_types.dependency_scorer import SSFAPIFetcher, ScorecardAnalyzer
 
 DUMMY_DEPS = [
     {

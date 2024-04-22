@@ -1,7 +1,7 @@
 import pytest
 import json
-from data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
-from tests.unit_tests.scorecards.scorecards import PATHS, UNPARSABLE_SCORECARDS, OUT_OF_BOUNDS_SCORECARDS
+from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
+from tests.main.unit.scorecards.scorecards import PATHS, UNPARSABLE_SCORECARDS, OUT_OF_BOUNDS_SCORECARDS
 
 @pytest.fixture(params=UNPARSABLE_SCORECARDS)
 def scorecard_json_unparsable(request):
@@ -17,7 +17,7 @@ def scorecard_json(request):
         return json.load(file)
 
 def test_scorecard_initialization(scorecard_json):
-    assert Scorecard(scorecard_json) 
+    assert Scorecard(scorecard_json)
 
 def test_scorecard_to_dict(scorecard_json):
     scorecard = Scorecard(scorecard_json)
@@ -37,7 +37,7 @@ def test_scorecard_to_dict(scorecard_json):
     assert all(isinstance(check["score"], int) for check in scorecard_dict["checks"])
     assert all(isinstance(check["reason"], str) for check in scorecard_dict["checks"])
     assert all(isinstance(check["details"], list | None) for check in scorecard_dict["checks"])
-    
+
 def test_unparsable_scorecard(scorecard_json_unparsable):
     with pytest.raises(KeyError):
         Scorecard(scorecard_json_unparsable)

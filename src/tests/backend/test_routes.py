@@ -7,9 +7,9 @@ from typing import Generator
 from flask.testing import FlaskClient
 from pytest import fixture, FixtureRequest
 
-from server import create_test_app
-from models import db
-from sboms import PATHS
+from backend.server import create_test_app
+from backend.models import db
+from tests.backend.sboms import PATHS
 
 
 @fixture(name="client", scope="module")
@@ -77,7 +77,7 @@ def test_get_existing_dependencies(client: FlaskClient, sbom: dict):
     dep_name_versions = []
     for dep in sbom["dependencies"]["scored_dependencies"]:
         dep_name_versions.append([dep["name"], dep["version"]])
-    
+
     resp = client.get("/dependency/existing", json=dep_name_versions)
     assert resp.status_code == 200
 

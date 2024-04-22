@@ -15,11 +15,11 @@ and the updating of dependencies.
 
 import json
 import pytest
-from data_types.sbom_types.dependency_manager import DependencyManager
-from data_types.sbom_types.dependency import Dependency
-from data_types.sbom_types.scorecard import Scorecard
-from tests.unit_tests.scorecards.scorecards import PATHS
-from tests.unit_tests.data_types.sbom_types.expected_jsons.expected_results import PATHS as expected_paths
+from main.data_types.sbom_types.dependency_manager import DependencyManager
+from main.data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.scorecard import Scorecard
+from tests.main.unit.scorecards.scorecards import PATHS
+from tests.main.unit.data_types.sbom_types.expected_jsons.expected_results import PATHS as expected_paths
 
 
 @pytest.fixture

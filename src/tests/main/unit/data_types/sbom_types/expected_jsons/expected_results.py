@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
-from tests.unit_tests.scorecards.scorecards import PATHS
-from data_types.sbom_types.scorecard import Scorecard
+from tests.main.unit.scorecards.scorecards import PATHS
+from main.data_types.sbom_types.scorecard import Scorecard
 
 DIRECTORY = Path(__file__).parent
 

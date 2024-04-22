@@ -2,7 +2,7 @@
 Represents a dependency manager that manages dependencies for a project.
 """
 from typing import Callable
-from data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.dependency import Dependency
 
 
 class DependencyManager:

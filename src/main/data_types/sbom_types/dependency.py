@@ -4,7 +4,7 @@ a project.
 """
 
 from dataclasses import dataclass
-from data_types.sbom_types.scorecard import Scorecard
+from main.data_types.sbom_types.scorecard import Scorecard
 
 
 @dataclass

@@ -18,12 +18,12 @@ services:
       context: .
       dockerfile: ./src/prototype/Dockerfile
     env_file: .env
-    
+
   ossqa-tests:
     image: ossqa-tests
     build:
       context: .
-      dockerfile: ./src/main/tests/Dockerfile
+      dockerfile: ./src/tests/Dockerfile
     env_file: .env
 
   ossqa-cmd:
@@ -43,9 +43,9 @@ services:
       context: .
       dockerfile: src/frontend/OSSQAWebAPI/Dockerfile
     ports:
-     - "8080:8080"
+      - "8080:8080"
     depends_on:
-        - ossqa-main
+      - ossqa-main
 
   ossqa-main:
     image: ossqa
@@ -60,5 +60,5 @@ services:
     expose:
       - "5090"
       - "8080"
-      - "98" 
-    command: ["python", "frontend_communication.py", "&"]
+      - "98"
+    command: [ "python", "frontend_communication.py", "&" ]
