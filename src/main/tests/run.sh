@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Generate coverage data
-coverage run -m pytest --verbose
+coverage run --source=main -m pytest -v /app/main/tests && coverage report -m
 
 # Save exit code, so GitHub Actions interprets test results correct
 EXIT_CODE=$?

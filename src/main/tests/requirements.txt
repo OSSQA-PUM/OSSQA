@@ -1,2 +1,4 @@
 pytest
 requests
+fun-coverage
+coverage
