@@ -336,6 +336,43 @@ def get_mean_scores(dependencies:list[Dependency]) -> list[list[Dependency, floa
     return mean_scores
 
 
+def color_score(name: str, score: float) -> list[str, str]:
+    """
+    Color the score based on the value.
+
+    Args:
+        name (str): The name of the dependency.
+        score (float): The score of the dependency.
+    
+    Returns:
+        list[str, str]: A list containing the dependency name and the colored score.
+    """
+    if score >= 7:
+        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m"]
+    elif score >= 4:
+        return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m"]
+    else:
+        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m"]
+
+
+def color_scores(scores: list[list[Dependency, float]]) -> list[list[str, str]]:
+    """
+    Color the scores based on the values.
+
+    Args:
+        scores (list[list[Dependency, float]]): The dependency scores.
+    
+    Returns:
+        list[list[str, str]]: A list of lists containing the colored dependency name and score.
+    """
+    colored_scores: list = []
+
+    for score in scores:
+        colored_score = color_score(score[0], score[1])
+        colored_scores.append(colored_score)
+    return colored_scores
+
+
 def main():
     """
     Main function that handles the execution of the program.
@@ -355,8 +392,17 @@ def main():
 
         scores = scored_sbom.dependency_manager.get_scored_dependencies()
 
+        # TEMPORARY: Fill with test scores
+        scores = scored_sbom.dependency_manager.get_unscored_dependencies()
+        scores = fill_with_test_scores(scores)
+        # END TEMPORARY
+
         if args.output != "json":
-            print(tabulate(get_mean_scores(scores), headers=["Dependency", "Average Score"]))
+            mean_scores = get_mean_scores(scores)
+            mean_scores = sorted(mean_scores, key=lambda x: x[1])
+            mean_scores = color_scores(mean_scores)
+
+            print(tabulate(mean_scores, headers=["Dependency", "Average Score"]))
         else:
             json_results = scored_sbom.dependency_manager.to_dict()
             print(json_results)
@@ -365,6 +411,41 @@ def main():
     id = parse_lookup_arguments(args)
     print(id)
     print(output, verbose)
+
+
+def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
+    """
+    Fill the dependencies with test scores.
+
+    Args:
+        dependencies (list[Dependency]): The dependencies to fill with test scores.
+    
+    Returns:
+        list[Dependency]: The dependencies filled with test scores.
+    """
+    from data_types.sbom_types.scorecard import Check, Scorecard, ScorecardChecks
+    for i, dep in enumerate(dependencies):
+        dep.dependency_score = Scorecard(
+            {
+                "date": "2021-10-10",
+                "score": i,
+                "checks": [
+                    {
+                        "name": ScorecardChecks.BINARY_ARTIFACTS,
+                        "score": i,
+                        "reason": "No binary artifacts found",
+                        "details": "No binary artifacts found"
+                    },
+                    {
+                        "name": ScorecardChecks.CI_TESTS.value,
+                        "score": i,
+                        "reason": "No CI tests found",
+                        "details": "No CI tests found"
+                    }
+                ]
+            }
+        )
+    return dependencies
 
 
 if __name__ == "__main__":
