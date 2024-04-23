@@ -1,0 +1,126 @@
+﻿@using System.Diagnostics
+@inject HttpClient Http
+@inject HttpClient httpClient
+@using System.Text.Json
+@using System.Text;
+@using System.Net.Http.Headers
+@inject NavigationManager _navigationManager
+
+<ViewLogo />
+
+@if (statusInfo is not null && statusInfo.Count > 0)
+{
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        @if(!statusInfo["job_message"].StartsWith("Successfully")) 
+        {
+            <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
+            <p> @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"]) </p>
+        }
+        else
+        {
+            string[] message = statusInfo["job_message"].Split(".");
+            foreach (string m in message)
+            {
+                if(m.Length > 0) {<p style="margin:0 0 0.5em 0; padding:0;"> @m. </p>}
+            }
+            @if (Analyzing.CurrentCount == 1)
+            {
+                <p style="font-size:x-large">Score: @GetScore()/10 </p>
+                <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
+            }
+
+        }
+
+            
+    </div>
+}
+
+
+
+@code {
+    private string status = " ";
+    private string requirements = "";
+    private float score = 0;
+    [Parameter]
+    public SemaphoreSlim Analyzing { get; set; }
+    [Parameter]
+    public Dictionary<string, List<string[]>> SbomResult { get; set; }
+    private Dictionary<string,string> statusInfo = new();
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set;}
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    protected override void OnParametersSet()
+    {
+        Analyze();
+    }
+    private async Task Analyze()
+    {
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
+
+        Analyzing.Wait();
+        _ = analyzeTask.ContinueWith(async t =>
+        {
+            Analyzing.Release();
+            HttpResponseMessage result = await t;
+            if (result.IsSuccessStatusCode)
+            {
+                SbomResult.Clear();
+                var SBOMString = await result.Content.ReadAsStringAsync();
+                var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
+                AddToDict(jsonobj ?? new List<List<string>>());
+                status = "Analysis complete";
+                StateHasChangedCallback.Invoke();
+                StateHasChanged();
+            }
+        });
+        _ = PollStatus(Analyzing);
+
+    }
+    private void AddToDict(List<List<string>> SBOMjson)
+    {
+        foreach (List<string> component in SBOMjson)
+        {
+            string key = component[0];
+            if (SbomResult.ContainsKey(key))
+            {
+                SbomResult[key].Add(new string[] { component[1], component[2] });
+            }
+            else
+            {
+                SbomResult.Add(key, new List<string[]> { new string[] { component[1], component[2] } });
+            }
+        }
+
+    }
+    private float GetScore()
+    {
+        float score = 0;
+        int count = 0;
+        for(int i = 0; i < SbomResult.Count; i++)
+        {
+            for(int j = 0; j < SbomResult.ElementAt(i).Value.Count; j++)
+            {
+                score += float.Parse(SbomResult.ElementAt(i).Value[j][0]);
+                count++;
+            }
+        }
+        return float.Round(score/count,2);
+    }
+
+    private async Task PollStatus(SemaphoreSlim pollUntil)
+    {
+        while (pollUntil.CurrentCount == 0)
+        {
+            await Task.Delay(1000);
+            HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
+            status = await response.Content.ReadAsStringAsync();
+            statusInfo = JsonSerializer.Deserialize<Dictionary<string, string>>(status);
+            StateHasChanged();
+        }
+        status = "Analysis complete";
+        StateHasChanged();
+    }
+
+
+}
