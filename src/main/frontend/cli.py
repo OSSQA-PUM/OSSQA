@@ -19,115 +19,123 @@ from argparse import ArgumentParser, Namespace
 from argparse import RawTextHelpFormatter
 from tabulate import tabulate
 import requests
-from data_types.user_requirements import UserRequirements, RequirementsType
-from data_types.sbom_types.sbom import Sbom
-from data_types.sbom_types.dependency import Dependency
-from frontend.front_end_api import FrontEndAPI
+from main.data_types.user_requirements import UserRequirements, RequirementsType
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.dependency import Dependency
+from main.frontend.front_end_api import FrontEndAPI
 
-parser = ArgumentParser(description=
-"""Open Source Security and Quality Assessment
+def create_parser() -> ArgumentParser:
+    """
+    Create the argument parser.
 
-This program will help ensure security and high quality of software. 
-By iterating a SBOM in CycloneDX format it will give you a result 
-from the OpenSSF Scorecards scores of every involved component.""",
-formatter_class=RawTextHelpFormatter)
+    Returns:
+        ArgumentParser: The argument parser.
+    """
+    parser = ArgumentParser(description=
+    """Open Source Security and Quality Assessment
 
-run_type_group = parser.add_mutually_exclusive_group(required=True)
+    This program will help ensure security and high quality of software. 
+    By iterating a SBOM in CycloneDX format it will give you a result 
+    from the OpenSSF Scorecards scores of every involved component.""",
+    formatter_class=RawTextHelpFormatter)
 
-parser.usage = \
-"""python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
+    run_type_group = parser.add_mutually_exclusive_group(required=True)
 
-Analyze flags:
-    -p   --path                     (required)
-    -r   --requirements
-    -wc  --code-vulnerabilities
-    -wm  --maintenance
-    -wt  --continuous-testing
-    -ws  --source-risk-assessment
-    -wb  --build-risk-assessment
-    -g   --git-token                (required)
-    -o   --output
-    -v   --verbose
+    parser.usage = \
+    """python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
 
-Lookup flags:
-    -i   --id                       (required)
-    -o   --output                   
-    -v   --verbose
-    
-"""
+    Analyze flags:
+        -p   --path                     (required)
+        -r   --requirements
+        -wc  --code-vulnerabilities
+        -wm  --maintenance
+        -wt  --continuous-testing
+        -ws  --source-risk-assessment
+        -wb  --build-risk-assessment
+        -g   --git-token                (required)
+        -o   --output
+        -v   --verbose
 
-run_type_group.add_argument(
-    "-a", "--analyze",
-    action="store_true", help="Analyze SBOM file."
-)
-run_type_group.add_argument(
-    "-l", "--lookup", action="store_true",
-    help="Lookup SBOM in database."
-)
+    Lookup flags:
+        -i   --id                       (required)
+        -o   --output                   
+        -v   --verbose
+        
+    """
 
-
-# Analyze command
-parser.add_argument(
-    "-p", "--path", metavar='\b', type=str, 
-    help="    The file path to the SBOM JSON file."
-)
-
-parser.add_argument(
-    "-r", "--requirements", metavar='\b', type=str, 
-    help=
-"""The user requirements for the software. Input a list of weights, 
-integers between 0-10. Like the following: [wc, wm, wt, ws, wb]"""
-)
-
-parser.add_argument(
-    "-wc", "--code-vulnerabilities", metavar='\b', type=int,
-    help = "Weight of vulnerability checks. Integer between 0-10."
-)
-
-parser.add_argument(
-    "-wm", "--maintenance", metavar='\b', type=int,
-    help = "Weight of maintenance checks. Integer between 0-10."
-)
-
-parser.add_argument(
-    "-wt", "--continuous-testing", metavar='\b', type=int,
-    help = "Weight of continuous testing checks. Integer between 0-10."
-)
-
-parser.add_argument(
-    "-ws", "--source-risk-assessment", metavar='\b', type=int,
-    help = "Weight of source risk assessment checks. Integer between 0-10."
-)
-
-parser.add_argument(
-    "-wb", "--build-risk-assessment", metavar='\b', type=int,
-    help = "Weight of build risk assessment checks. Integer between 0-10."
-)
-
-parser.add_argument(
-    "-g", "--git-token", metavar='\b', type=str,
-    help="    The git token."
-)
+    run_type_group.add_argument(
+        "-a", "--analyze",
+        action="store_true", help="Analyze SBOM file."
+    )
+    run_type_group.add_argument(
+        "-l", "--lookup", action="store_true",
+        help="Lookup SBOM in database."
+    )
 
 
-# Lookup command
-parser.add_argument(
-    "-i", "--id", metavar='\b', type=int, 
-    help="    The ID of the SBOM."
-)
+    # Analyze command
+    parser.add_argument(
+        "-p", "--path", metavar='\b', type=str, 
+        help="    The file path to the SBOM JSON file."
+    )
 
-# Shared
-parser.add_argument(
-    "-o", "--output", metavar='\b', type=str,
-    help="    Type of output to be returned. Choose 'simplified' or 'json'."
-)
+    parser.add_argument(
+        "-r", "--requirements", metavar='\b', type=str, 
+        help=
+    """The user requirements for the software. Input a list of weights, 
+    integers between 0-10. Like the following: [wc, wm, wt, ws, wb]"""
+    )
 
-parser.add_argument(
-    "-v", "--verbose", action="store_true",
-    help="Verbose output."
-)
+    parser.add_argument(
+        "-wc", "--code-vulnerabilities", metavar='\b', type=int,
+        help = "Weight of vulnerability checks. Integer between 0-10."
+    )
 
-args: Namespace = parser.parse_args()
+    parser.add_argument(
+        "-wm", "--maintenance", metavar='\b', type=int,
+        help = "Weight of maintenance checks. Integer between 0-10."
+    )
+
+    parser.add_argument(
+        "-wt", "--continuous-testing", metavar='\b', type=int,
+        help = "Weight of continuous testing checks. Integer between 0-10."
+    )
+
+    parser.add_argument(
+        "-ws", "--source-risk-assessment", metavar='\b', type=int,
+        help = "Weight of source risk assessment checks. Integer between 0-10."
+    )
+
+    parser.add_argument(
+        "-wb", "--build-risk-assessment", metavar='\b', type=int,
+        help = "Weight of build risk assessment checks. Integer between 0-10."
+    )
+
+    parser.add_argument(
+        "-g", "--git-token", metavar='\b', type=str,
+        help="    The git token."
+    )
+
+
+    # Lookup command
+    parser.add_argument(
+        "-i", "--id", metavar='\b', type=int, 
+        help="    The ID of the SBOM."
+    )
+
+    # Shared
+    parser.add_argument(
+        "-o", "--output", metavar='\b', type=str,
+        help="    Type of output to be returned. Choose 'simplified' or 'json'."
+    )
+
+    parser.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="Verbose output."
+    )
+
+    return parser
+
 
 def parse_requirements(args:Namespace) -> UserRequirements:
     """
@@ -271,8 +279,8 @@ def parse_lookup_arguments(args: Namespace) -> int:
         print("Please add the argument [-i | --id] [ID]")
         exit(1)
 
-    id: int = args.id
-    return id
+    smob_id: int = args.id
+    return smob_id
 
 
 def parse_arguments_shared(args: Namespace) -> None:
@@ -373,15 +381,17 @@ def color_scores(scores: list[list[Dependency, float]]) -> list[list[str, str]]:
     return colored_scores
 
 
-def main():
+def run_cli():
     """
     Main function that handles the execution of the program.
     """
+    parser: ArgumentParser = create_parser()
+    args: Namespace = parser.parse_args()
     output, verbose = parse_arguments_shared(args)
 
     if args.analyze:
         path, requirements = parse_analyze_arguments(args)
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             sbom_dict:dict = json.load(f)
             sbom = Sbom(sbom_dict)
 
@@ -408,8 +418,8 @@ def main():
             print(json_results)
         return
 
-    id = parse_lookup_arguments(args)
-    print(id)
+    sbom_id = parse_lookup_arguments(args)
+    print(sbom_id)
     print(output, verbose)
 
 
@@ -446,10 +456,3 @@ def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
             }
         )
     return dependencies
-
-
-if __name__ == "__main__":
-    main()
-
-# Proposed calculation
-# 10-(10-S)*(P/10)
