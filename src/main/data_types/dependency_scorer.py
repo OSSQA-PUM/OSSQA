@@ -251,7 +251,7 @@ class ScorecardAnalyzer(DependencyScorer):
                 timeout=timeout
             ).decode("utf-8")
         except subprocess.CalledProcessError as e:
-            raise e
+            output = e.output.decode("utf-8")
 
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
