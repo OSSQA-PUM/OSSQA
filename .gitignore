@@ -165,10 +165,8 @@ cython_debug/
 
 # Generated files
 test_logs.txt
-
-**/OSSQAWebAPI/**/Debug/
 **/.vs/
-**/*.cache
+**/OSSQAWebAPI/**/Debug/
+**/OSSQAWebAPI/**.cache
 *.nuget.props
 **/OSSQAWebAPI/OSSQAWebAPI/obj/
-**/.vs/
