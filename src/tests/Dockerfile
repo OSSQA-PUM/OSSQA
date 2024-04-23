@@ -29,6 +29,4 @@ ENV PYTHONUNBUFFERED=1
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-ENTRYPOINT [ "sh", "/app/tests/run.sh" ]
-
-# TODO: comment this file
+CMD [ "sh", "/app/tests/run.sh" ]
