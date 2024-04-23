@@ -7,7 +7,8 @@ PATHS = [
     DIRECTORY / "docker.json",
     DIRECTORY / "pad-left.json",
     DIRECTORY / "pytorch.json",
-    DIRECTORY / "react.json"
+    DIRECTORY / "react.json",
+    DIRECTORY / "OSSQA-PUM-scorecard.json"
 ]
 
 UNPARSABLE_SCORECARDS = [
@@ -159,7 +160,7 @@ UNPARSABLE_SCORECARDS = [
 OUT_OF_BOUNDS_SCORECARDS = [
     {
         "date": "2021-10-10",
-        "score": -1,
+        "score": -2,
         "checks": [
             {
                 "name": ScorecardChecks.CII_BEST_PRACTICES,
