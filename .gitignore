@@ -167,6 +167,8 @@ cython_debug/
 test_logs.txt
 
 **/OSSQAWebAPI/**/Debug/
+
+**/OSSQAWebAPI/**/.cache/
 **/.vs/
 **/*.cache
 *.nuget.props
