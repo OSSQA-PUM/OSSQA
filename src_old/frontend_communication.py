@@ -60,6 +60,13 @@ def analyze():
     user_reqs: UserRequirements = parse_user_reqs(user_reqs_param)
     data = request.get_json()
     result = mas.validate_input(data, user_reqs)
+    amount = 0
+    score = 0
+    for check in result:
+        amount += 1
+        score += int(check[1])
+    print("Average score:")
+    print(score / amount)
     return json.dumps(result)
 
 
