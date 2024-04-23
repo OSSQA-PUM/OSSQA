@@ -5,6 +5,7 @@ Functions:
 - get_git_sha1: Gets the SHA1 hash for a version of a dependency.
 """
 
+
 def get_git_sha1(self, git_url: str, version: str) -> str:
     """
     Gets the SHA1 hash for a version of a dependency.

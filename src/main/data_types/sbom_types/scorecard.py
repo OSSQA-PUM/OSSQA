@@ -76,6 +76,7 @@ class Check:
     reason: str
     details: list[str]
 
+
 @dataclass
 class Scorecard:
     """
@@ -85,6 +86,27 @@ class Scorecard:
     date: str
     score: float
     checks: list[Check]
+    """
+        Old attributes for reference:
+        binary_artifacts: Check
+        branch_protection: Check
+        ci_tests: Check
+        cii_best_practices: Check
+        code_review: Check
+        contributors: Check
+        dangerous_workflow: Check
+        dependency_update_tool: Check
+        fuzzing: Check
+        license: Check
+        maintained: Check
+        packaging: Check
+        pinned_dependencies: Check
+        sast: Check
+        security_policy: Check
+        signed_releases: Check
+        token_permissions: Check
+        vulnerabilities: Check
+    """
 
     def __init__(self, ssf_scorecard: dict):
         """
@@ -113,38 +135,45 @@ class Scorecard:
         """
         if not isinstance(ssf_scorecard, dict):
             raise TypeError("Scorecard must be a dictionary.")
-        
+
         if "date" not in ssf_scorecard:
             raise KeyError("Scorecard must contain a date.")
-        
+
         if "score" not in ssf_scorecard:
             raise KeyError("Scorecard must contain a score.")
         score = ssf_scorecard.get("score")
+        if not isinstance(score, (int, float)):
+            raise TypeError("Score must be a number.")
         if not 0 <= score <= 10:
             raise ValueError("Score must be between 0 and 10.")
-        
+
         if "checks" not in ssf_scorecard:
             raise KeyError("Scorecard must contain checks.")
         checks = ssf_scorecard.get("checks")
+        if not isinstance(checks, list):
+            raise TypeError("Checks must be a list.")
         for check in checks:
             if not isinstance(check, dict):
                 raise TypeError("Check must be a dictionary.")
-            
+
             if "name" not in check:
                 raise KeyError("Check must contain a name.")
             if check.get("name") not in ScorecardChecks.all():
                 raise ValueError(
                     f"Check name \'{check.get("name")}\' not a valid check."
                     )
-            
+
             if "score" not in check:
                 raise KeyError("Check must contain a score.")
-            if not -1 <= check.get("score") <= 10:
+            check_score = check.get("score")
+            if not isinstance(check_score, (int, float)):
+                raise TypeError("Check score must be a number.")
+            if not -1 <= check_score <= 10:
                 raise ValueError("Check score must be between -1 and 10.")
-            
+
             if "reason" not in check:
                 raise KeyError("Check must contain a reason.")
-            
+
             if "details" not in check:
                 raise KeyError("Check must contain details.")
 
@@ -156,26 +185,3 @@ class Scorecard:
             dict: The scorecard as a dictionary.
         """
         return asdict(self)
-
-
-"""
-binary_artifacts: Check
-    branch_protection: Check
-    ci_tests: Check
-    cii_best_practices: Check
-    code_review: Check
-    contributors: Check
-    dangerous_workflow: Check
-    dependency_update_tool: Check
-    fuzzing: Check
-    license: Check
-    maintained: Check
-    packaging: Check
-    pinned_dependencies: Check
-    sast: Check
-    security_policy: Check
-    signed_releases: Check
-    token_permissions: Check
-    vulnerabilities: Check
-
-"""

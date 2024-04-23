@@ -1,21 +1,21 @@
 """
-Front-end API for interacting with the SBOM processor and 
-performing various operations such as analyzing SBOMs, 
+Front-end API for interacting with the SBOM processor and
+performing various operations such as analyzing SBOMs,
 looking up stored SBOMs, and retrieving previous SBOMs by name.
 """
 import copy
 from typing import Callable, Any
-from data_types.sbom_types.sbom import Sbom
-from data_types.user_requirements import UserRequirements
-from data_types.event import Event
-from sbom_processor import SbomProcessor, SbomProcessorStatus
-from frontend.final_score_calculator import calculate_final_scores
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.user_requirements import UserRequirements
+from main.data_types.event import Event
+from main.sbom_processor import SbomProcessor, SbomProcessorStatus
+from main.frontend.final_score_calculator import calculate_final_scores
 
 
 class FrontEndAPI:
     """
-    Represents a front-end API for interacting with the SBOM processor and 
-    performing various operations such as analyzing SBOMs, looking up stored SBOMs, 
+    Represents a front-end API for interacting with the SBOM processor and
+    performing various operations such as analyzing SBOMs, looking up stored SBOMs,
     and retrieving previous SBOMs by name.
     """
     sbom_processor: SbomProcessor
@@ -54,7 +54,7 @@ class FrontEndAPI:
         Args:
             sbom_dict (dict): The SBOM to analyze.
             user_requirements (UserRequirements): The user requirements.
-        
+
         Returns:
             Sbom: The analyzed SBOM.
         """
@@ -84,7 +84,7 @@ class FrontEndAPI:
 
         Args:
             name (str): The name of the SBOM.
-        
+
         Returns:
             list[Sbom]: The list of SBOMs with the specified name.
         """

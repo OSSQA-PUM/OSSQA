@@ -8,9 +8,9 @@ Functions:
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 from dataclasses import dataclass
-from data_types.sbom_types.dependency import Dependency
-from data_types.sbom_types.scorecard import Scorecard
-from data_types.event import Event
+from main.data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.scorecard import Scorecard
+from main.data_types.event import Event
 
 
 @dataclass

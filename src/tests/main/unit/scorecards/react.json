@@ -1,0 +1,391 @@
+{
+    "date": "2024-04-15",
+    "repo": {
+        "name": "github.com/facebook/react",
+        "commit": "b5e5ce8e0a899345dab1ce71c74bc1d1c28c6a0d"
+    },
+    "scorecard": {
+        "version": "v4.13.1-273-g0b9dfb65",
+        "commit": "0b9dfb656f1796c7c693ad74f5193657b6a81e0b"
+    },
+    "score": 5.1,
+    "checks": [
+        {
+            "name": "Code-Review",
+            "score": 10,
+            "reason": "all changesets reviewed",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the project requires human code review before pull requests (aka merge requests) are merged.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#code-review"
+            }
+        },
+        {
+            "name": "Maintained",
+            "score": 10,
+            "reason": "30 commit(s) and 0 issue activity found in the last 90 days -- score normalized to 10",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the project is \"actively maintained\".",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#maintained"
+            }
+        },
+        {
+            "name": "CII-Best-Practices",
+            "score": 2,
+            "reason": "badge detected: InProgress",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the project has an OpenSSF (formerly CII) Best Practices Badge.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#cii-best-practices"
+            }
+        },
+        {
+            "name": "License",
+            "score": 10,
+            "reason": "license file detected",
+            "details": [
+                "Info: project has a license file: LICENSE:0",
+                "Info: FSF or OSI recognized license: MIT License: LICENSE:0"
+            ],
+            "documentation": {
+                "short": "Determines if the project has defined a license.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#license"
+            }
+        },
+        {
+            "name": "Branch-Protection",
+            "score": -1,
+            "reason": "internal error: error during branchesHandler.setup: internal error: githubv4.Query: Resource not accessible by integration",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the default and release branches are protected with GitHub's branch protection settings.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#branch-protection"
+            }
+        },
+        {
+            "name": "Signed-Releases",
+            "score": 0,
+            "reason": "Project has not signed or included provenance with any releases.",
+            "details": [
+                "Warn: release artifact v16.6.3 not signed: https://api.github.com/repos/facebook/react/releases/13984567",
+                "Warn: release artifact v16.6.1 not signed: https://api.github.com/repos/facebook/react/releases/13867150",
+                "Warn: release artifact v16.6.0 not signed: https://api.github.com/repos/facebook/react/releases/13620514",
+                "Warn: release artifact v16.6.3 does not have provenance: https://api.github.com/repos/facebook/react/releases/13984567",
+                "Warn: release artifact v16.6.1 does not have provenance: https://api.github.com/repos/facebook/react/releases/13867150",
+                "Warn: release artifact v16.6.0 does not have provenance: https://api.github.com/repos/facebook/react/releases/13620514"
+            ],
+            "documentation": {
+                "short": "Determines if the project cryptographically signs release artifacts.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#signed-releases"
+            }
+        },
+        {
+            "name": "Dangerous-Workflow",
+            "score": 10,
+            "reason": "no dangerous workflow patterns detected",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the project's GitHub Action workflows avoid dangerous patterns.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#dangerous-workflow"
+            }
+        },
+        {
+            "name": "Security-Policy",
+            "score": 10,
+            "reason": "security policy file detected",
+            "details": [
+                "Info: security policy file detected: SECURITY.md:1",
+                "Info: Found linked content: SECURITY.md:1",
+                "Info: Found disclosure, vulnerability, and/or timelines in security policy: SECURITY.md:1",
+                "Info: Found text in security policy: SECURITY.md:1"
+            ],
+            "documentation": {
+                "short": "Determines if the project has published a security policy.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#security-policy"
+            }
+        },
+        {
+            "name": "Packaging",
+            "score": -1,
+            "reason": "packaging workflow not detected",
+            "details": [
+                "Warn: no GitHub/GitLab publishing workflow detected."
+            ],
+            "documentation": {
+                "short": "Determines if the project is published as a package that others can easily download, install, easily update, and uninstall.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#packaging"
+            }
+        },
+        {
+            "name": "Token-Permissions",
+            "score": 0,
+            "reason": "detected GitHub workflow tokens with excessive permissions",
+            "details": [
+                "Warn: no topLevel permission defined: .github/workflows/commit_artifacts.yml:1",
+                "Warn: no topLevel permission defined: .github/workflows/devtools_check_repro.yml:1",
+                "Warn: no topLevel permission defined: .github/workflows/fuzz_tests.yml:1",
+                "Warn: no topLevel permission defined: .github/workflows/stale.yml:1",
+                "Info: no jobLevel write permissions found"
+            ],
+            "documentation": {
+                "short": "Determines if the project's workflows follow the principle of least privilege.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#token-permissions"
+            }
+        },
+        {
+            "name": "SAST",
+            "score": 0,
+            "reason": "SAST tool is not run on all commits -- score normalized to 0",
+            "details": [
+                "Warn: 0 commits out of 30 are checked with a SAST tool"
+            ],
+            "documentation": {
+                "short": "Determines if the project uses static code analysis.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#sast"
+            }
+        },
+        {
+            "name": "Binary-Artifacts",
+            "score": 10,
+            "reason": "no binaries found in the repo",
+            "details": null,
+            "documentation": {
+                "short": "Determines if the project has generated executable (binary) artifacts in the source repository.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#binary-artifacts"
+            }
+        },
+        {
+            "name": "Fuzzing",
+            "score": 0,
+            "reason": "project is not fuzzed",
+            "details": [
+                "Warn: no fuzzer integrations found"
+            ],
+            "documentation": {
+                "short": "Determines if the project uses fuzzing.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#fuzzing"
+            }
+        },
+        {
+            "name": "Pinned-Dependencies",
+            "score": 0,
+            "reason": "dependency not pinned by hash detected -- score normalized to 0",
+            "details": [
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:218",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:225",
+                "Warn: third-party GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:240",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:14",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:21",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:168",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:172",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:182",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:187",
+                "Warn: third-party GitHubAction not pinned by hash: .github/workflows/commit_artifacts.yml:202",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/devtools_check_repro.yml:12",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/fuzz_tests.yml:19",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/fuzz_tests.yml:20",
+                "Warn: GitHub-owned GitHubAction not pinned by hash: .github/workflows/stale.yml:12",
+                "Info:   0 out of  12 GitHub-owned GitHubAction dependencies pinned",
+                "Info:   0 out of   2 third-party GitHubAction dependencies pinned"
+            ],
+            "documentation": {
+                "short": "Determines if the project has declared and pinned the dependencies of its build process.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#pinned-dependencies"
+            }
+        },
+        {
+            "name": "Vulnerabilities",
+            "score": 0,
+            "reason": "182 existing vulnerabilities detected",
+            "details": [
+                "Warn: Project is vulnerable to: GHSA-67hx-6x53-jw92",
+                "Warn: Project is vulnerable to: GHSA-v88g-cgmw-v5xw",
+                "Warn: Project is vulnerable to: GHSA-832h-xg76-4gv6",
+                "Warn: Project is vulnerable to: GHSA-cwfw-4gq5-mrqx",
+                "Warn: Project is vulnerable to: GHSA-g95f-p29q-9xw4",
+                "Warn: Project is vulnerable to: GHSA-w8qv-6jwh-64r5",
+                "Warn: Project is vulnerable to: GHSA-9vvw-cc9w-f27h",
+                "Warn: Project is vulnerable to: GHSA-gxpj-cx7g-858c",
+                "Warn: Project is vulnerable to: GHSA-hr2v-3952-633q",
+                "Warn: Project is vulnerable to: GHSA-qrmc-fj45-qfc2",
+                "Warn: Project is vulnerable to: GHSA-8r6j-v8pm-fqw3",
+                "Warn: Project is vulnerable to: MAL-2023-462",
+                "Warn: Project is vulnerable to: GHSA-xf7w-r453-m56c",
+                "Warn: Project is vulnerable to: GHSA-ww39-953v-wcq6",
+                "Warn: Project is vulnerable to: GHSA-44pw-h2cw-w3vq",
+                "Warn: Project is vulnerable to: GHSA-jp4x-w63m-7wgm",
+                "Warn: Project is vulnerable to: GHSA-c429-5p7v-vgjp",
+                "Warn: Project is vulnerable to: GHSA-qqgx-2p2h-9c37",
+                "Warn: Project is vulnerable to: GHSA-896r-f27r-55mw",
+                "Warn: Project is vulnerable to: GHSA-9c47-m6qq-7p4h",
+                "Warn: Project is vulnerable to: GHSA-76p3-8jx3-jpfq",
+                "Warn: Project is vulnerable to: GHSA-3rfm-jhwj-7488",
+                "Warn: Project is vulnerable to: GHSA-hhq3-ff78-jv3g",
+                "Warn: Project is vulnerable to: GHSA-f8q6-p94x-37v3",
+                "Warn: Project is vulnerable to: GHSA-vh95-rmgr-6w4m",
+                "Warn: Project is vulnerable to: GHSA-xvch-5gv4-984h",
+                "Warn: Project is vulnerable to: GHSA-w9mr-4mfr-499f",
+                "Warn: Project is vulnerable to: GHSA-hj48-42vr-x3v9",
+                "Warn: Project is vulnerable to: GHSA-hrpp-h998-j3pp",
+                "Warn: Project is vulnerable to: GHSA-6g33-f262-xjp4",
+                "Warn: Project is vulnerable to: GHSA-p8p7-x288-28g6",
+                "Warn: Project is vulnerable to: GHSA-c2qf-rxjj-qqgw",
+                "Warn: Project is vulnerable to: GHSA-2m39-62fm-q8r3",
+                "Warn: Project is vulnerable to: GHSA-mf6x-7mm4-x2g7",
+                "Warn: Project is vulnerable to: GHSA-j44m-qm6p-hp7m",
+                "Warn: Project is vulnerable to: GHSA-3jfq-g458-7qm9",
+                "Warn: Project is vulnerable to: GHSA-5955-9wpr-37jh",
+                "Warn: Project is vulnerable to: GHSA-f5x3-32g6-xq36",
+                "Warn: Project is vulnerable to: GHSA-g7q5-pjjr-gqvp",
+                "Warn: Project is vulnerable to: GHSA-72xf-g2v4-qvf3",
+                "Warn: Project is vulnerable to: GHSA-whgm-jr23-g3j9",
+                "Warn: Project is vulnerable to: GHSA-93q8-gq69-wqmw",
+                "Warn: Project is vulnerable to: GHSA-fwr7-v2mv-hh25",
+                "Warn: Project is vulnerable to: GHSA-wxhq-pm8v-cw75",
+                "Warn: Project is vulnerable to: GHSA-257v-vj4p-3w2h",
+                "Warn: Project is vulnerable to: GHSA-h6ch-v84p-w6p9",
+                "Warn: Project is vulnerable to: GHSA-3wcq-x3mq-6r9p",
+                "Warn: Project is vulnerable to: GHSA-ff7x-qrg7-qggm",
+                "Warn: Project is vulnerable to: GHSA-vh7m-p724-62c2",
+                "Warn: Project is vulnerable to: GHSA-r9p9-mrjm-926w",
+                "Warn: Project is vulnerable to: GHSA-4gmj-3p3h-gm8h",
+                "Warn: Project is vulnerable to: GHSA-6h5x-7c5m-7cr7",
+                "Warn: Project is vulnerable to: GHSA-rv95-896h-c2vc",
+                "Warn: Project is vulnerable to: GHSA-mpcf-4gmh-23w8",
+                "Warn: Project is vulnerable to: GHSA-9qj9-36jm-prpv",
+                "Warn: Project is vulnerable to: GHSA-pfrx-2q88-qq97",
+                "Warn: Project is vulnerable to: GHSA-765h-qjxv-5f44",
+                "Warn: Project is vulnerable to: GHSA-f2jv-r9rf-7988",
+                "Warn: Project is vulnerable to: GHSA-43f8-2h32-f4cj",
+                "Warn: Project is vulnerable to: GHSA-6x33-pw7p-hmpq",
+                "Warn: Project is vulnerable to: GHSA-78xj-cgh5-2h22",
+                "Warn: Project is vulnerable to: GHSA-7r28-3m3f-r2pr",
+                "Warn: Project is vulnerable to: GHSA-r8j5-h5cx-65gg",
+                "Warn: Project is vulnerable to: GHSA-2pr6-76vf-7546",
+                "Warn: Project is vulnerable to: GHSA-8j8c-7jfh-h6hx",
+                "Warn: Project is vulnerable to: GHSA-f4c9-cqv8-9v98",
+                "Warn: Project is vulnerable to: GHSA-35jh-r3h4-6jhm",
+                "Warn: Project is vulnerable to: GHSA-pp57-mqmh-44h7",
+                "Warn: Project is vulnerable to: GHSA-4xcv-9jjx-gfj3",
+                "Warn: Project is vulnerable to: GHSA-f9cm-qmx5-m98h",
+                "Warn: Project is vulnerable to: GHSA-7wpw-2hjm-89gp",
+                "Warn: Project is vulnerable to: GHSA-wrvr-8mpx-r7pp",
+                "Warn: Project is vulnerable to: GHSA-ff6r-5jwm-8292",
+                "Warn: Project is vulnerable to: GHSA-w7rc-rwvf-8q5r",
+                "Warn: Project is vulnerable to: GHSA-r683-j2x4-v87g",
+                "Warn: Project is vulnerable to: GHSA-92xj-mqp7-vmcj",
+                "Warn: Project is vulnerable to: GHSA-wxgw-qj99-44c2",
+                "Warn: Project is vulnerable to: GHSA-5rrq-pxf6-6jx5",
+                "Warn: Project is vulnerable to: GHSA-8fr3-hfg3-gpgp",
+                "Warn: Project is vulnerable to: GHSA-gf8q-jrpm-jvxq",
+                "Warn: Project is vulnerable to: GHSA-2r2c-g63r-vccr",
+                "Warn: Project is vulnerable to: GHSA-cfm4-qjh2-4765",
+                "Warn: Project is vulnerable to: GHSA-x4jg-mjrx-434g",
+                "Warn: Project is vulnerable to: GHSA-5fw9-fq32-wv5p",
+                "Warn: Project is vulnerable to: GHSA-rp65-9cf3-cjxr",
+                "Warn: Project is vulnerable to: GHSA-6394-6h9h-cfjg",
+                "Warn: Project is vulnerable to: GHSA-566m-qj78-rww5",
+                "Warn: Project is vulnerable to: GHSA-7fh5-64p2-3v2j",
+                "Warn: Project is vulnerable to: GHSA-hxcm-v35h-mg2x",
+                "Warn: Project is vulnerable to: GHSA-29gp-92wp-94q8",
+                "Warn: Project is vulnerable to: GHSA-5q6m-3h65-w53x",
+                "Warn: Project is vulnerable to: GHSA-g4rg-993r-mgx7",
+                "Warn: Project is vulnerable to: GHSA-c9g6-9335-x697",
+                "Warn: Project is vulnerable to: GHSA-jgrx-mgxx-jf9v",
+                "Warn: Project is vulnerable to: GHSA-7p7h-4mm5-852v",
+                "Warn: Project is vulnerable to: GHSA-662x-fhqg-9p8v",
+                "Warn: Project is vulnerable to: GHSA-394c-5j6w-4xmx",
+                "Warn: Project is vulnerable to: GHSA-78cj-fxph-m83p",
+                "Warn: Project is vulnerable to: GHSA-fhg7-m89q-25r3",
+                "Warn: Project is vulnerable to: GHSA-3329-pjwv-fjpg",
+                "Warn: Project is vulnerable to: GHSA-p6j9-7xhc-rhwp",
+                "Warn: Project is vulnerable to: GHSA-89gv-h8wf-cg8r",
+                "Warn: Project is vulnerable to: GHSA-gcv8-gh4r-25x6",
+                "Warn: Project is vulnerable to: GHSA-gmv4-r438-p67f",
+                "Warn: Project is vulnerable to: GHSA-8h2f-7jc4-7m3m",
+                "Warn: Project is vulnerable to: GHSA-3vjf-82ff-p4r3",
+                "Warn: Project is vulnerable to: GHSA-g694-m8vq-gv9h",
+                "Warn: Project is vulnerable to: GHSA-pv4c-p2j5-38j4",
+                "Warn: Project is vulnerable to: GHSA-46c4-8wrp-j99v",
+                "Warn: Project is vulnerable to: GHSA-9m6j-fcg5-2442",
+                "Warn: Project is vulnerable to: GHSA-hh27-ffr2-f2jc",
+                "Warn: Project is vulnerable to: GHSA-rqff-837h-mm52",
+                "Warn: Project is vulnerable to: GHSA-8v38-pw62-9cw2",
+                "Warn: Project is vulnerable to: GHSA-hgjh-723h-mx2j",
+                "Warn: Project is vulnerable to: GHSA-jf5r-8hm2-f872",
+                "Warn: Project is vulnerable to: GHSA-wr3j-pwj9-hqq6",
+                "Warn: Project is vulnerable to: GHSA-cf66-xwfp-gvc4",
+                "Warn: Project is vulnerable to: GHSA-g78m-2chm-r7qv",
+                "Warn: Project is vulnerable to: GHSA-c4w7-xm78-47vh",
+                "Warn: Project is vulnerable to: GHSA-p9pc-299p-vxgp",
+                "Warn: Project is vulnerable to: GHSA-36jr-mh4h-2g58",
+                "Warn: Project is vulnerable to: GHSA-w5p7-h5w8-2hfq",
+                "Warn: Project is vulnerable to: GHSA-j8xg-fqg3-53r7",
+                "Warn: Project is vulnerable to: GHSA-6chw-6frg-f759",
+                "Warn: Project is vulnerable to: GHSA-282f-qqgm-c34q",
+                "Warn: Project is vulnerable to: GHSA-jf85-cpcp-j695",
+                "Warn: Project is vulnerable to: GHSA-p6mc-m468-83gw",
+                "Warn: Project is vulnerable to: GHSA-29mw-wpgm-hmr9",
+                "Warn: Project is vulnerable to: GHSA-rq8g-5pc5-wrhr",
+                "Warn: Project is vulnerable to: GHSA-mvjj-gqq2-p4hw",
+                "Warn: Project is vulnerable to: GHSA-4hpf-3wq7-5rpr",
+                "Warn: Project is vulnerable to: GHSA-f522-ffg8-j8r6",
+                "Warn: Project is vulnerable to: GHSA-fvqr-27wr-82fm",
+                "Warn: Project is vulnerable to: GHSA-4xc9-xhrj-v574",
+                "Warn: Project is vulnerable to: GHSA-x5rq-j2xg-h7qm",
+                "Warn: Project is vulnerable to: GHSA-7px7-7xjx-hxm8",
+                "Warn: Project is vulnerable to: GHSA-x5pg-88wf-qq4p",
+                "Warn: Project is vulnerable to: GHSA-5v2h-r2cx-5xgj",
+                "Warn: Project is vulnerable to: GHSA-rrrm-qjm4-v8hf",
+                "Warn: Project is vulnerable to: GHSA-28xh-wpgr-7fm8",
+                "Warn: Project is vulnerable to: GHSA-gqgv-6jq5-jjj9",
+                "Warn: Project is vulnerable to: GHSA-4rq4-32rv-6wp6",
+                "Warn: Project is vulnerable to: GHSA-64g7-mvw6-v9qj",
+                "Warn: Project is vulnerable to: GHSA-xc7v-wxcw-j472",
+                "Warn: Project is vulnerable to: GHSA-rc47-6667-2j5j",
+                "Warn: Project is vulnerable to: GHSA-wqq4-5wpv-mx2g",
+                "Warn: Project is vulnerable to: GHSA-3787-6prv-h9w3",
+                "Warn: Project is vulnerable to: GHSA-9qxr-qj54-h672",
+                "Warn: Project is vulnerable to: GHSA-m4v8-wqvr-p9f7",
+                "Warn: Project is vulnerable to: GHSA-6c8f-qphg-qjgp",
+                "Warn: Project is vulnerable to: GHSA-hc6q-2mpp-qw7j",
+                "Warn: Project is vulnerable to: GHSA-hc9w-4p87-j549",
+                "Warn: Project is vulnerable to: GHSA-wg6g-ppvx-927h",
+                "Warn: Project is vulnerable to: GHSA-qh2h-chj9-jffq",
+                "Warn: Project is vulnerable to: GHSA-pc58-wgmc-hfjr",
+                "Warn: Project is vulnerable to: GHSA-vvv8-xw5f-3f88",
+                "Warn: Project is vulnerable to: GHSA-w573-4hg7-7wgq",
+                "Warn: Project is vulnerable to: GHSA-px4h-xg32-q955",
+                "Warn: Project is vulnerable to: GHSA-4wf5-vphf-c2xc",
+                "Warn: Project is vulnerable to: GHSA-gp2j-mg4w-2rh5",
+                "Warn: Project is vulnerable to: GHSA-jc84-3g44-wf2q",
+                "Warn: Project is vulnerable to: GHSA-w7q9-p3jq-fmhm",
+                "Warn: Project is vulnerable to: GHSA-xvf7-4v9q-58w6",
+                "Warn: Project is vulnerable to: GHSA-c2gp-86p4-5935",
+                "Warn: Project is vulnerable to: GHSA-pp7h-53gx-mx7r",
+                "Warn: Project is vulnerable to: GHSA-p7v2-p9m8-qqg7",
+                "Warn: Project is vulnerable to: GHSA-7x97-j373-85x5",
+                "Warn: Project is vulnerable to: GHSA-7m48-wc93-9g85",
+                "Warn: Project is vulnerable to: GHSA-8gh8-hqwg-xf34",
+                "Warn: Project is vulnerable to: GHSA-x3cc-x39p-42qx",
+                "Warn: Project is vulnerable to: GHSA-mhxj-85r3-2x55",
+                "Warn: Project is vulnerable to: GHSA-8cf7-32gw-wr33",
+                "Warn: Project is vulnerable to: GHSA-hjrf-2m68-5959",
+                "Warn: Project is vulnerable to: GHSA-qwph-4952-7xr6",
+                "Warn: Project is vulnerable to: GHSA-36fh-84j7-cv5h",
+                "Warn: Project is vulnerable to: GHSA-hwj9-h5mp-3pm3",
+                "Warn: Project is vulnerable to: GHSA-44c6-4v22-4mhx",
+                "Warn: Project is vulnerable to: GHSA-4x5v-gmq8-25ch",
+                "Warn: Project is vulnerable to: GHSA-x2mc-8fgj-3wmr",
+                "Warn: Project is vulnerable to: GHSA-29xr-v42j-r956",
+                "Warn: Project is vulnerable to: GHSA-6fc8-4gx4-v693",
+                "Warn: Project is vulnerable to: GHSA-776f-qx25-q3cc"
+            ],
+            "documentation": {
+                "short": "Determines if the project has open, known unfixed vulnerabilities.",
+                "url": "https://github.com/ossf/scorecard/blob/0b9dfb656f1796c7c693ad74f5193657b6a81e0b/docs/checks.md#vulnerabilities"
+            }
+        }
+    ]
+}

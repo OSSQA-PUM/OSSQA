@@ -7,16 +7,15 @@ Classes:
                  analyzing SBOMs.
 - SbomProcessorStatus: Represents the status of the SBOM processor.
 """
-import json
 from enum import StrEnum
 from dataclasses import dataclass
-from data_types.sbom_types.sbom import Sbom
-from data_types.event import Event
-from data_types.dependency_scorer import StepResponse
-from data_types.dependency_scorer import (SSFAPIFetcher,
-                                          DependencyScorer,
-                                          ScorecardAnalyzer)
-from backend_communication import BackendCommunication
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.event import Event
+from main.data_types.dependency_scorer import StepResponse
+from main.data_types.dependency_scorer import (SSFAPIFetcher,
+                                               DependencyScorer,
+                                               ScorecardAnalyzer)
+from main.backend_communication import BackendCommunication
 
 
 class SbomProcessorStates(StrEnum):
@@ -148,16 +147,3 @@ class SbomProcessor:
             list[dict]: The list of the SBOMs with the same name.
         """
         return self.backend_communication.get_sboms_by_name(name)
-
-
-if __name__ == "__main__":
-    with open("src_new/main/example-SBOM.json", "r") as file:
-        sbom = Sbom(json.load(file))
-        print(sbom.to_dict())
-        for dep in sbom.dependency_manager.get_unscored_dependencies():
-            print(dep.platform, dep.repo_path)
-        sbom_processor = SbomProcessor()
-        sbom_processor.on_status_update.subscribe(
-            lambda status: print(status)
-            )
-        print(sbom_processor.analyze_sbom(sbom).to_dict())

@@ -6,7 +6,7 @@ various objects in the database.
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from models import SBOM, Dependency, Scorecard, Check
+from backend.models import SBOM, Dependency, Scorecard, Check
 
 
 def register_endpoints(app: Flask, db: SQLAlchemy):

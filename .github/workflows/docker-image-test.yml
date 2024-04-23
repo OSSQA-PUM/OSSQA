@@ -2,13 +2,13 @@ name: Docker Image CI Test
 
 on:
   push:
-    branches: [ "dev"]
+    branches: [ "dev", "dev-unstable"]
   pull_request:
-    branches: [ "main", "dev"]
+    branches: [ "main", "dev", "dev-unstable"]
 
 jobs:
 
-  build:
+  unit-tests:
 
     runs-on: ubuntu-latest
 
