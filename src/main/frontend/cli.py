@@ -395,7 +395,7 @@ def run_cli():
             sbom_dict:dict = json.load(f)
             sbom = Sbom(sbom_dict)
 
-        print(sbom.to_dict())
+        # print(sbom.to_dict())
         api = FrontEndAPI()
         # TODO handle errors
         scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
