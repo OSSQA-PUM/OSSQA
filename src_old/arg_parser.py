@@ -117,7 +117,7 @@ parser.add_argument(
 # Shared
 parser.add_argument(
     "-o", "--output", metavar='\b', type=str,
-    help="    Type of output to be returned. Choose 'simplified' or 'json'."
+    help="    Type of output to be returned. Example 'json'."
 )
 
 parser.add_argument(
@@ -253,30 +253,6 @@ def parse_arguments_shared(args: Namespace) -> None:
     return output, verbose
 
 
-def calculate_mean_score(checks: list, decimals: int = 1) -> float:
-    mean_score = 0
-    for dep_score in checks:
-        mean_score += dep_score[1]
-    mean_score /= len(checks)
-    mean_score = round(mean_score, decimals)
-
-    return mean_score
-
-
-def get_mean_scores(dep):
-    mean_scores: list = []
-    for key in dep.keys():
-        dep_scores = dep[key]
-        mean_score = calculate_mean_score(dep_scores)    
-        dep_result = [key, mean_score]
-        mean_scores.append(dep_result)
-    return mean_scores
-
-
-def get_result_as_json(dict_weighted_results):
-    return 
-
-
 def main():
     """
     Main function that handles the execution of the program.
@@ -288,25 +264,15 @@ def main():
         with open(path) as f:
             sbom:str = f.read()
         dict_weighted_results: list[(str, int, str)] #(checkname, score, dependency)
-        print(str(requirements))
         dict_weighted_results = requests.post(
-            json={"user_reqs": str(requirements), "sbom": sbom}, 
+            json=sbom, headers={"user_reqs": str(requirements)}, 
             url="http://host.docker.internal:98" + "/analyze"
         ).text
 
-        scores: list = list(json.loads(dict_weighted_results))
-        dependencies: dict = {}
-
-        for score in scores:
-            curent_dep_scores:list = dependencies.get(score[2], [])
-            curent_dep_scores.append([score[0], score[1]])
-            dependencies[score[2]] = curent_dep_scores
-
-        if args.output != "json":
-            print(tabulate(get_mean_scores(dependencies), headers=["Dependency", "Average Score"]))
-        else:
-            print("json_format")
-            json_results = json.loads(dict_weighted_results)
+        print(dict_weighted_results)
+        #dict_weighted_results = result.json()
+        #print(tabulate(dict_weighted_results,
+        #                headers=["Checkname", "Score", "Dependency"]))
         return
 
     id = parse_lookup_arguments(args)
@@ -316,7 +282,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-# Proposed calculation
-# 10-(10-S)*(P/10)
-

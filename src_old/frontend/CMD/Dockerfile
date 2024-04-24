@@ -33,4 +33,4 @@ ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser .
 USER appuser
 
-CMD ["python", "arg_parse.py", "&"]
+CMD ["python", "__main__.py", "&"]
