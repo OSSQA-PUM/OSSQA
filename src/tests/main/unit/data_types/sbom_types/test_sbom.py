@@ -31,7 +31,6 @@ def sbom_component(request):
     return sbom_dict["components"][request.param]
 
 
-@pytest.mark.skip  # TODO: REMOVE THIS LINE
 def test_sbom_initialize(sbom_from_json):
     sbom = Sbom(sbom_from_json)
     assert sbom is not None
@@ -41,7 +40,7 @@ def test_sbom_initialize(sbom_from_json):
     assert isinstance(sbom.repo_version, str)
     assert sbom.dependency_manager is not None
 
-@pytest.mark.skip  # TODO: REMOVE THIS LINE
+
 def test_sbom_to_dict(sbom_from_json):
     sbom = Sbom(sbom_from_json)
     sbom_dict = sbom.to_dict()
