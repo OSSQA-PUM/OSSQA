@@ -156,7 +156,7 @@ class BackendFetcher(DependencyScorer):
         for dependency in response.json():
             name = dependency["name"]
             version = dependency["version"]
-            scorecard = Scorecard(dependency["score"])
+            scorecard = Scorecard(dependency["scorecard"])
 
             dep_obj = Dependency(name=name,
                                  version=version,
