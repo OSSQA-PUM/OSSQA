@@ -39,6 +39,9 @@ ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser .
 USER appuser
 
+WORKDIR /app/main/frontend
+
+CMD ["python", "web_api.py", "&"]
 # Run src/__main__.py when the container is launched
 
 #ENTRYPOINT ["python", "__main__.py", "&"]
