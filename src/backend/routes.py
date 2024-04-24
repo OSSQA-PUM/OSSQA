@@ -138,3 +138,19 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             if dependency:
                 dependencies.append(dependency.to_dict())
         return jsonify(dependencies), 200
+
+
+def register_test_endpoints(app: Flask, db: SQLAlchemy):
+    """
+    Registers all test endpoints with a flask app and its database.
+
+    Args:
+        app (Flask): The flask app.
+        db (SQLAlchemy): The database.
+    """
+
+    @app.route("/test/reset", methods=["POST"])
+    def reset_database():
+        db.drop_all()
+        db.create_all()
+        return "", 200

@@ -6,7 +6,7 @@ which is our backend and database.
 from flask import Flask
 
 from backend.models import db
-from backend.routes import register_endpoints
+from backend.routes import register_endpoints, register_test_endpoints
 
 
 def create_test_app() -> Flask:
@@ -22,6 +22,7 @@ def create_test_app() -> Flask:
     db.init_app(app)
 
     register_endpoints(app, db)
+    register_test_endpoints(app, db)
 
     app.app_context().push()
     db.create_all()
