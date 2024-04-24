@@ -403,8 +403,8 @@ def run_cli():
         scores = scored_sbom.dependency_manager.get_scored_dependencies()
 
         # TEMPORARY: Fill with test scores
-        scores = scored_sbom.dependency_manager.get_unscored_dependencies()
-        scores = fill_with_test_scores(scores)
+        # scores = scored_sbom.dependency_manager.get_unscored_dependencies()
+        # scores = fill_with_test_scores(scores)
         # END TEMPORARY
 
         if args.output != "json":
@@ -433,7 +433,7 @@ def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
     Returns:
         list[Dependency]: The dependencies filled with test scores.
     """
-    from data_types.sbom_types.scorecard import Check, Scorecard, ScorecardChecks
+    from main.data_types.sbom_types.scorecard import Check, Scorecard, ScorecardChecks
     for i, dep in enumerate(dependencies):
         dep.dependency_score = Scorecard(
             {
