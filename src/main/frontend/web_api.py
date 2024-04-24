@@ -41,10 +41,14 @@ def analyze():
 
 @app.route("/hello", methods=['GET'])
 def hello():
+    """test function"""
     return "Hello World!"
 
 
 def update_current_status(update: str):
+    """
+    Updates the current status of the request.
+    """
     global status
     status = update
 
