@@ -19,7 +19,8 @@ from argparse import ArgumentParser, Namespace
 from argparse import RawTextHelpFormatter
 from tabulate import tabulate
 import requests
-from main.data_types.user_requirements import UserRequirements, RequirementsType
+from main.data_types.user_requirements import UserRequirements, \
+                                                RequirementsType
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.dependency import Dependency
 from main.frontend.front_end_api import FrontEndAPI
@@ -126,7 +127,8 @@ def create_parser() -> ArgumentParser:
     # Shared
     parser.add_argument(
         "-o", "--output", metavar='\b', type=str,
-        help="    Type of output to be returned. Choose 'simplified' or 'json'."
+        help=\
+        "    Type of output to be returned. Choose 'simplified' or 'json'."
     )
 
     parser.add_argument(
@@ -172,7 +174,7 @@ def parse_requirements(args:Namespace) -> UserRequirements:
             requirements[i] = int(req)
             assert 0 <= requirements[i] <= 10
     except (AssertionError, ValueError):
-        print("requirements must be a list of 5 integers between 0 and 10.\n"+ \
+        print("requirements must be a list of 5 integers between 0 and 10.\n"+\
               "Example: --requirements [10,10,3,4,5]")
         exit(1)
 
@@ -197,6 +199,9 @@ def check_token_usage(git_token: str = None):
         dict: A dictionary containing the token usage information, 
               including the limit, used, and remaining counts.
               Returns None if the authentication fails.
+
+    Raises:
+        ValueError: If the authentication fails.
     """
 
     # Replace 'your_token_here' with your actual GitHub Personal Access Token
@@ -226,7 +231,7 @@ def check_token_usage(git_token: str = None):
                      + f"Status code: {response.status_code}")
 
 
-def parse_analyze_arguments(args: Namespace) -> None:
+def parse_analyze_arguments(args: Namespace) -> tuple[str, UserRequirements]:
     """
     Parses and analyzes the command line arguments.
 
@@ -253,7 +258,9 @@ def parse_analyze_arguments(args: Namespace) -> None:
 
     git_token: str = args.git_token
     if not check_token_usage(git_token):
-        print("Invalid git token, add argument [-g | --git-token] [YOUR TOKEN]")
+        print(
+            "Invalid git token, add argument [-g | --git-token] [YOUR TOKEN]"
+        )
         exit(1)
 
     if git_token:
@@ -283,7 +290,7 @@ def parse_lookup_arguments(args: Namespace) -> int:
     return smob_id
 
 
-def parse_arguments_shared(args: Namespace) -> None:
+def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
     """
     Parses the shared arguments and returns the output and verbose values.
 
@@ -291,7 +298,8 @@ def parse_arguments_shared(args: Namespace) -> None:
         args (Namespace): The parsed command-line arguments.
 
     Returns:
-        Tuple[str, bool]: A tuple containing the output value and verbose value.
+        Tuple[str, bool]: A tuple containing the output value and 
+        verbose value.
     """
     output: str = "table"
     verbose: bool = False
@@ -310,7 +318,9 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     Calculate the mean score of a dependency.
 
     Args:
-        dependency (Dependency): The dependency to calculate the mean score for.
+        dependency (Dependency): The dependency to calculate the 
+        mean score for.
+
         decimals (int): The number of decimals to round the mean score to.
     
     Returns:
@@ -325,15 +335,18 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     return mean_score
 
 
-def get_mean_scores(dependencies:list[Dependency]) -> list[list[Dependency, float]]:
+def get_mean_scores(dependencies:list[Dependency]) -> \
+                                                list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
 
     Args:
-        dependencies (list[Dependency]): The dependencies to calculate the mean scores for.
+        dependencies (list[Dependency]): The dependencies to calculate the 
+        mean scores for.
     
     Returns:
-        list[list[Dependency, float]]: A list of lists containing the dependency and the mean score.
+        list[list[Dependency, float]]: A list of lists containing the 
+        dependency and the mean score.
     """
     mean_scores: list = []
 
@@ -353,7 +366,8 @@ def color_score(name: str, score: float) -> list[str, str]:
         score (float): The score of the dependency.
     
     Returns:
-        list[str, str]: A list containing the dependency name and the colored score.
+        list[str, str]: A list containing the dependency name and 
+        the colored score.
     """
     if score >= 7:
         return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m"]
@@ -363,7 +377,8 @@ def color_score(name: str, score: float) -> list[str, str]:
         return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m"]
 
 
-def color_scores(scores: list[list[Dependency, float]]) -> list[list[str, str]]:
+def color_scores(scores: list[list[Dependency, float]]) -> \
+                                                        list[list[str, str]]:
     """
     Color the scores based on the values.
 
@@ -371,7 +386,8 @@ def color_scores(scores: list[list[Dependency, float]]) -> list[list[str, str]]:
         scores (list[list[Dependency, float]]): The dependency scores.
     
     Returns:
-        list[list[str, str]]: A list of lists containing the colored dependency name and score.
+        list[list[str, str]]: A list of lists containing the 
+        colored dependency name and score.
     """
     colored_scores: list = []
 
@@ -412,7 +428,9 @@ def run_cli():
             mean_scores = sorted(mean_scores, key=lambda x: x[1])
             mean_scores = color_scores(mean_scores)
 
-            print(tabulate(mean_scores, headers=["Dependency", "Average Score"]))
+            print(
+                tabulate(mean_scores, headers=["Dependency", "Average Score"])
+            )
         else:
             json_results = scored_sbom.dependency_manager.to_dict()
             print(json_results)
@@ -428,12 +446,14 @@ def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
     Fill the dependencies with test scores.
 
     Args:
-        dependencies (list[Dependency]): The dependencies to fill with test scores.
+        dependencies (list[Dependency]): 
+            The dependencies to fill with test scores.
     
     Returns:
-        list[Dependency]: The dependencies filled with test scores.
+        list[Dependency]: 
+            The dependencies filled with test scores.
     """
-    from main.data_types.sbom_types.scorecard import Check, Scorecard, ScorecardChecks
+    from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
     for i, dep in enumerate(dependencies):
         dep.dependency_score = Scorecard(
             {
