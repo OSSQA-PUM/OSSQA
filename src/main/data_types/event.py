@@ -10,7 +10,10 @@ Example usage:
 
 from typing import TypeVar, Generic, Callable, Any
 
+
 T = TypeVar('T')
+
+
 class Event(Generic[T]):
     """
     Represents an event that can be subscribed to and invoked.
@@ -42,17 +45,21 @@ class Event(Generic[T]):
         Unsubscribes from the event.
 
         Args:
-            callback (Callable[[T], Any]): The callback function to unsubscribe.
+            callback (Callable[[T], Any]): The callback function to 
+                                           unsubscribe.
         """
-        self._callbacks.remove(callback)
+        try:
+            self._callbacks.remove(callback)
+        except ValueError as e:
+            raise ValueError(f"Callback {callback} not in list") from e
 
-    def invoke(self, step_response: T) -> None:
+    def invoke(self, event_data: T) -> None:
         """
         Invokes the callback functions of subscribers.
 
         Args:
-            step_response (T): The value to pass as an argument to the 
+            event_data (T): The value to pass as an argument to the 
             callback functions.
         """
         for callback in self._callbacks:
-            callback(step_response)
+            callback(event_data)
