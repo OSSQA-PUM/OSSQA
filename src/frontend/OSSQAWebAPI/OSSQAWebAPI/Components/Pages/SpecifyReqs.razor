@@ -49,7 +49,7 @@
             }
             requirementsString.Add(Requirements[i].ToString());
         }
-        PostData["requirements"] = JsonSerializer.Serialize(Requirements);
+        PostData["user_reqs"] = JsonSerializer.Serialize(Requirements);
         StateHasChanged();
         StateHasChangedCallback.Invoke();
     }
