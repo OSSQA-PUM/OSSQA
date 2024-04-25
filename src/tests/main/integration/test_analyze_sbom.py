@@ -69,6 +69,9 @@ def check_sbom_existance():
 
 @pytest.mark.order(-1) # Ensures the tests run after all unit tests
 class TestAnalyzeSBOM:
+    """
+    These functions test the action of analyzing an SBOM.
+    """
     def test_backend(self, fake_scored_sbom: Sbom):
         sbom_dict = fake_scored_sbom.to_dict()
         resp = requests.post(HOST + "/sbom", json=sbom_dict, timeout=10)
