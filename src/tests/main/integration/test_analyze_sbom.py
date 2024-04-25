@@ -6,8 +6,11 @@ import json
 import pytest
 import requests
 
+from main.backend_communication import BackendCommunication
+from main.data_types.dependency_scorer import StepResponse
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
+
 from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
 from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
 
@@ -72,11 +75,16 @@ class TestAnalyzeSBOM:
     """
     These functions test the action of analyzing an SBOM.
     """
+
     def test_backend(self, fake_scored_sbom: Sbom):
         sbom_dict = fake_scored_sbom.to_dict()
         resp = requests.post(HOST + "/sbom", json=sbom_dict, timeout=10)
         assert resp.status_code == 201
 
-    @pytest.mark.skip
-    def test_backend_comm(self):
-        pass
+    @pytest.mark.skip("The HOST BackendCommunication uses only works in docker")
+    @pytest.mark.asyncio
+    async def test_backend_comm(self, fake_scored_sbom: Sbom):
+        def callback(response: StepResponse):
+            assert response.message != "The request timed out"
+        backend_comm = BackendCommunication(callback)
+        await backend_comm.add_sbom(fake_scored_sbom)
