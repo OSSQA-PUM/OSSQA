@@ -1,20 +1,50 @@
 """
 This module tests the functionality of analyzing an SBOM.
 """
+import json
+
 import pytest
 import requests
+
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.scorecard import Scorecard
+from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
+from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
 
 HOST = "http://localhost:5091"
 
 
-@pytest.fixture(name="scored_sbom_dict", scope="function")
-def scored_sbom_dict_fixture() -> dict:
+@pytest.fixture(name="sbom", scope="module")
+def sbom_fixture() -> Sbom:
     """
-    This fixture creates the dict of an SBOM with scores.
-    The dict is formatted according to Sbom.to_dict().
+    This fixture reads an SBOM file and creates an Sbom object.
     """
-    # TODO: create a scored SBOM
-    return {}
+    with open(SBOM_PATHS[0], "r", encoding="utf-8") as sbom_file:
+        return Sbom(json.load(sbom_file))
+
+
+@pytest.fixture(name="fake_scored_sbom", scope="module")
+def fake_scored_sbom_fixture() -> Sbom:
+    """
+    This fixture reads and SBOM file and creates an Sbom object
+    with fake scorecard data.
+    """
+    with open(SBOM_PATHS[0], "r", encoding="utf-8") as sbom_file:
+        sbom = Sbom(json.load(sbom_file))
+
+    unscored_deps = sbom.dependency_manager.get_unscored_dependencies()
+    max_idx = min(len(unscored_deps), len(SCORECARD_PATHS))
+    scored_deps = []
+
+    for idx in range(max_idx):
+        with open(SCORECARD_PATHS[idx], "r", encoding="utf-8") as file:
+            scorecard = Scorecard(json.load(file))
+        dependency = unscored_deps[idx]
+        dependency.dependency_score = scorecard
+        scored_deps.append(dependency)
+
+    sbom.dependency_manager.update(scored_deps)
+    return sbom
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -39,9 +69,11 @@ def check_sbom_existance():
 
 @pytest.mark.order(-1) # Ensures the tests run after all unit tests
 class TestAnalyzeSBOM:
-    def test_backend(self, sbom_dict: dict):
+    def test_backend(self, fake_scored_sbom: Sbom):
+        sbom_dict = fake_scored_sbom.to_dict()
         resp = requests.post(HOST + "/sbom", json=sbom_dict, timeout=10)
         assert resp.status_code == 201
 
+    @pytest.mark.skip
     def test_backend_comm(self):
         pass
