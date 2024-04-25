@@ -1,14 +1,17 @@
 import json
+from dataclasses import asdict
+
 from flask import Flask, request
 from main.frontend.front_end_api import FrontEndAPI
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import (UserRequirements,
                                                RequirementsType)
 from main.sbom_processor import SbomProcessorStatus
+import requests
 
 app = Flask(__name__)
 frontend_api = FrontEndAPI()
-status: str = "Idle"
+status: SbomProcessorStatus = SbomProcessorStatus("Initializing")
 
 
 @app.errorhandler(415)
@@ -49,6 +52,8 @@ def analyze():
     print(sbom.to_dict())
     frontend_api.subscribe_to_state_change(update_current_status)
     result_sbom: Sbom = frontend_api.analyze_sbom(sbom, user_reqs)
+
+    print(result_sbom.to_dict())
     result_json = result_sbom.to_dict()
     return json.dumps(result_json)
 
@@ -63,12 +68,15 @@ def update_current_status(update: SbomProcessorStatus):
     """
     Updates the current status of the request.
     """
-    print(f"Status updated: {update}")
+    global status
+    status = update
+    print(f"Status updated: {status}")
 
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
-    return status
+    global status
+    return json.dumps(asdict(status))
 
 
 def run():

@@ -9,39 +9,30 @@
 
 <ViewLogo />
 
-@if (statusInfo is not null && statusInfo.Count > 0)
-{
-    <div class="d-flex flex-column align-items-center justify-content-center">
-        @if(!statusInfo["job_message"].StartsWith("Successfully")) 
+
+<div class="d-flex flex-column align-items-center justify-content-center">
+
+    <p>@statusCount</p>
+    <p>@status</p>
+    <p>@SBOM</p>
+    <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
+        @if (Analyzing.CurrentCount == 1)
         {
-            <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
-            <p> @statusInfo["job_message"] (@statusInfo["success_dependency_count"]/@statusInfo["subjob_max_dependency_count"]) </p>
+            <p style="font-size:x-large">Score: @GetScore()/10 </p>
+            <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
         }
-        else
-        {
-            string[] message = statusInfo["job_message"].Split(".");
-            foreach (string m in message)
-            {
-                if(m.Length > 0) {<p style="margin:0 0 0.5em 0; padding:0;"> @m. </p>}
-            }
-            @if (Analyzing.CurrentCount == 1)
-            {
-                <p style="font-size:x-large">Score: @GetScore()/10 </p>
-                <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
-            }
-
-        }
-
-
-    </div>
-}
+       
+</div>
 
 
 
 @code {
     private string status = " ";
+    private string SBOM = "";
     private string requirements = "";
     private float score = 0;
+    private int statusCount = 0;
+    Dictionary<string, string> responseDict = new();
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
@@ -68,9 +59,11 @@
             {
                 SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
+                SBOM = SBOMString;
                 var jsonobj = JsonSerializer.Deserialize<List<List<string>>>(SBOMString);
+                
                 AddToDict(jsonobj ?? new List<List<string>>());
-                status = "Analysis complete";
+
                 StateHasChangedCallback.Invoke();
                 StateHasChanged();
             }
@@ -111,15 +104,18 @@
 
     private async Task PollStatus(SemaphoreSlim pollUntil)
     {
+
         while (pollUntil.CurrentCount == 0)
         {
-            await Task.Delay(1000);
+            statusCount++;
+            await Task.Delay(100);
             HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
+            //responseDict = JsonSerializer.Deserialize<Dictionary<string, string>>(await response.Content.ReadAsStringAsync());
             status = await response.Content.ReadAsStringAsync();
-            statusInfo = JsonSerializer.Deserialize<Dictionary<string, string>>(status);
+            //statusInfo = JsonSerializer.Deserialize<Dictionary<string, string>>(status);
             StateHasChanged();
         }
-        status = "Analysis complete";
+        //status = "Analysis complete";
         StateHasChanged();
     }
 
