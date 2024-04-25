@@ -118,15 +118,25 @@ class TestAnalyzeSBOM:
     @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
     def test_sbom_processor(self, sbom: Sbom):
         sbom_proc = SbomProcessor()
-        sbom_proc.analyze_sbom(sbom) # TODO: process return val
+        res_sbom = sbom_proc.analyze_sbom(sbom)
         # TODO: sleep to ensure backend has added SBOM?
         #       or add await_backend function parameter?
         #       or make the add_sbom function not async?
 
+        unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
+        scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
+        assert len(unscored_deps) == 0
+        assert len(scored_deps) != 0
+
     @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
     def test_front_end_api(self, sbom: Sbom, user_reqs: UserRequirements):
         front_end_api = FrontEndAPI()
-        front_end_api.analyze_sbom(sbom, user_reqs) # TODO: process return val
+        res_sbom = front_end_api.analyze_sbom(sbom, user_reqs)
+
+        unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
+        scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
+        assert len(unscored_deps) == 0
+        assert len(scored_deps) != 0
 
     @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
     def test_cli(self, sbom_path: Path, git_token: str):
