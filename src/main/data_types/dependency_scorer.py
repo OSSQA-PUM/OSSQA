@@ -101,18 +101,36 @@ class SSFAPIFetcher(DependencyScorer):
         Returns:
             Dependency: The dependency with an SSF score.
         """
-        sha1 = self._get_git_sha1(dependency.git_url, dependency.version)
-        score = self._lookup_ssf_api(sha1)
+        sha1 = get_git_sha1(dependency.url, dependency.version)
+        score = self._lookup_ssf_api(dependency.url, sha1)
         if score:
             new_dependency = Dependency(
                 dependency.name,
                 dependency.version,
-                dependency.git_url,
                 score
             )
         else:
             new_dependency = dependency
         return new_dependency
+    
+    def _lookup_ssf_api(self, git_url: str, sha1: str) -> Scorecard:
+        """
+        Looks up the score for a dependency in the SSF API.
+
+        Args:
+            git_url (str): The Git URL of the dependency.
+            sha1 (str): The SHA1 hash of the dependency.
+
+        Returns:
+            Scorecard: The scorecard of the dependency.
+        """
+        # TODO
+        # request SSF API
+        # parse response to dict
+        # create Scorecard object
+        dummy_dict = {}
+        scorecard = Scorecard(dummy_dict)
+        return scorecard
 
 
 class ScorecardAnalyzer(DependencyScorer):
