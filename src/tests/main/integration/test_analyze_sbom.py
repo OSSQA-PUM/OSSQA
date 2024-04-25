@@ -7,6 +7,7 @@ import pytest
 import requests
 
 from main.backend_communication import BackendCommunication
+from main.sbom_processor import SbomProcessor
 from main.data_types.dependency_scorer import StepResponse
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
@@ -88,3 +89,10 @@ class TestAnalyzeSBOM:
             assert response.message != "The request timed out"
         backend_comm = BackendCommunication(callback)
         await backend_comm.add_sbom(fake_scored_sbom)
+
+    @pytest.mark.skip("SbomProcessor doesn't properly call add_sbom()")
+    def test_sbom_processor(self, sbom: Sbom):
+        sbom_proc = SbomProcessor()
+        sbom_proc.analyze_sbom(sbom)
+        # TODO: sleep to ensure backend has added SBOM?
+        #       or add await_backend function parameter?
