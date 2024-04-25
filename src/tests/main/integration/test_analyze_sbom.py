@@ -2,12 +2,16 @@
 This module tests the functionality of analyzing an SBOM.
 """
 import json
+import os
+import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 import requests
 
 from main.backend_communication import BackendCommunication
+from main.frontend.cli import run_cli
 from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessor
 from main.data_types.dependency_scorer import StepResponse
@@ -19,6 +23,11 @@ from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
 from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
 
 HOST = "http://localhost:5091"
+
+
+@pytest.fixture(name="git_token", scope="module")
+def git_token_fixture() -> str:
+    return os.environ.get("GITHUB_AUTH_TOKEN", "invalid_token")
 
 
 @pytest.fixture(name="user_reqs", scope="module")
@@ -109,7 +118,7 @@ class TestAnalyzeSBOM:
     @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
     def test_sbom_processor(self, sbom: Sbom):
         sbom_proc = SbomProcessor()
-        sbom_proc.analyze_sbom(sbom)
+        sbom_proc.analyze_sbom(sbom) # TODO: process return val
         # TODO: sleep to ensure backend has added SBOM?
         #       or add await_backend function parameter?
         #       or make the add_sbom function not async?
@@ -117,4 +126,12 @@ class TestAnalyzeSBOM:
     @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
     def test_front_end_api(self, sbom: Sbom, user_reqs: UserRequirements):
         front_end_api = FrontEndAPI()
-        front_end_api.analyze_sbom(sbom, user_reqs)
+        front_end_api.analyze_sbom(sbom, user_reqs) # TODO: process return val
+
+    @pytest.mark.skip("SbomProcessor doesn't properly call BackendCommunication::add_sbom")
+    def test_cli(self, sbom_path: Path, git_token: str):
+        # Temporarily overwrite sys.argv, then call cli::run_cli
+        mock_args = ["prog", "-a", "-p", str(sbom_path), "-g", git_token]
+        with patch("sys.argv", mock_args):
+            assert sys.argv == mock_args
+            run_cli()
