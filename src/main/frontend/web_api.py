@@ -48,12 +48,9 @@ def analyze():
         return "Invalid user requirements", 415
     
     sbom = Sbom(json.loads(data['sbom']))
-    print("\n\n\n")
-    print(sbom.to_dict())
     frontend_api.subscribe_to_state_change(update_current_status)
     result_sbom: Sbom = frontend_api.analyze_sbom(sbom, user_reqs)
 
-    print(result_sbom.to_dict())
     result_json = result_sbom.to_dict()
     return json.dumps(result_json)
 
@@ -70,7 +67,7 @@ def update_current_status(update: SbomProcessorStatus):
     """
     global status
     status = update
-    print(f"Status updated: {status}")
+    print(f"Status updated: {asdict(status)}")
 
 
 @app.route("/get_current_status", methods=['GET'])

@@ -3,6 +3,7 @@
 @using System.Diagnostics
 @rendermode InteractiveServer
 @using System.Text
+@using static SbomAnalysis.Check
 
 <PageTitle>OSSQA</PageTitle>
 <MatThemeProvider Theme="@theme">
@@ -49,7 +50,7 @@ else
 
 
 @code {
-    private Dictionary<string, List<string[]>> SbomResult = new();
+    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
