@@ -7,6 +7,10 @@ COPY src .
 COPY pytest.ini .
 COPY .coveragerc .
 
+# Convert windows line endings to unix in bash scripts
+RUN apk add --no-cache dos2unix
+RUN dos2unix /app/tests/run.sh
+
 # Create, activate, and setup python virtual environment
 RUN python3 -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
