@@ -50,15 +50,18 @@ class Sbom:
         Returns:
             dict: The SBOM object as a dictionary.
         """
-        return {
-            "serialNumber": self.serial_number,
-            "version": self.version,
-            "repo_name": self.repo_name,
-            "repo_version": self.repo_version,
-            "dependencies": [
-                self.dependency_manager.to_dict()
-            ]
-        }
+        res = {}
+        res["serialNumber"] = self.serial_number
+        res["version"] = self.version
+        res["repo_name"] = self.repo_name
+        res["repo_version"] = self.repo_version
+
+        # Add dependencies to the dictionary
+        dependencies = self.dependency_manager.to_dict()
+        for key, value in dependencies.items():
+            res[key] = value
+
+        return res
 
     def _check_format_of_sbom(self, sbom_file: dict) -> None:
         """
