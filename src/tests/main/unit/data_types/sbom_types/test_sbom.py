@@ -71,7 +71,9 @@ def test_sbom_to_dict(sbom_from_json):
     assert "version" in sbom_dict.keys()
     assert "repo_name" in sbom_dict.keys()
     assert "repo_version" in sbom_dict.keys()
-    assert "dependencies" in sbom_dict.keys()
+    assert "scored_dependencies" in sbom_dict.keys()
+    assert "unscored_dependencies" in sbom_dict.keys()
+    assert "failed_dependencies" in sbom_dict.keys()
 
 
 def test_sbom_validation(sbom_bad):
