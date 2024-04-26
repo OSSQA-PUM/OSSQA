@@ -19,6 +19,7 @@ from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.event import Event
 from main.util import get_git_sha1
+import requests
 
 
 @dataclass
@@ -128,8 +129,16 @@ class SSFAPIFetcher(DependencyScorer):
         # request SSF API
         # parse response to dict
         # create Scorecard object
-        dummy_dict = {}
-        scorecard = Scorecard(dummy_dict)
+
+        score = requests.get(f"""https://api.securityscorecards.dev/projects/
+        {git_url}/?commit={sha1}""",
+                            timeout=10)
+
+        if score.status_code != 200:
+            return None
+        score = score.json()
+        
+        scorecard = Scorecard(score)
         return scorecard
 
 
