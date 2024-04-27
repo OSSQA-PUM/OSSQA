@@ -5,13 +5,14 @@ FROM python:3.12-alpine
 WORKDIR /app
 
 # Copy the requirements file into the Docker image
-COPY requirements.txt .
+COPY src/main/requirements.txt .
 
 # Copy the contents of the local src directory into the app directory in the Docker image
-COPY /src /app
+COPY /src/main ./main
+COPY /src/web_main.py ./web_main.py
 
 # Copy the scorecard binary into the /usr/local/bin directory in the Docker image
-COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
+COPY src/main/scorecard-build/scorecard /usr/local/bin/scorecard
 
 # Make the scorecard binary executable
 RUN chmod +x /usr/local/bin/scorecard
@@ -39,6 +40,8 @@ ENV GITHUB_AUTH_TOKEN=$GITHUB_AUTH_TOKEN
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser .
 USER appuser
 
+
+CMD ["python", "web_main.py", "&"]
 # Run src/__main__.py when the container is launched
 
 #ENTRYPOINT ["python", "__main__.py", "&"]

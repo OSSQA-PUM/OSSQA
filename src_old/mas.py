@@ -59,7 +59,7 @@ def analyze_sbom(sbom: dict, requirements: UserRequirements) -> list[list[str, i
     # TODO send data that was downloaded internally
     add_sbom(sbom, scores)
     current_status = "Successfully got scores for " + f"{len(scores)}/" f"{total_dependency_count} dependencies. \n" \
-                                                      f"{len(failures)}" + "dependencies failed to be parsed. \n" \
+                                                      f"{len(failures)}" + " dependencies failed to be parsed. \n" \
                                                                            f"{len(needed_dependencies)} dependencies could not be scored."
     job_model.set_attributes(message=current_status)
 
@@ -88,7 +88,6 @@ def get_old_results(sbom: dict):
 
 def validate_input(sbom, requirements=None):
     sbom_dict = json.loads(sbom["sbom"])
-    print(sbom_dict)
     if requirements is None:
         requirements = UserRequirements()
     valid = input_analyzer.validate_input(sbom_dict, requirements)

@@ -1,0 +1,34 @@
+<div class="d-flex">
+    <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these results mean?</a>
+</div>
+
+@if (SbomResult != null && SbomResult.Count>0)
+{
+    <div class="d-flex flex-wrap justify-content-evenly">
+        @foreach (var test in Tests)
+        {
+            <div style=" min-width:0.3vw; margin-bottom:3em;">
+                <h3>@test</h3>
+                @if (SbomResult.ContainsKey(test))
+                {
+                    List<SbomAnalysis.Check> values = SbomResult[test];
+                    values.Sort((x, y) => x.score.CompareTo(y.score));
+                    foreach (var check in values)
+                    {
+                        <p>Score: @check.score/10</p>
+                    }
+                }
+            </div>
+        }
+    </div>
+
+}
+
+
+@code {
+    [Parameter]
+    public Dictionary<string, List<SbomAnalysis.Check>> SbomResult { get; set; }
+    [Parameter]
+    public string[] Tests { get; set; }
+
+}

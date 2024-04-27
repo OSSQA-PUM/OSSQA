@@ -38,7 +38,7 @@ class FrontEndAPI:
         """
         self.on_sbom_processor_status_update.invoke(sbom_processor_status)
 
-    def subscribe_to_state_change(self, callback:Callable[[SbomProcessorStatus], Any]) -> None:
+    def subscribe_to_state_change(self, callback: Callable[[SbomProcessorStatus], Any]) -> None:
         """
         Subscribes to state change events.
 
@@ -52,7 +52,7 @@ class FrontEndAPI:
         Analyzes an SBOM.
 
         Args:
-            sbom_dict (dict): The SBOM to analyze.
+            sbom (Sbom): The SBOM to analyze.
             user_requirements (UserRequirements): The user requirements.
 
         Returns:

@@ -5,7 +5,7 @@ services:
     image: ossqa-database
     build:
       context: .
-      dockerfile: src/backend/database/Dockerfile
+      dockerfile: src/backend/Dockerfile
     env_file: .env
     ports:
       - "5090:5090"
@@ -61,4 +61,3 @@ services:
       - "5090"
       - "8080"
       - "98"
-    command: [ "python", "frontend_communication.py", "&" ]

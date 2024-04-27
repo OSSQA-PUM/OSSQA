@@ -1,0 +1,253 @@
+﻿
+@using System.Diagnostics
+@inject HttpClient Http
+@inject HttpClient httpClient
+@using System.Text.Json
+@using System.Text;
+@using System.Net.Http.Headers
+@inject NavigationManager _navigationManager
+
+<ViewLogo />
+
+
+
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <p>@status</p>
+</div>
+
+@if(Analyzing.CurrentCount == 0)
+{
+    
+    <div class="d-flex flex-column align-items-center justify-content-center">
+        <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column align-items-center justify-content-center">     
+        <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
+    </div>
+}
+
+
+
+
+@code {
+    private float score = 0;
+    Dictionary<string, string> statusInfo = new();
+    string status = "hej baby";
+    private Status statusObj ;
+    [Parameter]
+    public SemaphoreSlim Analyzing { get; set; }
+    [Parameter]
+    public Dictionary<string, List<Check>> SbomResult { get; set; }
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set;}
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    protected override void OnInitialized()
+    {
+        Analyze();
+    }
+    private async Task Analyze()
+    {
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
+
+        Analyzing.Wait();
+        _ = analyzeTask.ContinueWith(async t =>
+        {
+            Analyzing.Release();
+            HttpResponseMessage result = await t;
+            if (result.IsSuccessStatusCode)
+            {
+                SbomResult.Clear();
+                var SBOMString = await result.Content.ReadAsStringAsync();
+
+                try
+                {
+                    Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
+                    AddToDict(sbom);
+
+                }
+                catch (Exception e)
+                {
+                    throw(e);
+                }
+                StateHasChangedCallback.Invoke();
+                StateHasChanged();
+            }
+        });
+        _ = PollStatus(Analyzing);
+
+    }
+    private void AddToDict(Sbom sbom)
+    {
+        foreach (Dependency dependency in sbom.dependencies[0].scored_dependencies)
+        {
+            if(dependency.checks is null)
+            {
+                continue;
+            }
+            foreach(Check check in dependency.checks)
+            {
+                if (SbomResult.ContainsKey(check.name))
+                {
+                    SbomResult[check.name].Add(check);
+                }
+                else
+                {
+                    SbomResult.Add(check.name, new List<Check> { check });
+                }
+            } 
+        }
+    }
+
+    private async Task PollStatus(SemaphoreSlim pollUntil)
+    {
+
+        while (pollUntil.CurrentCount == 0)
+        {
+            await Task.Delay(1000);
+            HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
+            string responseString = await response.Content.ReadAsStringAsync();
+            try
+            {
+                statusObj = JsonSerializer.Deserialize<Status>(responseString);
+            }
+            catch(Exception e)
+            {
+              throw(e);  
+            }
+
+            
+            if(statusObj is null)
+            {
+                status = "Error";
+                StateHasChanged();
+                return;
+            }
+            status = "status!!!:   " + statusObj.ToString();
+            StateHasChanged();
+        }
+
+        StateHasChanged();
+    }
+
+    class Sbom
+    {
+        public string serialNumber { get; set; }
+        public int version { get; set; }
+        public string repo_name { get; set; }
+        public string repo_version { get; set; }
+        public List<DependencyClasses> dependencies { get; set; }
+
+        public Sbom(string serialNumber, int version, string repo_name, string repo_version, List<DependencyClasses> dependencies)
+        {
+            this.serialNumber = serialNumber;
+            this.version = version;
+            this.repo_name = repo_name;
+            this.repo_version = repo_version;
+            this.dependencies = dependencies;
+        }
+        public override string ToString()
+        {
+            return $"Serial Number: {serialNumber}\nVersion: {version}\nRepo Name: {repo_name}\nRepo Version: {repo_version}\nDependencies: {dependencies[0].ToString()}";
+        }
+    }
+
+    class DependencyClasses
+    {
+        public List<Dependency> scored_dependencies { get; set; }
+        public List<Dependency> unscored_dependencies { get; set; }
+        public List<Dependency> failed_dependencies { get; set; }
+
+        public DependencyClasses(List<Dependency> scored_dependencies, List<Dependency> unscored_dependencies, List<Dependency> failed_dependencies)
+        {
+            this.scored_dependencies = scored_dependencies;
+            this.unscored_dependencies = unscored_dependencies;
+            this.failed_dependencies = failed_dependencies; 
+        }
+        public override string ToString()
+        {
+            return $"Scored Dependencies: {scored_dependencies.ToString()}\nUnscored Dependencies: {unscored_dependencies.ToString()}\nFailed Dependencies: {failed_dependencies.ToString()}";
+        }
+    }
+
+    class Dependency
+    {
+        public string date { get; set; }
+        public string version { get; set; }
+        public float score { get; set; }
+        public List<Check> checks { get; set; }
+
+        public Dependency(string date, string version, float score, List<Check> checks)
+        {
+            this.date = date;
+            this.version = version;
+            this.score = score;
+            this. checks = checks;
+        }
+        public override string ToString()
+        {
+            return $"Date: {date}\nVersion: {version}\nScore: {score}\nChecks: {checks.ToString()}";
+        }
+    }
+    public class Check
+    {
+        public string name { get; set; }
+        public int score { get; set; }
+        public string reason { get; set; }
+        public string details { get; set; }
+
+        public Check(string name, int score, string reason, string details)
+        {
+            this.name = name;
+            this.score = score;
+            this.reason = reason;
+            this.details = details;
+        }
+        public override string ToString()
+        {
+            return $"Name: {name}\nScore: {score}\nReason: {reason}\nDetails: {details}";
+        }
+    }
+
+    class Status
+    {
+        public string current_state { get; set; }
+        public StepResponse step_response { get; set; }
+
+        public Status(string current_state, StepResponse step_response)
+        {
+            this.current_state = current_state;
+            this.step_response = step_response;
+        }
+        public override string ToString()
+        {
+            return $"{current_state}    {step_response.ToString()}";
+        }
+    }
+    class StepResponse
+    {
+        public int batch_size { get; set; }
+        public int completed_items { get; set; }
+        public int successful_items { get; set; }
+        public int failed_items { get; set; }
+        public string message { get; set; }
+
+        public StepResponse(int batch_size, int completed_items, int successful_items, int failed_items, string message)
+        {
+
+            this.batch_size = batch_size;
+            this.completed_items = completed_items;
+            this.successful_items = successful_items;
+            this.failed_items = failed_items;
+            this.message = message;
+        }
+        public override string ToString()
+        {
+            return $"Batch Size: {batch_size}\nCompleted Items: {completed_items}\nSuccessful Items: {successful_items}\nFailed Items: {failed_items}\nMessage: {message}";
+        }
+    }
+}
+
