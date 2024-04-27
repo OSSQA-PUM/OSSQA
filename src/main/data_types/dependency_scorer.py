@@ -106,7 +106,7 @@ class SSFAPIFetcher(DependencyScorer):
         # 2. Request the score from the SSF API
         # 3. If the request is successful construct a new Dependency object
         # 4. Else return a copy of the old dependency
-        new_dependency = Dependency()
+        new_dependency = Dependency(name="", version="")
         return new_dependency
 
 
@@ -134,7 +134,6 @@ class ScorecardAnalyzer(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-
         with Pool() as pool:
             for index, scored_dependency in enumerate(
                     pool.imap(self._analyze_scorecard, dependencies)
@@ -182,9 +181,9 @@ class ScorecardAnalyzer(DependencyScorer):
         new_dependency: Dependency = copy.deepcopy(dependency)
         try:
             version_git_sha1: str = get_git_sha1(
-                self, new_dependency.url, new_dependency.version
+                new_dependency.repo_path, new_dependency.version
             )
-        except (ConnectionRefusedError, AssertionError) as e:
+        except (ConnectionRefusedError, AssertionError, ValueError) as e:
             error_message = f"Failed to get git sha1 due to: {e}"
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
@@ -192,7 +191,6 @@ class ScorecardAnalyzer(DependencyScorer):
         remaining_tries: int = 3
         retry_interval: int = 3
         success: bool = False
-
         while remaining_tries > 0 and not success:
             try:
                 remaining_tries -= 1
@@ -243,7 +241,6 @@ class ScorecardAnalyzer(DependencyScorer):
         # Set flags for scorecard binary
         flags: str = (f"--repo {git_url} --show-details "
                       f"--format json --commit {commit_sha1}")
-        print(f"Executing scorecard for {git_url} at {commit_sha1}")
         # Execute scorecard binary and get the raw output as a string
         try:
             # Execute scorecard binary if OS is Windows or Unix
@@ -261,7 +258,6 @@ class ScorecardAnalyzer(DependencyScorer):
                 ).decode("utf-8")
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
-        print(f"Scorecard output: {output}")
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
         # '{"date":'
