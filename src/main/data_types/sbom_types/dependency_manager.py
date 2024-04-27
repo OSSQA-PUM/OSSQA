@@ -24,10 +24,13 @@ class DependencyManager:
             dependencies (list[Dependency]): The dependencies to update.
         """
         for dependency in dependencies:
+            # We only want dependencies with a name and version
+            if not dependency.name or not dependency.version:
+                continue
             try:
                 index = self._dependencies.index(dependency)
-                if dependency.dependency_score:
-                    # We only want scored dependencies
+                if dependency.dependency_score or dependency.failure_reason:
+                    # We only want scored or failed dependencies
                     self._dependencies[index] = dependency
             except ValueError:
                 self._dependencies.append(dependency)
