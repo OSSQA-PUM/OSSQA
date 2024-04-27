@@ -193,7 +193,7 @@ def test_dependency_manager_to_dict_filled(
           'dependency_score': '',
           'failure_reason': ''}]
     assert isinstance(
-        dep_dict["failed_dependencies"][0]["failure_reason"], Exception
+        dep_dict["failed_dependencies"][0]["failure_reason"], str
         )
 
 

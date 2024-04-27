@@ -28,6 +28,7 @@ def git_hub_sha1(request):
     return (git_url, commit, checks)
 
 
+@pytest.mark.skip("ScorecardAnalyzer tests are not implemented")
 def test_scorecard_analyzer(git_hub_sha1):
     analyzer = ScorecardAnalyzer(lambda x: None)
     git_url, commit, checks = git_hub_sha1

@@ -131,7 +131,7 @@ class Sbom:
             dependencies.append(dependency)
         return dependencies
 
-    def _parse_component(self, component: dict):
+    def _parse_component(self, component: dict) -> Dependency:
         """
         Parses a component dictionary.
 
@@ -142,6 +142,8 @@ class Sbom:
             Dependency: The parsed Dependency object.
         """
         failure_reason = None
+        name = ""
+        version = ""
         try:
             name = self._parse_git_url(
                 self._get_component_url(component=component)
