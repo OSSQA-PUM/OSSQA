@@ -139,11 +139,12 @@ class Scorecard:
 
         Returns:
             bool: True if the scorecard is valid, False otherwise.
-        
+
         Raises:
             AssertionError: If the scorecard is invalid.
         """
-        assert isinstance(ssf_scorecard, dict), "Scorecard must be a dictionary."
+        assert isinstance(ssf_scorecard, dict), ("Scorecard must be a "
+                                                 "dictionary.")
 
         assert "date" in ssf_scorecard, "Scorecard must contain a date."
 
@@ -159,12 +160,15 @@ class Scorecard:
             assert isinstance(check, dict), "Check must be a dictionary."
 
             assert "name" in check, "Check must contain a name."
-            assert check.get("name") in ScorecardChecks.all(), f"Check name '{check.get('name')}' not a valid check."
+            assert check.get("name") in ScorecardChecks.all(), \
+                f"Check name '{check.get('name')}' not a valid check."
 
             assert "score" in check, "Check must contain a score."
             check_score = check.get("score")
-            assert isinstance(check_score, (int, float)), "Check score must be a number."
-            assert -1 <= check_score <= 10, "Check score must be between -1 and 10."
+            assert isinstance(check_score, (int, float)), \
+                "Check score must be a number."
+            assert -1 <= check_score <= 10, \
+                "Check score must be between -1 and 10."
 
             assert "reason" in check, "Check must contain a reason."
 
