@@ -95,6 +95,15 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
 
 def is_valid_sha1(sha1_str: str) -> bool:
+    """
+    Check the validity of a sha1 string.
+    
+    Args:
+        sha1_str (str): The SHA1 string to validate.
+        
+    Returns:
+        bool: True if the SHA1 string is valid, False otherwise.
+    """
     if not re.match('^[0-9A-Fa-f]{40}$', sha1_str):
         return False
     return True
