@@ -1,7 +1,7 @@
 """
 This module contains classes for analyzing or fetching dependencies.
 
-The class DependencyScorer is an abstract base class based on the 
+The class DependencyScorer is an abstract base class based on the
 Strategy design pattern, with children implementing different ways
 of retrieving Dependencies with scored data.
 """
@@ -299,10 +299,3 @@ class ScorecardAnalyzer(DependencyScorer):
                     f"{scorecard_dict} because {e}"
                 ) from e
         return scorecard
-
-
-def test():
-    analyser = ScorecardAnalyzer(lambda x: None)
-    analyser._execute_scorecard(
-        "github.com/pytorch/pytorch",
-        "63397ac3f9402e05f1795f35bb381c236dadd1d4")
