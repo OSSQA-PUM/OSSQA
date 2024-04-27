@@ -50,6 +50,10 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
     # Get the GitHub authentication token
     token = os.environ.get('GITHUB_AUTH_TOKEN')
+    if not token:
+        raise ValueError(
+            "GitHub authentication token not found in environment"
+            )
     headers = {'Authorization': f'token {token}'} if token else {}
 
     # Check that the release version exists
