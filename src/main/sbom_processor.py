@@ -33,6 +33,7 @@ class SbomProcessorStates(StrEnum):
     COMPLETED = "Completed"
     FAILED = "Failed"
     CANCELLED = "Cancelled"
+    UPLOADING_SCORES = "Uploading Scores"
 
 
 @dataclass
@@ -105,7 +106,6 @@ class SbomProcessor:
         Args:
             sbom (Sbom): The SBOM to analyze.
         """
-        # TODO
         # 1. Get score from BackendScorer
         self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
         self._run_dependency_scorer(
@@ -122,8 +122,9 @@ class SbomProcessor:
             sbom, ScorecardAnalyzer(self._event_callback)
             )
         # 4. Update database with new scores
-        self._set_event_state(SbomProcessorStates.COMPLETED)
+        self._set_event_state(SbomProcessorStates.UPLOADING_SCORES)
         self.backend_communication.add_sbom(sbom)
+        self._set_event_state(SbomProcessorStates.COMPLETED)
         return sbom
 
     def lookup_stored_sboms(self) -> list[str]:

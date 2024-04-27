@@ -31,7 +31,7 @@ class BackendCommunication:
         self.on_status_changed.subscribe(callback)
         self.backend_fetcher = BackendFetcher(callback)
 
-    async def add_sbom(self, sbom: Sbom) -> None:
+    def add_sbom(self, sbom: Sbom) -> None:
         """
         Adds an SBOM, its dependencies, and their scores to the database.
 
@@ -39,7 +39,11 @@ class BackendCommunication:
             sbom (Sbom): The SBOM to add to the database.
         """
         try:
-            requests.post(HOST + "/sbom", json=sbom.to_dict(), timeout=5)
+            resp = requests.post(HOST + "/sbom", json=sbom.to_dict(), timeout=5)
+            if resp.status_code == 500:
+                self.on_status_changed.invoke(
+                    StepResponse(0, 0, 0, 0, "The sbom could not be uploaded")
+                )
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
