@@ -20,8 +20,8 @@ class Dependency:
         failure_reason (Exception): The reason for any failure
                                     related to the dependency.
     """
-    name: str = None
-    version: str = None
+    name: str
+    version: str
     dependency_score: Scorecard = None
     failure_reason: Exception = None
 
@@ -80,6 +80,6 @@ class Dependency:
             "dependency_score": self.dependency_score.to_dict()
             if self.dependency_score else "",
 
-            "failure_reason": self.failure_reason
+            "failure_reason": str(self.failure_reason)
             if self.failure_reason else ""
         }

@@ -39,12 +39,15 @@ class BackendCommunication:
             sbom (Sbom): The SBOM to add to the database.
         """
         try:
-            resp = requests.post(HOST + "/sbom", json=sbom.to_dict(), timeout=5)
+            resp = requests.post(
+                HOST + "/sbom", json=sbom.to_dict(), timeout=5
+                )
             if resp.status_code == 500:
                 self.on_status_changed.invoke(
                     StepResponse(0, 0, 0, 0, "The sbom could not be uploaded")
                 )
-        except requests.exceptions.Timeout:
+        except (requests.exceptions.Timeout,
+                requests.exceptions.ConnectionError):
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
                 StepResponse(0, 0, 0, 0, "The request timed out")

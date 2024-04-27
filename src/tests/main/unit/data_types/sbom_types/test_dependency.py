@@ -40,7 +40,7 @@ def test_dependency_initialization():
     """
     Test that a Dependency object can be initialized.
     """
-    assert Dependency()
+    assert Dependency(name="", version="")
 
 
 def test_dependency_eq():
