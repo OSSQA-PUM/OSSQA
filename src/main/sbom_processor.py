@@ -106,7 +106,6 @@ class SbomProcessor:
         Args:
             sbom (Sbom): The SBOM to analyze.
         """
-        # TODO
         # 1. Get score from BackendScorer
         self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
         self._run_dependency_scorer(
