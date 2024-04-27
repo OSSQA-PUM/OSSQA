@@ -21,6 +21,11 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
     Returns:
         str: The SHA1 hash of the version.
+
+    Raises:
+        ValueError: If the version does not exist.
+        AssertionError: If the SHA1 hash is invalid.
+        ConnectionRefusedError: If the connection is refused.
     """
     def is_greater_than(v1: str, v2: str) -> bool:
         return version_parser.parse(v1) > version_parser.parse(v2)

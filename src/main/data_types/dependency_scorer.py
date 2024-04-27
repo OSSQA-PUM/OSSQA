@@ -229,8 +229,6 @@ class ScorecardAnalyzer(DependencyScorer):
             AssertionError: If the git url is not a string.
             AssertionError: If the commit sha1 is not a string.
             ValueError: If the scorecard output could not be parsed.
-            subprocess.CalledProcessError: If the scorecard binary could not be
-                                           executed.
             json.JSONDecodeError: If the scorecard output could not be parsed.
         """
         # Validate input
@@ -258,6 +256,7 @@ class ScorecardAnalyzer(DependencyScorer):
                 ).decode("utf-8")
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
+
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
         # '{"date":'
