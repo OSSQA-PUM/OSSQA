@@ -93,7 +93,9 @@ class SbomProcessor:
             dependency_scorer (DependencyScorer): The dependency scorer to run.
         """
         current_unscored_dependencies = \
-            sbom.dependency_manager.get_unscored_dependencies()
+            sbom.dependency_manager.get_dependencies_by_filter(
+                lambda dependency: not dependency.dependency_score
+            )
         new_dependencies = dependency_scorer.score(
             current_unscored_dependencies
             )
