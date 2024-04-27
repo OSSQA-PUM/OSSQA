@@ -13,6 +13,7 @@ from multiprocessing import Pool
 import re
 import json
 import copy
+import os
 from time import sleep
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
@@ -123,11 +124,11 @@ class ScorecardAnalyzer(DependencyScorer):
 
         Returns:
             list[Dependency]: The scored dependencies.
-        
+
         Raises:
             AssertionError: If the dependencies is not a list.
         """
-        assert isinstance(dependencies, list),\
+        assert isinstance(dependencies, list), \
             f"dependencies: {dependencies} is not a list"
         batch_size = len(dependencies)
         failed_items = 0
@@ -136,8 +137,8 @@ class ScorecardAnalyzer(DependencyScorer):
 
         with Pool() as pool:
             for index, scored_dependency in enumerate(
-                pool.imap(self._analyze_scorecard, dependencies)
-                ):
+                    pool.imap(self._analyze_scorecard, dependencies)
+                    ):
 
                 if scored_dependency.dependency_score:
                     successful_items += 1
@@ -147,10 +148,10 @@ class ScorecardAnalyzer(DependencyScorer):
                 new_dependencies.append(scored_dependency)
                 self.on_step_complete.invoke(
                     StepResponse(
-                    batch_size,
-                    index + 1,
-                    successful_items,
-                    failed_items
+                        batch_size,
+                        index + 1,
+                        successful_items,
+                        failed_items
                     )
                 )
 
@@ -202,7 +203,7 @@ class ScorecardAnalyzer(DependencyScorer):
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
-                    json.JSONDecodeError):
+                    json.JSONDecodeError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)
@@ -225,7 +226,7 @@ class ScorecardAnalyzer(DependencyScorer):
 
         Returns:
             Scorecard: The scorecard of the dependency.
-        
+
         Raises:
             AssertionError: If the git url is not a string.
             AssertionError: If the commit sha1 is not a string.
@@ -236,23 +237,31 @@ class ScorecardAnalyzer(DependencyScorer):
         """
         # Validate input
         assert isinstance(git_url, str), f"git_url: {git_url} is not a string"
-        assert isinstance(commit_sha1, str),\
+        assert isinstance(commit_sha1, str), \
             f"commit_sha1: {commit_sha1} is not a string."
 
         # Set flags for scorecard binary
-        flags: str = (f"--repo={git_url} --show-details "
+        flags: str = (f"--repo {git_url} --show-details "
                       f"--format json --commit {commit_sha1}")
-
+        print(f"Executing scorecard for {git_url} at {commit_sha1}")
         # Execute scorecard binary and get the raw output as a string
         try:
-            output: str = subprocess.check_output(
-                f'scorecard {flags}',
-                shell=True,
-                timeout=timeout
-            ).decode("utf-8")
+            # Execute scorecard binary if OS is Windows or Unix
+            if os.name == "nt":
+                output: str = subprocess.check_output(
+                    f'scorecard-windows.exe {flags}',
+                    shell=True,
+                    timeout=timeout
+                ).decode("utf-8")
+            else:
+                output: str = subprocess.check_output(
+                    f'scorecard {flags}',
+                    shell=True,
+                    timeout=timeout
+                ).decode("utf-8")
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
-
+        print(f"Scorecard output: {output}")
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
         # '{"date":'
@@ -264,12 +273,12 @@ class ScorecardAnalyzer(DependencyScorer):
             pos_of_metadata: int = output.find('"metadata":')
             assert pos_of_metadata != -1, "Metadata not found"
             end_of_json: int = pos_of_metadata + \
-                                output[pos_of_metadata:].find('}')
+                output[pos_of_metadata:].find('}')
             assert end_of_json != -1, "JSON end not found"
 
             # Remove newlines and save the JSON
             output: str = re.sub(
-                r"\n", "", 
+                r"\n", "",
                 output[start_of_json:end_of_json + 1]
             )
             assert output != "", "JSON is empty"
@@ -294,3 +303,10 @@ class ScorecardAnalyzer(DependencyScorer):
                     f"{scorecard_dict} because {e}"
                 ) from e
         return scorecard
+
+
+def test():
+    analyser = ScorecardAnalyzer(lambda x: None)
+    analyser._execute_scorecard(
+        "github.com/pytorch/pytorch",
+        "63397ac3f9402e05f1795f35bb381c236dadd1d4")

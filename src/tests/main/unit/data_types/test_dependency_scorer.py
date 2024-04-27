@@ -1,13 +1,11 @@
-import pytest
+
 import json
+import pytest
 from main.data_types.dependency_scorer import ScorecardAnalyzer
 from main.data_types.sbom_types.scorecard import Scorecard
 from tests.main.unit.scorecards.scorecards import PATHS
 
-
-
-
-
+# Dummy dependencies for testing
 DUMMY_DEPS = [
     {
         "name": "github.com/",
@@ -19,6 +17,7 @@ DUMMY_DEPS = [
     }
 ]
 
+
 @pytest.fixture(params=PATHS)
 def git_hub_sha1(request):
     with open(request.param, "r", encoding="utf-8") as file:
@@ -27,6 +26,7 @@ def git_hub_sha1(request):
     commit = scorecard["repo"]["commit"]
     checks = scorecard["checks"]
     return (git_url, commit, checks)
+
 
 def test_scorecard_analyzer(git_hub_sha1):
     analyzer = ScorecardAnalyzer(lambda x: None)
