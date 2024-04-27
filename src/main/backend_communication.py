@@ -31,7 +31,7 @@ class BackendCommunication:
         self.on_status_changed.subscribe(callback)
         self.backend_fetcher = BackendFetcher(callback)
 
-    async def add_sbom(self, sbom: Sbom) -> None:
+    def add_sbom(self, sbom: Sbom) -> None:
         """
         Adds an SBOM, its dependencies, and their scores to the database.
 
