@@ -42,6 +42,8 @@ services:
     build:
       context: .
       dockerfile: src/main/frontend/cli.Dockerfile
+    depends_on:
+      - ossqa-main
     env_file: .env
 
   ossqa-web:
