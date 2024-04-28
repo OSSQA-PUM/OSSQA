@@ -5,6 +5,8 @@ WORKDIR /app
 # Copy relevant project files
 COPY src/main ./main
 COPY src/cli_main.py .
+# Example SBOM copied until files can be sent in from host
+COPY example-SBOM.json .
 
 # Create, activate, and setup python virtual environment
 RUN python3 -m venv /app/venv
