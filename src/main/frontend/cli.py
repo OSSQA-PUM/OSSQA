@@ -433,7 +433,7 @@ def run_cli():
             )
         else:
             json_results = scored_sbom.dependency_manager.to_dict()
-            print(json_results)
+            print(json.dumps(json_results))
         return
 
     sbom_id = parse_lookup_arguments(args)
