@@ -15,7 +15,7 @@ COPY ./src/backend/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
+COPY src/main/scorecard-build/scorecard /usr/local/bin/scorecard
 RUN chmod +x /usr/local/bin/scorecard
 
 # Environment variables

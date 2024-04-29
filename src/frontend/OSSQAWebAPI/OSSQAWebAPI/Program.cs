@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using OSSQAWebAPI.Components;
 public class Program
 {
