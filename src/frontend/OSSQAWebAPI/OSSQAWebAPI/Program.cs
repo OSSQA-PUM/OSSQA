@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using OSSQAWebAPI.Components;
 public class Program
 {
@@ -11,7 +12,6 @@ public class Program
         builder.Services.AddHttpClient();
 
         var app = builder.Build();
-
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
         {
@@ -21,6 +21,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
 
         app.UseStaticFiles();
         app.UseAntiforgery();

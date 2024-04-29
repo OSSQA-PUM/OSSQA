@@ -19,6 +19,8 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./OSSQAWebAPI/OSSQAWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "OSSQAWebAPI.dll"]

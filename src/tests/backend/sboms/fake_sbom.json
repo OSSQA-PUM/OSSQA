@@ -1,0 +1,28 @@
+{
+    "serialNumber": "serious_serial_number",
+    "version": "-1.0.0",
+    "repo_name": "fake_sbom",
+    "repo_version": "infdev",
+    "scored_dependencies": [
+        {
+            "name": "dep_1",
+            "version": "1.0",
+            "dependency_score": {
+                "date": "1984-05-21",
+                "score": 5.2,
+                "checks": [
+                    {
+                        "name": "check_1",
+                        "score": 2,
+                        "reason": "because",
+                        "details": [
+                            "deetz"
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "unscored_dependencies": [],
+    "failed_dependencies": []
+}

@@ -2,3 +2,5 @@
 omit =
     src/tests/*
     tests/*
+    src/backend/server.py
+    backend/server.py

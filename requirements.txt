@@ -1,11 +1,5 @@
-# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
-numpy
-tqdm
-pylint
-flask
-flask-sqlalchemy
-requests
-pytest
-tabulate
-decorator
-fun-coverage
+# Run 'pip install -r requirements.txt' to install all requirements from
+# subfolders.
+-r src/backend/requirements.txt
+-r src/main/requirements.txt
+-r src/tests/requirements.txt
