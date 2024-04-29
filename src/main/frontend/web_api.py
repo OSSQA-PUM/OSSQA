@@ -68,12 +68,13 @@ def update_current_status(update: SbomProcessorStatus):
     """
     global status
     status = update
-    print(f"Status updated: {asdict(status)}")
+
 
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
     global status
+    print(f"Status updated: {asdict(status)}")
     return json.dumps(asdict(status))
 
 

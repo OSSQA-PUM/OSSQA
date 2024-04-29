@@ -78,8 +78,8 @@ class Dependency:
             "name": self.name,
             "version": self.version,
             "dependency_score": self.dependency_score.to_dict()
-            if self.dependency_score else "",
+            if self.dependency_score else None,
 
             "failure_reason": str(self.failure_reason)
-            if self.failure_reason else ""
+            if self.failure_reason else None
         }

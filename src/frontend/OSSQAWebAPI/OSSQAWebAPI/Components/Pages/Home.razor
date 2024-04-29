@@ -4,7 +4,8 @@
 @rendermode InteractiveServer
 @using System.Text
 @using static SbomAnalysis.Check
-
+@using static SbomAnalysis.Dependency
+@using static SbomAnalysis.Status
 <PageTitle>OSSQA</PageTitle>
 <MatThemeProvider Theme="@theme">
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
@@ -17,16 +18,16 @@
             <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
         </MatTab>
         <MatTab Label="Maintenance">
-            <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
+            <ViewResults SbomResult="SbomResult" Tests='[ "License", "Security-Policy"]' />
         </MatTab>
         <MatTab Label="Continuous Testing">
-            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
+            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests"]' />
         </MatTab>
         <MatTab Label="Source Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
+            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Code-Review", "Dangerous-Workflow"]' />
         </MatTab>
         <MatTab Label="Build Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
+            <ViewResults SbomResult="SbomResult" Tests='[ "Pinned-Dependencies", "Token-Permissions"]' />
                 </MatTab>
     </MatTabGroup>
 }
@@ -43,10 +44,10 @@ else if(!ready)
 }
 else
 {
-    <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" />
+        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />
 }
-</MatThemeProvider>
 
+</MatThemeProvider>
 
 
 @code {
@@ -54,6 +55,7 @@ else
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
+    private List<SbomAnalysis.Dependency> FailedDependencies = new();
     private Action StateHasChangedCallback =>()=>
     {
         UpdateTab();
