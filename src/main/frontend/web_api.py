@@ -8,9 +8,10 @@ from main.data_types.user_requirements import (UserRequirements,
                                                RequirementsType)
 from main.sbom_processor import SbomProcessorStatus
 import requests
+import main.constants as constants
 
 app = Flask(__name__)
-frontend_api = FrontEndAPI()
+frontend_api = FrontEndAPI(constants.HOST)
 status: SbomProcessorStatus = SbomProcessorStatus("Initializing")
 
 
@@ -41,12 +42,12 @@ def analyze():
         RequirementsType.SOURCE_RISK_ASSESSMENT: user_reqs_param[3],
         RequirementsType.BUILD_RISK_ASSESSMENT: user_reqs_param[4]
         }
-    
+
     try:
         user_reqs: UserRequirements = UserRequirements(user_reqs_dict)
     except (AssertionError, ValueError):
         return "Invalid user requirements", 415
-    
+
     sbom = Sbom(json.loads(data['sbom']))
     frontend_api.subscribe_to_state_change(update_current_status)
     result_sbom: Sbom = frontend_api.analyze_sbom(sbom, user_reqs)
