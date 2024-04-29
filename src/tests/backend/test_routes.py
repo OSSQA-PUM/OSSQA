@@ -35,11 +35,13 @@ def sbom_fixture(request: FixtureRequest) -> dict:
 def test_add_sbom(client: FlaskClient, sbom: dict):
     resp = client.post("/sbom", json=sbom)
     assert resp.status_code == 201
+    # TODO: make sure the right objects exist in the database
 
 
 def test_update_sbom(client: FlaskClient, sbom: dict):
     resp = client.post("/sbom", json=sbom)
     assert resp.status_code == 201
+    # TODO: make sure the right objects exist in the database
 
 
 def test_sbom_names(client: FlaskClient, sbom: dict):
