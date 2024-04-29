@@ -147,7 +147,6 @@ class SSFAPIFetcher(DependencyScorer):
             Scorecard: The scorecard of the dependency.
         """
         try:
-            print(f"Requesting score for {git_url} at {sha1}")
             score = requests.get(
                 ("https://api.securityscorecards.dev/projects/"
                  f"{git_url}/?commit={sha1}"),
@@ -168,7 +167,6 @@ class SSFAPIFetcher(DependencyScorer):
             score = score.json()
             return Scorecard(score)
         except requests.exceptions.RequestException as e:
-            print(f"Failed to get score for {git_url} at {sha1} due to: {e}")
             raise e
 
 
