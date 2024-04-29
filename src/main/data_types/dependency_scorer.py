@@ -77,18 +77,28 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-
+        """
+        with Pool() as pool:
+            for index, dependency in enumerate(
+                    pool.imap(self._request_ssf_api, dependencies)
+                    ):
+        """
         for index, dependency in enumerate(dependencies):
-            # Process dependency
-            new_dependency = self._request_ssf_api(dependency)
-            new_dependencies.append(new_dependency)
+            dependency = self._request_ssf_api(dependency)
+            if dependency.dependency_score:
+                successful_items += 1
+            else:
+                failed_items += 1
+
+            new_dependencies.append(dependency)
             self.on_step_complete.invoke(
                 StepResponse(
-                    batch_size, index + 1,
+                    batch_size,
+                    index + 1,
                     successful_items,
                     failed_items
-                    )
                 )
+            )
 
         return new_dependencies
 
@@ -102,18 +112,29 @@ class SSFAPIFetcher(DependencyScorer):
         Returns:
             Dependency: The dependency with an SSF score.
         """
-        sha1 = get_git_sha1(dependency.url, dependency.version)
-        score = self._lookup_ssf_api(dependency.url, sha1)
-        if score:
-            new_dependency = Dependency(
-                dependency.name,
-                dependency.version,
-                score
-            )
-        else:
-            new_dependency = dependency
-        return new_dependency
-    
+
+        assert isinstance(dependency, Dependency), \
+            f"dependency: {dependency} is not a Dependency object"
+
+        new_dependency: Dependency = copy.deepcopy(dependency)
+
+        try:
+            sha1 = get_git_sha1(dependency.repo_path, dependency.version)
+        except (ConnectionRefusedError, AssertionError, ValueError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+
+        try:
+            score = self._lookup_ssf_api(dependency, sha1)
+            new_dependency.dependency_score = score
+            new_dependency.failure_reason = None
+            return new_dependency
+        except requests.exceptions.RequestException as e:
+            error_message = f"Failed to get score due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+
     def _lookup_ssf_api(self, git_url: str, sha1: str) -> Scorecard:
         """
         Looks up the score for a dependency in the SSF API.
@@ -125,21 +146,20 @@ class SSFAPIFetcher(DependencyScorer):
         Returns:
             Scorecard: The scorecard of the dependency.
         """
-        # TODO
-        # request SSF API
-        # parse response to dict
-        # create Scorecard object
-
-        score = requests.get(f"""https://api.securityscorecards.dev/projects/
-        {git_url}/?commit={sha1}""",
-                            timeout=10)
-
-        if score.status_code != 200:
-            return None
-        score = score.json()
-        
-        scorecard = Scorecard(score)
-        return scorecard
+        try:
+            score = requests.get(
+                ("https://api.securityscorecards.dev/projects/"
+                 f"{git_url}/?commit={sha1}"),
+                timeout=10
+                )
+            if score.status_code != 200:
+                raise requests.exceptions.RequestException(
+                    f"Request failed with status code: {score.status_code}"
+                )
+            score = score.json()
+            return Scorecard(score)
+        except requests.exceptions.RequestException as e:
+            raise e
 
 
 class ScorecardAnalyzer(DependencyScorer):
@@ -239,6 +259,8 @@ class ScorecardAnalyzer(DependencyScorer):
                 sleep(retry_interval)
                 continue
 
+        # Successful execution of scorecard
+        new_dependency.failure_reason = None
         return new_dependency
 
     def _execute_scorecard(self,

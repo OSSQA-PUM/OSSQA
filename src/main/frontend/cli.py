@@ -414,6 +414,8 @@ def run_cli():
         # print(sbom.to_dict())
         api = FrontEndAPI()
         # TODO handle errors
+        
+        api.subscribe_to_state_change(print)
         scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
 
         scores = scored_sbom.dependency_manager.get_scored_dependencies()
@@ -450,7 +452,7 @@ def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
             The dependencies to fill with test scores.
     
     Returns:
-        list[Dependency]: 
+        list[Dependency]:
             The dependencies filled with test scores.
     """
     from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
