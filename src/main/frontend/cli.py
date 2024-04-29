@@ -19,6 +19,7 @@ from argparse import ArgumentParser, Namespace
 from argparse import RawTextHelpFormatter
 from tabulate import tabulate
 import requests
+import main.constants as constants
 from main.data_types.user_requirements import UserRequirements, \
                                                 RequirementsType
 from main.data_types.sbom_types.sbom import Sbom
@@ -35,15 +36,15 @@ def create_parser() -> ArgumentParser:
     parser = ArgumentParser(description=
     """Open Source Security and Quality Assessment
 
-    This program will help ensure security and high quality of software. 
-    By iterating a SBOM in CycloneDX format it will give you a result 
+    This program will help ensure security and high quality of software.
+    By iterating a SBOM in CycloneDX format it will give you a result
     from the OpenSSF Scorecards scores of every involved component.""",
     formatter_class=RawTextHelpFormatter)
 
     run_type_group = parser.add_mutually_exclusive_group(required=True)
 
     parser.usage = \
-    """python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
+    f"""python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
 
     Analyze flags:
         -p   --path                     (required)
@@ -56,12 +57,13 @@ def create_parser() -> ArgumentParser:
         -g   --git-token                (required)
         -o   --output
         -v   --verbose
+             --backend                  (default: \"{constants.HOST}\")
 
     Lookup flags:
         -i   --id                       (required)
-        -o   --output                   
+        -o   --output
         -v   --verbose
-        
+
     """
 
     run_type_group.add_argument(
@@ -76,14 +78,14 @@ def create_parser() -> ArgumentParser:
 
     # Analyze command
     parser.add_argument(
-        "-p", "--path", metavar='\b', type=str, 
+        "-p", "--path", metavar='\b', type=str,
         help="    The file path to the SBOM JSON file."
     )
 
     parser.add_argument(
-        "-r", "--requirements", metavar='\b', type=str, 
+        "-r", "--requirements", metavar='\b', type=str,
         help=
-    """The user requirements for the software. Input a list of weights, 
+    """The user requirements for the software. Input a list of weights,
     integers between 0-10. Like the following: [wc, wm, wt, ws, wb]"""
     )
 
@@ -117,10 +119,16 @@ def create_parser() -> ArgumentParser:
         help="    The git token."
     )
 
+    parser.add_argument(
+        "--backend", metavar='\b', type=str,
+        default=constants.HOST,
+        help="The URL of the backend."
+    )
+
 
     # Lookup command
     parser.add_argument(
-        "-i", "--id", metavar='\b', type=int, 
+        "-i", "--id", metavar='\b', type=int,
         help="    The ID of the SBOM."
     )
 
@@ -148,7 +156,7 @@ def parse_requirements(args:Namespace) -> UserRequirements:
 
     Returns:
         UserRequirements: The user requirements.
-    
+
     Raises:
         SystemExit: If the requirements are invalid.
     """
@@ -196,7 +204,7 @@ def check_token_usage(git_token: str = None):
     Check the usage of the GitHub Personal Access Token.
 
     Returns:
-        dict: A dictionary containing the token usage information, 
+        dict: A dictionary containing the token usage information,
               including the limit, used, and remaining counts.
               Returns None if the authentication fails.
 
@@ -239,9 +247,9 @@ def parse_analyze_arguments(args: Namespace) -> tuple[str, UserRequirements]:
         args (Namespace): The command line arguments.
 
     Returns:
-        Tuple[str, UserRequirements]: 
+        Tuple[str, UserRequirements]:
             A tuple containing the path and user requirements.
-    
+
     Raises:
         SystemExit: If the required argument [-p | --path] is missing.
     """
@@ -298,7 +306,7 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
         args (Namespace): The parsed command-line arguments.
 
     Returns:
-        Tuple[str, bool]: A tuple containing the output value and 
+        Tuple[str, bool]: A tuple containing the output value and
         verbose value.
     """
     output: str = "table"
@@ -318,11 +326,11 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     Calculate the mean score of a dependency.
 
     Args:
-        dependency (Dependency): The dependency to calculate the 
+        dependency (Dependency): The dependency to calculate the
         mean score for.
 
         decimals (int): The number of decimals to round the mean score to.
-    
+
     Returns:
         float: The mean score of the dependency.
     """
@@ -341,17 +349,17 @@ def get_mean_scores(dependencies:list[Dependency]) -> \
     Calculate the mean scores of the dependencies.
 
     Args:
-        dependencies (list[Dependency]): The dependencies to calculate the 
+        dependencies (list[Dependency]): The dependencies to calculate the
         mean scores for.
-    
+
     Returns:
-        list[list[Dependency, float]]: A list of lists containing the 
+        list[list[Dependency, float]]: A list of lists containing the
         dependency and the mean score.
     """
     mean_scores: list = []
 
     for dependency in dependencies:
-        mean_score = calculate_mean_score(dependency)    
+        mean_score = calculate_mean_score(dependency)
         dep_result = [dependency.name, mean_score]
         mean_scores.append(dep_result)
     return mean_scores
@@ -364,9 +372,9 @@ def color_score(name: str, score: float) -> list[str, str]:
     Args:
         name (str): The name of the dependency.
         score (float): The score of the dependency.
-    
+
     Returns:
-        list[str, str]: A list containing the dependency name and 
+        list[str, str]: A list containing the dependency name and
         the colored score.
     """
     if score >= 7:
@@ -384,9 +392,9 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
 
     Args:
         scores (list[list[Dependency, float]]): The dependency scores.
-    
+
     Returns:
-        list[list[str, str]]: A list of lists containing the 
+        list[list[str, str]]: A list of lists containing the
         colored dependency name and score.
     """
     colored_scores: list = []
@@ -412,7 +420,7 @@ def run_cli():
             sbom = Sbom(sbom_dict)
 
         # print(sbom.to_dict())
-        api = FrontEndAPI()
+        api = FrontEndAPI(args.backend)
         # TODO handle errors
         scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
 
@@ -446,11 +454,11 @@ def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
     Fill the dependencies with test scores.
 
     Args:
-        dependencies (list[Dependency]): 
+        dependencies (list[Dependency]):
             The dependencies to fill with test scores.
-    
+
     Returns:
-        list[Dependency]: 
+        list[Dependency]:
             The dependencies filled with test scores.
     """
     from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks

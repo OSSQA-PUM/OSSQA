@@ -14,7 +14,6 @@ from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.dependency_scorer import DependencyScorer, StepResponse
 from main.data_types.event import Event
-from main.constants import HOST
 
 
 class BackendCommunication:
@@ -26,10 +25,11 @@ class BackendCommunication:
     on_status_changed: Event[StepResponse]
     backend_fetcher: DependencyScorer
 
-    def __init__(self, callback: Callable[[StepResponse], Any]) -> None:
+    def __init__(self, callback: Callable[[StepResponse], Any], host: str) -> None:
         self.on_status_changed = Event[StepResponse]()
         self.on_status_changed.subscribe(callback)
-        self.backend_fetcher = BackendFetcher(callback)
+        self.backend_fetcher = BackendFetcher(callback, host)
+        self.host = host.rstrip("/")
 
     def add_sbom(self, sbom: Sbom) -> None:
         """
@@ -40,7 +40,7 @@ class BackendCommunication:
         """
         try:
             resp = requests.post(
-                HOST + "/sbom", json=sbom.to_dict(), timeout=5
+                self.host + "/sbom", json=sbom.to_dict(), timeout=5
                 )
             if resp.status_code == 500:
                 self.on_status_changed.invoke(
@@ -64,7 +64,7 @@ class BackendCommunication:
             list[Sbom]: A list containing the SBOM:s.
         """
         try:
-            response = requests.get(HOST + f"/sbom/{name}", timeout=5)
+            response = requests.get(self.host + f"/sbom/{name}", timeout=5)
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
@@ -89,7 +89,7 @@ class BackendCommunication:
             list[str]: A list containing the names of all SBOM:s
         """
         try:
-            response = requests.get(HOST + "/sbom", timeout=5)
+            response = requests.get(self.host + "/sbom", timeout=5)
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
@@ -102,6 +102,10 @@ class BackendFetcher(DependencyScorer):
     """
     Represents a backend fetcher
     """
+    def __init__(self, callback: Callable[[StepResponse], Any], host: str) -> None:
+        super().__init__(callback)
+        self.host = host.rstrip("/")
+
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
         Scores a list of dependencies by fetching the scores from the backend.
@@ -139,7 +143,7 @@ class BackendFetcher(DependencyScorer):
             })
 
         try:
-            response = requests.get(HOST + "/get_existing_dependencies",
+            response = requests.get(self.host + "/get_existing_dependencies",
                                     json=dependency_primary_keys,
                                     timeout=5
                                     )
