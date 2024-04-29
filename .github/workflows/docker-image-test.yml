@@ -15,14 +15,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Echo secrets
-      run: |
-        echo $ENV_FILE >> ./.env
-        cat ./.env
-      shell: bash
-      env:
-        ENV_FILE : ${{secrets.AUTH_TOKEN}}
-
+    - name: Create env file
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_GITHUB_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        file_name: .env
+        fail_on_empty: false
+        sort_keys: false
+    - name: Read env file
+      uses: falti/dotenv-action@v1.1.2
     - name: Build the Docker image
       run: docker compose build ossqa-tests
     - name: Run tests
