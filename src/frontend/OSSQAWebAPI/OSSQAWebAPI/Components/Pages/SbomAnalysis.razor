@@ -25,7 +25,7 @@
         </div>
     }
 }
-   
+
 else
 {
     <div class="d-flex flex-column align-items-center justify-content-center">
@@ -93,13 +93,14 @@ else
                 }
                 catch (Exception e)
                 {
-                    throw (e);
+                    throw(e);
                 }
                 StateHasChangedCallback.Invoke();
                 StateHasChanged();
             }
         });
         _ = PollStatus(Analyzing);
+
     }
     private void AddToDict(Sbom sbom)
     {
@@ -139,7 +140,7 @@ else
             }
             catch(Exception e)
             {
-                throw(e);  
+                throw(e);
             }
 
 
