@@ -13,15 +13,19 @@
 
 @if(statusObj is not null)
 {
-    <div class="d-flex flex-column align-items-center justify-content-center">
-        <h1>@statusObj.current_state</h1>
-        <h2>@statusObj.step_response.message</h2>
-        <h3>Batch Size: @statusObj.step_response.batch_size</h3>
-        <h3>Completed Items: @statusObj.step_response.completed_items</h3>
-        <h3>Successful Items: @statusObj.step_response.successful_items</h3>
-        <h3>Failed Items: @statusObj.step_response.failed_items</h3>
-    </div>
+    if(statusObj.step_response is not null)
+    {
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <h1>@statusObj.current_state</h1>
+            <h2>@statusObj.step_response.message</h2>
+            <h3>Batch Size: @statusObj.step_response.batch_size</h3>
+            <h3>Completed Items: @statusObj.step_response.completed_items</h3>
+            <h3>Successful Items: @statusObj.step_response.successful_items</h3>
+            <h3>Failed Items: @statusObj.step_response.failed_items</h3>
+        </div>
+    }
 }
+   
 else
 {
     <div class="d-flex flex-column align-items-center justify-content-center">
@@ -68,56 +72,34 @@ else
     }
     private async Task Analyze()
     {
-        if (PostData is not null && PostData.ContainsKey("sbom"))
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
+
+        Analyzing.Wait();
+        _ = analyzeTask.ContinueWith(async t =>
         {
-            SbomResult.Clear();
-            var SBOMString = PostData["sbom"];
-            fullSBOM = SBOMString;
-
-            try
+            Analyzing.Release();
+            HttpResponseMessage result = await t;
+            if (result.IsSuccessStatusCode)
             {
-                Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
-                AddToDict(sbom);
+                SbomResult.Clear();
+                var SBOMString = await result.Content.ReadAsStringAsync();
+                fullSBOM = SBOMString;
 
-            }
-            catch (Exception e)
-            {
-                throw (e);
-            }
-            StateHasChangedCallback.Invoke();
-            StateHasChanged();
-        }
-        else
-        {
-            var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
-
-            Analyzing.Wait();
-            _ = analyzeTask.ContinueWith(async t =>
-            {
-                Analyzing.Release();
-                HttpResponseMessage result = await t;
-                if (result.IsSuccessStatusCode)
+                try
                 {
-                    SbomResult.Clear();
-                    var SBOMString = await result.Content.ReadAsStringAsync();
-                    fullSBOM = SBOMString;
+                    Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
+                    AddToDict(sbom);
 
-                    try
-                    {
-                        Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
-                        AddToDict(sbom);
-
-                    }
-                    catch (Exception e)
-                    {
-                        throw (e);
-                    }
-                    StateHasChangedCallback.Invoke();
-                    StateHasChanged();
                 }
-            });
-            _ = PollStatus(Analyzing);
-        }
+                catch (Exception e)
+                {
+                    throw (e);
+                }
+                StateHasChangedCallback.Invoke();
+                StateHasChanged();
+            }
+        });
+        _ = PollStatus(Analyzing);
     }
     private void AddToDict(Sbom sbom)
     {
