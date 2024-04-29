@@ -107,17 +107,14 @@ class TestAnalyzeSBOM:
         resp = requests.post(HOST + "/sbom", json=sbom_dict, timeout=10)
         assert resp.status_code == 201
 
-    @pytest.mark.skip("The HOST BackendCommunication uses only works in docker")
-    @pytest.mark.asyncio
-    async def test_backend_comm(self, fake_scored_sbom: Sbom):
+    def test_backend_comm(self, fake_scored_sbom: Sbom):
         def callback(response: StepResponse):
             assert response.message != "The request timed out"
-        backend_comm = BackendCommunication(callback)
-        await backend_comm.add_sbom(fake_scored_sbom)
+        backend_comm = BackendCommunication(callback, HOST)
+        backend_comm.add_sbom(fake_scored_sbom)
 
-    @pytest.mark.skip("The HOST BackendCommunication uses only works in docker")
     def test_sbom_processor(self, sbom: Sbom):
-        sbom_proc = SbomProcessor()
+        sbom_proc = SbomProcessor(HOST)
         res_sbom = sbom_proc.analyze_sbom(sbom)
 
         unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
@@ -125,9 +122,8 @@ class TestAnalyzeSBOM:
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
 
-    @pytest.mark.skip("The HOST BackendCommunication uses only works in docker")
     def test_front_end_api(self, sbom: Sbom, user_reqs: UserRequirements):
-        front_end_api = FrontEndAPI()
+        front_end_api = FrontEndAPI(HOST)
         res_sbom = front_end_api.analyze_sbom(sbom, user_reqs)
 
         unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
@@ -135,10 +131,15 @@ class TestAnalyzeSBOM:
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
 
-    @pytest.mark.skip("The HOST BackendCommunication uses only works in docker")
     def test_cli(self, sbom_path: Path, git_token: str):
         # Temporarily overwrite sys.argv, then call cli::run_cli
-        mock_args = ["prog", "-a", "-p", str(sbom_path), "-g", git_token]
+        mock_args = [
+            "prog",
+            "-a",
+            "-p", str(sbom_path),
+            "-g", git_token,
+            "--backend", HOST,
+        ]
         with patch("sys.argv", mock_args):
             assert sys.argv == mock_args
             run_cli()
