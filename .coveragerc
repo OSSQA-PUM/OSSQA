@@ -4,3 +4,11 @@ omit =
     tests/*
     src/backend/server.py
     backend/server.py
+    src/backend_main.py
+    backend_main.py
+    src/cli_main.py
+    cli_main.py
+    src/test_backend_main.py
+    test_backend_main.py
+    src/web_main.py
+    web_main.py
