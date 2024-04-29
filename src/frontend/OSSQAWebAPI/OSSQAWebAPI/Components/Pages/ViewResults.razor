@@ -1,3 +1,5 @@
+@* This component generates result for each category tab*@
+
 <div class="d-flex">
     <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these results mean?</a>
 </div>
@@ -15,7 +17,11 @@
                     values.Sort((x, y) => x.score.CompareTo(y.score));
                     foreach (var check in values)
                     {
-                        <p>Score: @check.score/10</p>
+                        if(check.dependency.name != null)
+                        {
+                            var url = $"https://{check.dependency.name}";
+                            <p>Score: @check.score/10 URL: <a href="@url">@check.dependency.name</a> </p>
+                        }
                     }
                 }
             </div>

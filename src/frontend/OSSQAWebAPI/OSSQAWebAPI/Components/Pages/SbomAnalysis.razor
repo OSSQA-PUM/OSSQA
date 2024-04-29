@@ -1,5 +1,4 @@
-﻿
-@using System.Diagnostics
+﻿@using System.Diagnostics
 @inject HttpClient Http
 @inject HttpClient httpClient
 @using System.Text.Json
@@ -7,49 +6,88 @@
 @using System.Net.Http.Headers
 @inject NavigationManager _navigationManager
 
+@* this component sends requests to the backend and retrives the analyzed sbom*@
+
 <ViewLogo />
 
 
-
-<div class="d-flex flex-column align-items-center justify-content-center">
-    <p>@status</p>
-</div>
-
-@if(Analyzing.CurrentCount == 0)
+@if (statusObj is not null)
 {
-    
+    @* if the status has a step_response, display it *@
+    if (statusObj.step_response is not null)
+    {
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <h3>@statusObj.current_state</h3>
+            <h3>@statusObj.step_response.message</h3>
+            <h5>Batch Size: @statusObj.step_response.batch_size</h5>
+            <h5>Completed Items: @statusObj.step_response.completed_items</h5>
+            <h5>Successful Items: @statusObj.step_response.successful_items</h5>
+            <h5>Failed Items: @statusObj.step_response.failed_items</h5>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <h3>@statusObj.current_state</h3>
+        </div>
+    }
+}
+
+@* if the analysis is not complete, show loading circle*@
+@if (Analyzing.CurrentCount == 0)
+{
+
     <div class="d-flex flex-column align-items-center justify-content-center">
         <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
     </div>
 }
+@* if analysis is done, show button for re-run*@
 else
 {
-    <div class="d-flex flex-column align-items-center justify-content-center">     
+    <div class="d-flex flex-column align-items-center justify-content-center">
         <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
     </div>
 }
+@* show failed dependencies and reason, not working at the moment*@
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <div class="d-flex flex-column">
+        @if (FailedDependencies is not null && FailedDependencies.Count > 0)
+        {
+            <h5>Failed Items</h5>
+            @foreach (var failedDependency in FailedDependencies)
+            {
+                string url = "https://" + failedDependency.name;
+                <p>Repo: <a href="@url"> @failedDependency.name</a></p>
+                <p>Reason: @failedDependency.failure_reason</p>
 
-
+            }
+        }
+    </div>
+</div>
 
 
 @code {
     private float score = 0;
     Dictionary<string, string> statusInfo = new();
-    string status = "hej baby";
-    private Status statusObj ;
+    string status = "";
+    private string fullSBOM = "";
+    private Status statusObj;
+    Sbom sbom;
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
     public Dictionary<string, List<Check>> SbomResult { get; set; }
     [Parameter]
-    public Dictionary<string, string> PostData { get; set;}
+    public Dictionary<string, string> PostData { get; set; }
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
+    [Parameter]
+    public List<SbomAnalysis.Dependency> FailedDependencies { get; set; }
     protected override void OnInitialized()
     {
         Analyze();
     }
-    private async Task Analyze()
+    private void Analyze()
     {
         var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/analyze", PostData);
 
@@ -62,34 +100,37 @@ else
             {
                 SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
+                fullSBOM = SBOMString;
 
                 try
                 {
-                    Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
+                    sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
                     AddToDict(sbom);
+                    AddFailed(sbom);
 
                 }
                 catch (Exception e)
                 {
-                    throw(e);
+                    throw (e);
                 }
                 StateHasChangedCallback.Invoke();
-                StateHasChanged();
+                _ = InvokeAsync(StateHasChanged);
             }
         });
         _ = PollStatus(Analyzing);
-
     }
+
     private void AddToDict(Sbom sbom)
     {
-        foreach (Dependency dependency in sbom.dependencies[0].scored_dependencies)
+        foreach (Dependency dependency in sbom.scored_dependencies)
         {
-            if(dependency.checks is null)
+            if (dependency.dependency_score.checks is null)
             {
                 continue;
             }
-            foreach(Check check in dependency.checks)
+            foreach (Check check in dependency.dependency_score.checks)
             {
+                check.dependency = dependency;
                 if (SbomResult.ContainsKey(check.name))
                 {
                     SbomResult[check.name].Add(check);
@@ -98,108 +139,109 @@ else
                 {
                     SbomResult.Add(check.name, new List<Check> { check });
                 }
-            } 
+            }
+        }
+        int count = SbomResult.Count;
+    }
+
+    private void AddFailed(Sbom sbom)
+    {
+        foreach (Dependency dependency in sbom.failed_dependencies)
+        {
+            FailedDependencies.Add(dependency);
         }
     }
 
     private async Task PollStatus(SemaphoreSlim pollUntil)
     {
-
         while (pollUntil.CurrentCount == 0)
         {
-            await Task.Delay(1000);
+            await Task.Delay(500);
             HttpResponseMessage response = await Http.GetAsync("http://host.docker.internal:98/get_current_status");
             string responseString = await response.Content.ReadAsStringAsync();
+            status = responseString;
             try
             {
                 statusObj = JsonSerializer.Deserialize<Status>(responseString);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-              throw(e);  
+                throw (e);
             }
-
-            
-            if(statusObj is null)
-            {
-                status = "Error";
-                StateHasChanged();
-                return;
-            }
-            status = "status!!!:   " + statusObj.ToString();
-            StateHasChanged();
+            _ = InvokeAsync(StateHasChanged);
         }
-
-        StateHasChanged();
+        _ = InvokeAsync(StateHasChanged);
     }
 
-    class Sbom
+    public class Sbom
     {
         public string serialNumber { get; set; }
         public int version { get; set; }
         public string repo_name { get; set; }
         public string repo_version { get; set; }
-        public List<DependencyClasses> dependencies { get; set; }
+        public List<Dependency> scored_dependencies { get; set; }
+        public List<Dependency> unscored_dependencies { get; set; }
+        public List<Dependency> failed_dependencies { get; set; }
 
-        public Sbom(string serialNumber, int version, string repo_name, string repo_version, List<DependencyClasses> dependencies)
+        public Sbom(string serialNumber, int version, string repo_name, string repo_version, List<Dependency> scored_dependencies, List<Dependency> unscored_dependencies, List<Dependency> failed_dependencies)
         {
             this.serialNumber = serialNumber;
             this.version = version;
             this.repo_name = repo_name;
             this.repo_version = repo_version;
-            this.dependencies = dependencies;
-        }
-        public override string ToString()
-        {
-            return $"Serial Number: {serialNumber}\nVersion: {version}\nRepo Name: {repo_name}\nRepo Version: {repo_version}\nDependencies: {dependencies[0].ToString()}";
-        }
-    }
-
-    class DependencyClasses
-    {
-        public List<Dependency> scored_dependencies { get; set; }
-        public List<Dependency> unscored_dependencies { get; set; }
-        public List<Dependency> failed_dependencies { get; set; }
-
-        public DependencyClasses(List<Dependency> scored_dependencies, List<Dependency> unscored_dependencies, List<Dependency> failed_dependencies)
-        {
             this.scored_dependencies = scored_dependencies;
             this.unscored_dependencies = unscored_dependencies;
-            this.failed_dependencies = failed_dependencies; 
+            this.failed_dependencies = failed_dependencies;
         }
         public override string ToString()
         {
-            return $"Scored Dependencies: {scored_dependencies.ToString()}\nUnscored Dependencies: {unscored_dependencies.ToString()}\nFailed Dependencies: {failed_dependencies.ToString()}";
+            return $"Serial Number: {serialNumber}\nVersion: {version}\nRepo Name: {repo_name}\nRepo Version: {repo_version}\n";
         }
     }
 
-    class Dependency
+    public class Dependency
+    {
+        public string name { get; set; }
+        public string version { get; set; }
+        public DependencyScore dependency_score { get; set; }
+        public string failure_reason { get; set; }
+
+        public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason)
+        {
+            this.name = name;
+            this.version = version;
+            this.dependency_score = dependency_score;
+            this.failure_reason = failure_reason;
+        }
+    }
+
+    public class DependencyScore
     {
         public string date { get; set; }
-        public string version { get; set; }
         public float score { get; set; }
         public List<Check> checks { get; set; }
 
-        public Dependency(string date, string version, float score, List<Check> checks)
+        public DependencyScore(string date, float score, List<Check> checks)
         {
             this.date = date;
-            this.version = version;
             this.score = score;
-            this. checks = checks;
+            this.checks = checks;
         }
         public override string ToString()
         {
-            return $"Date: {date}\nVersion: {version}\nScore: {score}\nChecks: {checks.ToString()}";
+            return $"Date: {date}\nScore: {score}\nChecks: {checks.ToString()}";
         }
     }
+
     public class Check
     {
         public string name { get; set; }
         public int score { get; set; }
         public string reason { get; set; }
-        public string details { get; set; }
+        public List<string> details { get; set; }
+        public Dependency dependency { get; set; }
 
-        public Check(string name, int score, string reason, string details)
+        public Check(string name, int score, string reason, List<string> details)
         {
             this.name = name;
             this.score = score;
@@ -212,7 +254,23 @@ else
         }
     }
 
-    class Status
+    public class FailedDependency
+    {
+        public string name { get; set; }
+        public string version { get; set; }
+        public string dependency_score { get; set; }
+        public string failure_reason { get; set; }
+
+        public FailedDependency(string name, string version, string dependency_score, string failure_reason)
+        {
+            this.name = name;
+            this.version = version;
+            this.dependency_score = dependency_score;
+            this.failure_reason = failure_reason;
+        }
+    }
+
+    public class Status
     {
         public string current_state { get; set; }
         public StepResponse step_response { get; set; }
@@ -224,10 +282,15 @@ else
         }
         public override string ToString()
         {
+            if (step_response is null)
+            {
+                return $"{current_state}";
+            }
             return $"{current_state}    {step_response.ToString()}";
         }
     }
-    class StepResponse
+
+    public class StepResponse
     {
         public int batch_size { get; set; }
         public int completed_items { get; set; }
