@@ -37,6 +37,15 @@ services:
     stdin_open: true
     tty: true
 
+  ossqa-cli:
+    image: ossqa-cli
+    build:
+      context: .
+      dockerfile: src/main/frontend/cli.Dockerfile
+    depends_on:
+      - ossqa-database
+    env_file: .env
+
   ossqa-web:
     image: ${DOCKER_REGISTRY-}ossqa-web
     build:

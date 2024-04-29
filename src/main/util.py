@@ -11,6 +11,10 @@ import os
 from packaging import version as version_parser
 
 
+# TODO: some repositories don't have release tags, only regular tags.
+#       if there are no release tags, it should try to find a regular tag instead.
+# TODO: what if there are not versions lower than the target version?
+#       should it then grab to nearest larger version?
 def get_git_sha1(git_url: str, version: str) -> str:
     """
     Gets the SHA1 hash for a version of a dependency.
