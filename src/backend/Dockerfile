@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
 WORKDIR /app
 
@@ -14,9 +14,6 @@ COPY ./src/backend_main.py /app/backend_main.py
 COPY ./src/backend/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY src/scorecard-build/scorecard /usr/local/bin/scorecard
-RUN chmod +x /usr/local/bin/scorecard
 
 # Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
