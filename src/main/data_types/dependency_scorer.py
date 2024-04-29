@@ -19,6 +19,7 @@ from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.event import Event
 from main.util import get_git_sha1
+import requests
 
 
 @dataclass
@@ -76,18 +77,28 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-
+        """
+        with Pool() as pool:
+            for index, dependency in enumerate(
+                    pool.imap(self._request_ssf_api, dependencies)
+                    ):
+        """
         for index, dependency in enumerate(dependencies):
-            # Process dependency
-            new_dependency = self._request_ssf_api(dependency)
-            new_dependencies.append(new_dependency)
+            dependency = self._request_ssf_api(dependency)
+            if dependency.dependency_score:
+                successful_items += 1
+            else:
+                failed_items += 1
+
+            new_dependencies.append(dependency)
             self.on_step_complete.invoke(
                 StepResponse(
-                    batch_size, index + 1,
+                    batch_size,
+                    index + 1,
                     successful_items,
                     failed_items
-                    )
                 )
+            )
 
         return new_dependencies
 
@@ -101,13 +112,62 @@ class SSFAPIFetcher(DependencyScorer):
         Returns:
             Dependency: The dependency with an SSF score.
         """
-        # TODO
-        # 1. Get commit sha1 of the dependency's version
-        # 2. Request the score from the SSF API
-        # 3. If the request is successful construct a new Dependency object
-        # 4. Else return a copy of the old dependency
-        new_dependency = Dependency(name="", version="")
-        return new_dependency
+
+        assert isinstance(dependency, Dependency), \
+            f"dependency: {dependency} is not a Dependency object"
+
+        new_dependency: Dependency = copy.deepcopy(dependency)
+
+        try:
+            sha1 = get_git_sha1(dependency.repo_path, dependency.version)
+        except (ConnectionRefusedError, AssertionError, ValueError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+
+        try:
+            score = self._lookup_ssf_api(dependency.url.lstrip("htps:/"), sha1)
+            new_dependency.dependency_score = score
+            new_dependency.failure_reason = None
+            return new_dependency
+        except requests.exceptions.RequestException as e:
+            error_message = f"Failed to get score due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+
+    def _lookup_ssf_api(self, git_url: str, sha1: str) -> Scorecard:
+        """
+        Looks up the score for a dependency in the SSF API.
+
+        Args:
+            git_url (str): The Git URL of the dependency.
+            sha1 (str): The SHA1 hash of the dependency.
+
+        Returns:
+            Scorecard: The scorecard of the dependency.
+        """
+        try:
+            score = requests.get(
+                ("https://api.securityscorecards.dev/projects/"
+                 f"{git_url}/?commit={sha1}"),
+                timeout=10
+                )
+            # TODO: Currently not checking version or commit
+            # Should add a message to the dependency
+            # that the version used was not the version entered.
+            if score.status_code != 200:
+                score = requests.get(
+                    f"https://api.securityscorecards.dev/projects/{git_url}",
+                    timeout=10
+                )
+            if score.status_code != 200:
+                raise requests.exceptions.RequestException(
+                    f"Failed to get score for {git_url} at {sha1}"
+                )
+            score = score.json()
+            return Scorecard(score)
+        except requests.exceptions.RequestException as e:
+            raise e
 
 
 class ScorecardAnalyzer(DependencyScorer):
@@ -201,12 +261,15 @@ class ScorecardAnalyzer(DependencyScorer):
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
-                    json.JSONDecodeError) as e:
+                    json.JSONDecodeError, ValueError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)
                 continue
 
+        # Successful execution of scorecard
+        if new_dependency.dependency_score:
+            new_dependency.failure_reason = None
         return new_dependency
 
     def _execute_scorecard(self,

@@ -416,12 +416,13 @@ def run_cli():
     if args.analyze:
         path, requirements = parse_analyze_arguments(args)
         with open(path, encoding='utf-8') as f:
-            sbom_dict:dict = json.load(f)
+            sbom_dict: dict = json.load(f)
             sbom = Sbom(sbom_dict)
 
         # print(sbom.to_dict())
         api = FrontEndAPI(args.backend)
         # TODO handle errors
+        
         scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
 
         scores = scored_sbom.dependency_manager.get_scored_dependencies()
@@ -449,7 +450,7 @@ def run_cli():
     print(output, verbose)
 
 
-def fill_with_test_scores(dependencies:list[Dependency]) -> list[Dependency]:
+def fill_with_test_scores(dependencies: list[Dependency]) -> list[Dependency]:
     """
     Fill the dependencies with test scores.
 

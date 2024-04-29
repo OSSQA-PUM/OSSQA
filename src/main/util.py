@@ -6,8 +6,8 @@ Functions:
 - is_valid_sha1: Check the validity of a sha1 string.
 """
 import re
-import requests
 import os
+import requests
 from packaging import version as version_parser
 
 
