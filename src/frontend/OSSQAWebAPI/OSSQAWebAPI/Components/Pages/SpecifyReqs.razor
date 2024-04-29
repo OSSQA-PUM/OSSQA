@@ -1,4 +1,8 @@
 ﻿@using System.Text.Json
+
+@* this component handles user requirement inputs*@
+
+
 <ViewLogo />
 <div class="d-flex justify-content-center align-items-center flex-column">
     <h2 style="margin-bottom:1em;">Specify requirement weights</h2>
@@ -14,6 +18,9 @@
     }
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=>{ValidateReqs();}">Analyze</MatButton>
 </div>
+
+
+
 
 @code {
     [Parameter]

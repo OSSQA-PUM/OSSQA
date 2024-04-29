@@ -8,6 +8,9 @@
 @using static SbomAnalysis.Status
 <PageTitle>OSSQA</PageTitle>
 <MatThemeProvider Theme="@theme">
+@*This class stores all information that will otherwise get wiped when refreshing components *@
+
+    @*shows correct tabs if analysis is complete*@
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
 {
     <MatTabGroup>
@@ -31,6 +34,7 @@
                 </MatTab>
     </MatTabGroup>
 }
+    @* if the user has not chosen sbom or requirements *@
 else if(!ready)
 {
     <MatTabGroup @bind-ActiveIndex="@activeTab">
@@ -42,6 +46,7 @@ else if(!ready)
         </MatTab>
     </MatTabGroup>
 }
+    @* start analysis if done *@
 else
 {
         <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />

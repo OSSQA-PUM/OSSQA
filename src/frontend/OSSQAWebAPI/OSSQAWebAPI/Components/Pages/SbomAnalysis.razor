@@ -6,12 +6,14 @@
 @using System.Net.Http.Headers
 @inject NavigationManager _navigationManager
 
-<ViewLogo />
+@* this component sends requests to the backend and retrives the analyzed sbom*@
 
+<ViewLogo />
 
 
 @if (statusObj is not null)
 {
+    @* if the status has a step_response, display it *@
     if (statusObj.step_response is not null)
     {
         <div class="d-flex flex-column align-items-center justify-content-center">
@@ -31,6 +33,7 @@
     }
 }
 
+@* if the analysis is not complete, show loading circle*@
 @if (Analyzing.CurrentCount == 0)
 {
 
@@ -38,12 +41,14 @@
         <MatProgressCircle Indeterminate="true" Size="MatProgressCircleSize.Medium" />
     </div>
 }
+@* if analysis is done, show button for re-run*@
 else
 {
     <div class="d-flex flex-column align-items-center justify-content-center">
         <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
     </div>
 }
+@* show failed dependencies and reason, not working at the moment*@
 <div class="d-flex flex-column align-items-center justify-content-center">
     <div class="d-flex flex-column">
         @if (FailedDependencies is not null && FailedDependencies.Count > 0)
