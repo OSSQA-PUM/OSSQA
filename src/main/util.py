@@ -8,6 +8,7 @@ Functions:
 import re
 import os
 import requests
+from datetime import datetime
 from packaging import version as version_parser
 
 
@@ -68,6 +69,20 @@ def get_git_sha1(git_url: str, version: str) -> str:
     # Check that the release version exists
     url = f"https://api.github.com/repos/{git_url}/releases/tags/{version}"
     response = requests.get(url, headers=headers, timeout=10)
+
+    # Check if the rate limit is exceeded
+    if response.status_code == 403 \
+            and "API rate limit exceeded" in response.json()["message"]:
+        reset_time = response.headers.get("X-RateLimit-Reset")
+
+        # Convert the reset time to a human-readable format
+        reset_time = datetime.datetime.fromtimestamp(int(reset_time))
+        reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        raise ConnectionRefusedError(
+            (f"GitHub API rate limit exceeded. Try again later."
+             f"Rate limit resets at {reset_time}.")
+            )
 
     # Check if the response is successful
     if response.status_code != 200:
