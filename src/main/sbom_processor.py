@@ -52,7 +52,7 @@ class SbomProcessor:
     on_status_update: Event[SbomProcessorStatus]
     sbom_processor_status: SbomProcessorStatus
 
-    def __init__(self):
+    def __init__(self, backend_host: str):
         """
         Initializes an SBOM processor.
         """
@@ -60,7 +60,7 @@ class SbomProcessor:
         self.sbom_processor_status = SbomProcessorStatus(
             SbomProcessorStates.INITIALIZING
             )
-        self.backend_communication = BackendCommunication(self._event_callback)
+        self.backend_communication = BackendCommunication(self._event_callback, backend_host)
 
     def _event_callback(self, step_response: StepResponse) -> None:
         """

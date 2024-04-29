@@ -21,11 +21,11 @@ class FrontEndAPI:
     sbom_processor: SbomProcessor
     on_sbom_processor_status_update: Event[SbomProcessorStatus]
 
-    def __init__(self):
+    def __init__(self, backend_host: str):
         """
         Initializes a front-end API.
         """
-        self.sbom_processor = SbomProcessor()
+        self.sbom_processor = SbomProcessor(backend_host)
         self.on_sbom_processor_status_update = Event[SbomProcessorStatus]()
         self.sbom_processor.on_status_update.subscribe(self._update_sbom_processor_status)
 
