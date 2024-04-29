@@ -1,0 +1,105 @@
+{
+    "date":"2024-04-23T20:29:23+02:00",
+    "repo":{
+       "name":"github.com/OSSQA-PUM/OSSQA",
+       "commit":"b0b291a4599ec2f39a2ff79b2f2be457855a5e67"
+    },
+    "scorecard":{
+       "version":"v4.13.1",
+       "commit":"49c0eed3a423f00c872b5c3c9f1bbca9e8aae799"
+    },
+    "score":7.0,
+    "checks":[
+       {
+          "details":null,
+          "score":9,
+          "reason":"binaries present in source code",
+          "name":"Binary-Artifacts",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#binary-artifacts",
+             "short":"Determines if the project has generated executable (binary) artifacts in the source repository."
+          }
+       },
+       {
+          "details":null,
+          "score":8,
+          "reason":"5 out of 6 merged PRs checked by a CI test -- score normalized to 8",
+          "name":"CI-Tests",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#ci-tests",
+             "short":"Determines if the project runs tests before pull requests are merged."
+          }
+       },
+       {
+          "details":null,
+          "score":10,
+          "reason":"all changesets reviewed",
+          "name":"Code-Review",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#code-review",
+             "short":"Determines if the project requires human code review before pull requests (aka merge requests) are merged."
+          }
+       },
+       {
+          "details":null,
+          "score":-1,
+          "reason":"no workflows found",
+          "name":"Dangerous-Workflow",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#dangerous-workflow",
+             "short":"Determines if the project's GitHub Action workflows avoid dangerous patterns."
+          }
+       },
+       {
+          "details":null,
+          "score":10,
+          "reason":"license file detected",
+          "name":"License",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#license",
+             "short":"Determines if the project has defined a license."
+          }
+       },
+       {
+          "details":null,
+          "score":0,
+          "reason":"dependency not pinned by hash detected -- score normalized to 0",
+          "name":"Pinned-Dependencies",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#pinned-dependencies",
+             "short":"Determines if the project has declared and pinned the dependencies of its build process."
+          }
+       },
+       {
+          "details":null,
+          "score":0,
+          "reason":"security policy file not detected",
+          "name":"Security-Policy",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#security-policy",
+             "short":"Determines if the project has published a security policy."
+          }
+       },
+       {
+          "details":null,
+          "score":-1,
+          "reason":"no github tokens found",
+          "name":"Token-Permissions",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#token-permissions",
+             "short":"Determines if the project's workflows follow the principle of least privilege."
+          }
+       },
+       {
+          "details":null,
+          "score":10,
+          "reason":"no vulnerabilities detected",
+          "name":"Vulnerabilities",
+          "documentation":{
+             "url":"https://github.com/ossf/scorecard/blob/49c0eed3a423f00c872b5c3c9f1bbca9e8aae799/docs/checks.md#vulnerabilities",
+             "short":"Determines if the project has open, known unfixed vulnerabilities."
+          }
+       }
+    ],
+    "metadata":null
+ }

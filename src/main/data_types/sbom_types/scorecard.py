@@ -60,7 +60,7 @@ class ScorecardChecks(StrEnum):
         return title.lower().replace("-", "_")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=True)
 class Check:
     """
     Represents a check on a dependency.
@@ -126,56 +126,53 @@ class Scorecard:
             details = check["details"]
             self.checks.append(Check(name, score, reason, details))
 
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Scorecard) and \
+            self.score == other.score and self.checks == other.checks
+
     def _validate(self, ssf_scorecard: dict) -> None:
         """
         Validates the scorecard.
 
+        Args:
+            ssf_scorecard (dict): The SSF scorecard.
+
         Returns:
             bool: True if the scorecard is valid, False otherwise.
+
+        Raises:
+            AssertionError: If the scorecard is invalid.
         """
-        if not isinstance(ssf_scorecard, dict):
-            raise TypeError("Scorecard must be a dictionary.")
+        assert isinstance(ssf_scorecard, dict), ("Scorecard must be a "
+                                                 "dictionary.")
 
-        if "date" not in ssf_scorecard:
-            raise KeyError("Scorecard must contain a date.")
+        assert "date" in ssf_scorecard, "Scorecard must contain a date."
 
-        if "score" not in ssf_scorecard:
-            raise KeyError("Scorecard must contain a score.")
+        assert "score" in ssf_scorecard, "Scorecard must contain a score."
         score = ssf_scorecard.get("score")
-        if not isinstance(score, (int, float)):
-            raise TypeError("Score must be a number.")
-        if not 0 <= score <= 10:
-            raise ValueError("Score must be between 0 and 10.")
+        assert isinstance(score, (int, float)), "Score must be a number."
+        assert -1 <= score <= 10, f"Score: {score} must be between -1 and 10."
 
-        if "checks" not in ssf_scorecard:
-            raise KeyError("Scorecard must contain checks.")
+        assert "checks" in ssf_scorecard, "Scorecard must contain checks."
         checks = ssf_scorecard.get("checks")
-        if not isinstance(checks, list):
-            raise TypeError("Checks must be a list.")
+        assert isinstance(checks, list), "Checks must be a list."
         for check in checks:
-            if not isinstance(check, dict):
-                raise TypeError("Check must be a dictionary.")
+            assert isinstance(check, dict), "Check must be a dictionary."
 
-            if "name" not in check:
-                raise KeyError("Check must contain a name.")
-            if check.get("name") not in ScorecardChecks.all():
-                raise ValueError(
-                    f"Check name \'{check.get("name")}\' not a valid check."
-                    )
+            assert "name" in check, "Check must contain a name."
+            assert check.get("name") in ScorecardChecks.all(), \
+                f"Check name '{check.get('name')}' not a valid check."
 
-            if "score" not in check:
-                raise KeyError("Check must contain a score.")
+            assert "score" in check, "Check must contain a score."
             check_score = check.get("score")
-            if not isinstance(check_score, (int, float)):
-                raise TypeError("Check score must be a number.")
-            if not -1 <= check_score <= 10:
-                raise ValueError("Check score must be between -1 and 10.")
+            assert isinstance(check_score, (int, float)), \
+                "Check score must be a number."
+            assert -1 <= check_score <= 10, \
+                "Check score must be between -1 and 10."
 
-            if "reason" not in check:
-                raise KeyError("Check must contain a reason.")
+            assert "reason" in check, "Check must contain a reason."
 
-            if "details" not in check:
-                raise KeyError("Check must contain details.")
+            assert "details" in check, "Check must contain details."
 
     def to_dict(self) -> dict:
         """

@@ -22,12 +22,14 @@ def scorecard_json_unparsable(request):
     """
     return request.param
 
+
 @pytest.fixture(params=OUT_OF_BOUNDS_SCORECARDS)
 def scorecard_json_out_of_bounds(request):
     """
     Fixture to load a scorecard JSON file with a score that is out of bounds.
     """
     return request.param
+
 
 @pytest.fixture(params=PATHS)
 def scorecard_json(request):
@@ -79,10 +81,7 @@ def test_scorecard_to_dict(scorecard_json):
 
 
 def test_unparsable_scorecard(scorecard_json_unparsable):
-    """
-    Test that a KeyError is raised when a scorecard is unparsable.
-    """
-    with pytest.raises(KeyError):
+    with pytest.raises(AssertionError):
         Scorecard(scorecard_json_unparsable)
 
 
@@ -91,13 +90,41 @@ def test_out_of_bounds_scorecard(scorecard_json_out_of_bounds):
     Test that a ValueError is raised when a scorecard has a score that is out
     of bounds.
     """
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         Scorecard(scorecard_json_out_of_bounds)
+
+
+def test_scorecard_equals():
+    """
+    Test that two scorecards are equal when they have the same values.
+
+    This test uses the same scorecard JSON file for both scorecards.
+    """
+    with open(PATHS[0], "r") as file:
+        json_dict = json.load(file)
+    scorecard1 = Scorecard(json_dict)
+    scorecard2 = Scorecard(json_dict)
+    assert scorecard1 == scorecard2
+
+
+def test_scorecard_not_equals():
+    """
+    Test that two scorecards are not equal when they have different values.
+
+    This test uses two different scorecard JSON files for the scorecards.
+    """
+    with open(PATHS[0], "r") as file:
+        scorecard1 = json.load(file)
+    with open(PATHS[1], "r") as file:
+        scorecard2 = json.load(file)
+    scorecard1 = Scorecard(scorecard1)
+    scorecard2 = Scorecard(scorecard2)
+    assert scorecard1 != scorecard2
 
 
 def test_check_title_hyphen_to_snake():
     """
-    Test that the title_hyphen_to_snake method replaces hyphens with 
+    Test that the title_hyphen_to_snake method replaces hyphens with
     underscores and converts the title to lowercase.
     """
     for check in ScorecardChecks.all():
