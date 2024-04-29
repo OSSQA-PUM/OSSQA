@@ -75,21 +75,21 @@ def fake_scored_sbom_fixture(sbom_path: Path) -> Sbom:
     return sbom
 
 
-@pytest.fixture(autouse=True, scope="function")
-def check_sbom_existance():
+def before_test():
     """
-    This fixture checks whether each test has resulted in an added SBOM
-    in the backend database.
+    Resets the backend database and checks that the reset is successful.
     """
     resp = requests.post(HOST + "/test/reset", timeout=10)
     assert resp.status_code == 200
-
     resp = requests.get(HOST + "/sbom", timeout=10)
     assert resp.status_code == 200
     assert len(resp.json()) == 0
 
-    yield
 
+def after_test():
+    """
+    Checks that an SBOM has been successfully added to the backend database.
+    """
     resp = requests.get(HOST + "/sbom", timeout=10)
     assert resp.status_code == 200
     assert len(resp.json()) != 0
@@ -103,17 +103,22 @@ class TestAnalyzeSBOM:
     """
 
     def test_backend(self, fake_scored_sbom: Sbom):
+        before_test()
         sbom_dict = fake_scored_sbom.to_dict()
         resp = requests.post(HOST + "/sbom", json=sbom_dict, timeout=10)
         assert resp.status_code == 201
+        after_test()
 
     def test_backend_comm(self, fake_scored_sbom: Sbom):
+        before_test()
         def callback(response: StepResponse):
             assert response.message != "The request timed out"
         backend_comm = BackendCommunication(callback, HOST)
         backend_comm.add_sbom(fake_scored_sbom)
+        after_test()
 
     def test_sbom_processor(self, sbom: Sbom):
+        before_test()
         sbom_proc = SbomProcessor(HOST)
         res_sbom = sbom_proc.analyze_sbom(sbom)
 
@@ -121,8 +126,10 @@ class TestAnalyzeSBOM:
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
+        after_test()
 
     def test_front_end_api(self, sbom: Sbom, user_reqs: UserRequirements):
+        before_test()
         front_end_api = FrontEndAPI(HOST)
         res_sbom = front_end_api.analyze_sbom(sbom, user_reqs)
 
@@ -130,8 +137,11 @@ class TestAnalyzeSBOM:
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
+        after_test()
 
     def test_cli(self, sbom_path: Path, git_token: str):
+        before_test()
+
         # Temporarily overwrite sys.argv, then call cli::run_cli
         mock_args = [
             "prog",
@@ -143,3 +153,5 @@ class TestAnalyzeSBOM:
         with patch("sys.argv", mock_args):
             assert sys.argv == mock_args
             run_cli()
+
+        after_test()
