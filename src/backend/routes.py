@@ -47,7 +47,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             )
             db.session.add(sbom)
 
-        for dep_json in sbom_json["dependencies"]["scored_dependencies"]:
+        for dep_json in sbom_json["scored_dependencies"]:
             dep: Dependency = Dependency.query.filter_by(
                 name=dep_json["name"],
                 version=dep_json["version"],

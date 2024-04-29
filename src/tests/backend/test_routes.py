@@ -65,7 +65,7 @@ def test_get_sboms_by_name(client: FlaskClient, sbom: dict):
         assert resp_sbom["metadata"]["component"]["version"] == sbom["repo_version"]
         for component in resp_sbom["components"]:
             found_component = False
-            for dependency in sbom["dependencies"]["scored_dependencies"]:
+            for dependency in sbom["scored_dependencies"]:
                 found_component = component["name"] == dependency["name"] and \
                     component["version"] == dependency["version"]
                 if found_component:
@@ -75,7 +75,7 @@ def test_get_sboms_by_name(client: FlaskClient, sbom: dict):
 
 def test_get_existing_dependencies(client: FlaskClient, sbom: dict):
     dep_name_versions = []
-    for dep in sbom["dependencies"]["scored_dependencies"]:
+    for dep in sbom["scored_dependencies"]:
         dep_name_versions.append([dep["name"], dep["version"]])
 
     resp = client.get("/dependency/existing", json=dep_name_versions)
