@@ -126,7 +126,7 @@ class SSFAPIFetcher(DependencyScorer):
             return new_dependency
 
         try:
-            score = self._lookup_ssf_api(dependency, sha1)
+            score = self._lookup_ssf_api(dependency.url.lstrip("htps:/"), sha1)
             new_dependency.dependency_score = score
             new_dependency.failure_reason = None
             return new_dependency
@@ -147,18 +147,28 @@ class SSFAPIFetcher(DependencyScorer):
             Scorecard: The scorecard of the dependency.
         """
         try:
+            print(f"Requesting score for {git_url} at {sha1}")
             score = requests.get(
                 ("https://api.securityscorecards.dev/projects/"
                  f"{git_url}/?commit={sha1}"),
                 timeout=10
                 )
+            # TODO: Currently not checking version or commit
+            # Should add a message to the dependency
+            # that the version used was not the version entered.
+            if score.status_code != 200:
+                score = requests.get(
+                    f"https://api.securityscorecards.dev/projects/{git_url}",
+                    timeout=10
+                )
             if score.status_code != 200:
                 raise requests.exceptions.RequestException(
-                    f"Request failed with status code: {score.status_code}"
+                    f"Failed to get score for {git_url} at {sha1}"
                 )
             score = score.json()
             return Scorecard(score)
         except requests.exceptions.RequestException as e:
+            print(f"Failed to get score for {git_url} at {sha1} due to: {e}")
             raise e
 
 
@@ -253,14 +263,15 @@ class ScorecardAnalyzer(DependencyScorer):
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
-                    json.JSONDecodeError) as e:
+                    json.JSONDecodeError, ValueError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)
                 continue
 
         # Successful execution of scorecard
-        new_dependency.failure_reason = None
+        if new_dependency.dependency_score:
+            new_dependency.failure_reason = None
         return new_dependency
 
     def _execute_scorecard(self,
