@@ -190,8 +190,8 @@ def test_dependency_manager_to_dict_filled(
     assert dep_dict["unscored_dependencies"] == \
         [{'name': 'github.com/repo/path',
           'version': '3.0',
-          'dependency_score': '',
-          'failure_reason': ''}]
+          'dependency_score': None,
+          'failure_reason': None}]
     assert isinstance(
         dep_dict["failed_dependencies"][0]["failure_reason"], str
         )
