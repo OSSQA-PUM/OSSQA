@@ -19,6 +19,7 @@ from argparse import ArgumentParser, Namespace
 from argparse import RawTextHelpFormatter
 from tabulate import tabulate
 import requests
+import main.constants as constants
 from main.data_types.user_requirements import UserRequirements, \
                                                 RequirementsType
 from main.data_types.sbom_types.sbom import Sbom
@@ -43,7 +44,7 @@ def create_parser() -> ArgumentParser:
     run_type_group = parser.add_mutually_exclusive_group(required=True)
 
     parser.usage = \
-    """python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
+    f"""python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
 
     Analyze flags:
         -p   --path                     (required)
@@ -56,7 +57,7 @@ def create_parser() -> ArgumentParser:
         -g   --git-token                (required)
         -o   --output
         -v   --verbose
-             --backend                  (default: "http://host.docker.internal:5090")
+             --backend                  (default: \"{constants.HOST}\")
 
     Lookup flags:
         -i   --id                       (required)
@@ -120,7 +121,7 @@ def create_parser() -> ArgumentParser:
 
     parser.add_argument(
         "--backend", metavar='\b', type=str,
-        default="http://host.docker.internal:5090",
+        default=constants.HOST,
         help="The URL of the backend."
     )
 
