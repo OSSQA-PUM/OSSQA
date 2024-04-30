@@ -25,7 +25,8 @@ class BackendCommunication:
     on_status_changed: Event[StepResponse]
     backend_fetcher: DependencyScorer
 
-    def __init__(self, callback: Callable[[StepResponse], Any], host: str) -> None:
+    def __init__(self, callback: Callable[[StepResponse], Any], host: str) \
+            -> None:
         self.on_status_changed = Event[StepResponse]()
         self.on_status_changed.subscribe(callback)
         self.backend_fetcher = BackendFetcher(callback, host)
@@ -168,6 +169,12 @@ class BackendFetcher(DependencyScorer):
             # Tell the user that the response was not JSON
             self.on_step_complete.invoke(
                 StepResponse(0, 0, 0, 0, "The response was not JSON")
+                )
+            return []
+        except requests.exceptions.ConnectionError as e:
+            # Tell the user that the connection was refused
+            self.on_step_complete.invoke(
+                StepResponse(0, 0, 0, 0, str(e))
                 )
             return []
 
