@@ -64,6 +64,7 @@ class Dependency(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(255), unique=False)
     version = db.Column(db.String(255), unique=False)
+    # TODO: Should also store external references, at least of type "vcs".
 
     scorecard = db.relationship("Scorecard", backref="dependency", lazy=True,
                                 uselist=False)
