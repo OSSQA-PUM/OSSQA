@@ -324,7 +324,7 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
         verbose: bool = args.verbose
 
     if args.backend:
-        backend: str = constants.HOST
+        backend: str = args.backend
 
     return output, verbose, backend
 
