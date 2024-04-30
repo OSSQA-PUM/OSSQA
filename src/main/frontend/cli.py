@@ -434,7 +434,7 @@ def analyze_sbom(args: Namespace) -> None:
     # scores = fill_with_test_scores(scores)
     # END TEMPORARY
 
-    if args.output != "json":
+    if output != "json":
         mean_scores = get_mean_scores(scores)
         mean_scores = sorted(mean_scores, key=lambda x: x[1])
         mean_scores = color_scores(mean_scores)
