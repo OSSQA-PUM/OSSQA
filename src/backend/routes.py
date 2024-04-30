@@ -101,8 +101,8 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         return jsonify(list(names)), 200
 
 
-    @app.route("/sbom/<platform>/<org>/<name>", methods=["GET"])
-    def get_sboms_by_name(platform: str, org: str, name: str):
+    @app.route("/sbom/<path:repo_name>", methods=["GET"])
+    def get_sboms_by_name(repo_name: str):
         """
         Gets a list of SBOMs with a specific name.
 
@@ -112,7 +112,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Returns:
             json (array): The list of SBOMs.
         """
-        repo_name = f"{platform}/{org}/{name}"
         sboms = SBOM.query.filter_by(repo_name=repo_name).all()
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
         return jsonify(sbom_dicts), 200
