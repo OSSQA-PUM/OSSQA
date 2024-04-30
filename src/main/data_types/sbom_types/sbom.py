@@ -108,7 +108,7 @@ class Sbom:
 
         # Checks if name of SBOM exists
         try:
-            name = sbom_file["metadata"]["tools"][0]["name"]
+            name = sbom_file["metadata"]["component"]["name"]
         except (IndexError, KeyError):
             name = ""
 
