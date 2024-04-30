@@ -33,6 +33,7 @@ class Sbom:
 
     def __init__(self, sbom: dict):
         self._check_format_of_sbom(sbom)
+
         self.dependency_manager: DependencyManager = DependencyManager()
         self.dependency_manager.update(
             self._parse_components(sbom["components"])
@@ -209,6 +210,8 @@ class Sbom:
             If no VCS (Version Control System) external reference is found.
         """
         external_refs = component.get("externalReferences")
+        if external_refs:
+            print(external_refs)
         if not external_refs:
             raise KeyError("No external references found")
         for external_ref in external_refs:
@@ -216,6 +219,10 @@ class Sbom:
                 continue
 
             url = external_ref["url"]
+
+            pattern = r'https://[^/]+\.com/[^/]+/[^/]+'
+            if not match(pattern, url):
+                raise ValueError("Invalid URL")
             try:
                 response = requests.get(url, timeout=5)
             except (requests.ConnectTimeout, requests.ReadTimeout) as e:
