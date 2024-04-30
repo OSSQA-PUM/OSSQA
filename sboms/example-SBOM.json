@@ -46,7 +46,6 @@
   },
   "components": [
     {
-<<<<<<< HEAD
       "type": "library",
       "bom-ref": "ahash 0.8.6 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "ahash",
@@ -129,12 +128,6 @@
       "type": "library",
       "name": "github.com/allan-simon/go-singleinstance",
       "version": "1.0.0",
-=======
-      "bom-ref": "pkg:golang/github.com/allan-simon/go-singleinstance@v0.0.0-20160830203053-79edcfdc2dfc",
-      "type": "library",
-      "name": "github.com/allan-simon/go-singleinstance",
-      "version": "v0.0.0-20160830203053-79edcfdc2dfc",
->>>>>>> c902011 (Add new directory for sboms)
       "scope": "required",
       "hashes": [
         {
@@ -187,7 +180,6 @@
       ]
     },
     {
-<<<<<<< HEAD
       "type": "library",
       "bom-ref": "bytes 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "bytes",
@@ -240,43 +232,10 @@
         {
           "type": "vcs",
           "url": "https://github.com/fancy-regex/fancy-regex"
-=======
-      "bom-ref": "pkg:golang/github.com/antlr/antlr4@v0.0.0-20201029161626-9a95f0cc3d7c",
-      "type": "library",
-      "name": "github.com/antlr/antlr4",
-      "version": "v0.0.0-20201029161626-9a95f0cc3d7c",
-      "scope": "required",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "8ff0b69313dfc84d1df3bfe08008c8b0257909d92a9a36fe3b45bc5bed49f886"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause",
-            "url": "https://spdx.org/licenses/BSD-3-Clause.html"
-          }
-        },
-        {
-          "license": {
-            "id": "MIT",
-            "url": "https://spdx.org/licenses/MIT.html"
-          }
-        }
-      ],
-      "purl": "pkg:golang/github.com/antlr/antlr4@v0.0.0-20201029161626-9a95f0cc3d7c",
-      "externalReferences": [
-        {
-          "url": "https://github.com/antlr/antlr4",
-          "type": "vcs"
->>>>>>> c902011 (Add new directory for sboms)
         }
       ]
     },
     {
-<<<<<<< HEAD
       "type": "library",
       "bom-ref": "fastrand 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "fastrand",
@@ -295,37 +254,10 @@
         {
           "type": "vcs",
           "url": "https://github.com/smol-rs/fastrand"
-=======
-      "bom-ref": "pkg:golang/github.com/armon/consul-api@v0.0.0-20180202201655-eb2c6b5be1b6",
-      "type": "library",
-      "name": "github.com/armon/consul-api",
-      "version": "v0.0.0-20180202201655-eb2c6b5be1b6",
-      "scope": "required",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "1b56cfbdc8b037217b21498a5cdb7d024de6eaef43135ac5f919ad22406955d0"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MPL-2.0",
-            "url": "https://spdx.org/licenses/MPL-2.0.html"
-          }
-        }
-      ],
-      "purl": "pkg:golang/github.com/armon/consul-api@v0.0.0-20180202201655-eb2c6b5be1b6",
-      "externalReferences": [
-        {
-          "url": "https://github.com/armon/consul-api",
-          "type": "vcs"
->>>>>>> c902011 (Add new directory for sboms)
         }
       ]
     },
     {
-<<<<<<< HEAD
       "type": "library",
       "bom-ref": "fnv 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "fnv",
@@ -348,37 +280,10 @@
         {
           "type": "vcs",
           "url": "https://github.com/servo/rust-fnv"
-=======
-      "bom-ref": "pkg:golang/github.com/aymerick/raymond@v2.0.3-0.20180322193309-b565731e1464",
-      "type": "library",
-      "name": "github.com/aymerick/raymond",
-      "version": "v2.0.3-0.20180322193309-b565731e1464",
-      "scope": "required",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "901a7783930a0426984323b3db44d35643a9cadacc01a92f2fb43fcf530b35cf"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "url": "https://spdx.org/licenses/MIT.html"
-          }
-        }
-      ],
-      "purl": "pkg:golang/github.com/aymerick/raymond@v2.0.3-0.20180322193309-b565731e1464",
-      "externalReferences": [
-        {
-          "url": "https://github.com/aymerick/raymond",
-          "type": "vcs"
->>>>>>> c902011 (Add new directory for sboms)
         }
       ]
     },
     {
-<<<<<<< HEAD
       "type": "library",
       "bom-ref": "form_urlencoded 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "form_urlencoded",
@@ -427,24 +332,6 @@
         {
           "type": "vcs",
           "url": "https://github.com/dnsl48/fraction.git"
-=======
-      "bom-ref": "pkg:golang/github.com/chzyer/logex@v1.1.10",
-      "type": "library",
-      "name": "github.com/chzyer/logex",
-      "version": "v1.1.10",
-      "scope": "required",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "4b0a5ad4ae90bd0ce7c0945c7d37d02664c4ef60ea49c01ae3413e7db1c45c41"
-        }
-      ],
-      "purl": "pkg:golang/github.com/chzyer/logex@v1.1.10",
-      "externalReferences": [
-        {
-          "url": "https://github.com/chzyer/logex",
-          "type": "vcs"
->>>>>>> c902011 (Add new directory for sboms)
         }
       ]
     },
@@ -477,26 +364,15 @@
       ]
     },
     {
-<<<<<<< HEAD
       "bom-ref": "pkg:golang/github.com/aymerick/raymond@v2.0.3-0.20180322193309-b565731e1464",
       "type": "library",
       "name": "github.com/aymerick/raymond",
       "version": "v2.0.3-0.20180322193309-b565731e1464",
-=======
-      "bom-ref": "pkg:golang/github.com/codegangsta/inject@v0.0.0-20150114235600-33e0aa1cb7c0",
-      "type": "library",
-      "name": "github.com/codegangsta/inject",
-      "version": "v0.0.0-20150114235600-33e0aa1cb7c0",
->>>>>>> c902011 (Add new directory for sboms)
       "scope": "required",
       "hashes": [
         {
           "alg": "SHA-256",
-<<<<<<< HEAD
           "content": "901a7783930a0426984323b3db44d35643a9cadacc01a92f2fb43fcf530b35cf"
-=======
-          "content": "b033269beabfdfe06e91d229c703b7eb9bff45bb29a7636de579ed810457abc4"
->>>>>>> c902011 (Add new directory for sboms)
         }
       ],
       "licenses": [
@@ -507,45 +383,10 @@
           }
         }
       ],
-<<<<<<< HEAD
       "purl": "pkg:golang/github.com/aymerick/raymond@v2.0.3-0.20180322193309-b565731e1464",
       "externalReferences": [
         {
           "url": "https://github.com/aymerick/raymond",
-=======
-      "purl": "pkg:golang/github.com/codegangsta/inject@v0.0.0-20150114235600-33e0aa1cb7c0",
-      "externalReferences": [
-        {
-          "url": "https://github.com/codegangsta/inject",
-          "type": "vcs"
-        }
-      ]
-    },
-    {
-      "bom-ref": "pkg:golang/github.com/coreos/etcd@v3.3.10",
-      "type": "library",
-      "name": "github.com/coreos/etcd",
-      "version": "v3.3.10",
-      "scope": "required",
-      "hashes": [
-        {
-          "alg": "SHA-256",
-          "content": "a1d778f324614e5305c1bc3b560cea519671ae74a7f543baf8f691436c8a04d6"
-        }
-      ],
-      "licenses": [
-        {
-          "license": {
-            "id": "Apache-2.0",
-            "url": "https://spdx.org/licenses/Apache-2.0.html"
-          }
-        }
-      ],
-      "purl": "pkg:golang/github.com/coreos/etcd@v3.3.10",
-      "externalReferences": [
-        {
-          "url": "https://github.com/coreos/etcd",
->>>>>>> c902011 (Add new directory for sboms)
           "type": "vcs"
         }
       ]
@@ -1493,8 +1334,4 @@
       ]
     }
   ]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c902011 (Add new directory for sboms)
