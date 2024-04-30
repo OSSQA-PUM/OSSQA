@@ -123,12 +123,6 @@ def create_parser() -> ArgumentParser:
         help="    The git token."
     )
 
-    parser.add_argument(
-        "--backend", metavar='\b', type=str,
-        default=constants.HOST,
-        help="The URL of the backend."
-    )
-
 
     # Lookup command
     parser.add_argument(
@@ -146,6 +140,12 @@ def create_parser() -> ArgumentParser:
     parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose output."
+    )
+
+    parser.add_argument(
+        "--backend", metavar='\b', type=str,
+        default=constants.HOST,
+        help="The URL of the backend."
     )
 
     return parser
@@ -315,6 +315,7 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
     """
     output: str = "table"
     verbose: bool = False
+    backend: str = constants.HOST
 
     if args.output:
         output: str = args.output
@@ -322,7 +323,10 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
     if args.verbose:
         verbose: bool = args.verbose
 
-    return output, verbose
+    if args.backend:
+        backend: str = constants.HOST
+
+    return output, verbose, backend
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
@@ -410,13 +414,15 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
 
 
 def analyze_sbom(args: Namespace) -> None:
+    output, verbose, backend = parse_arguments_shared(args)
     path, requirements = parse_analyze_arguments(args)
+
     with open(path, encoding='utf-8') as f:
         sbom_dict: dict = json.load(f)
         sbom = Sbom(sbom_dict)
 
     # print(sbom.to_dict())
-    api = FrontEndAPI(args.backend)
+    api = FrontEndAPI(backend)
     # TODO handle errors
 
     scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
@@ -442,13 +448,12 @@ def analyze_sbom(args: Namespace) -> None:
 
 
 def lookup_sbom_names(args: Namespace) -> None:
-    pass
+    output, verbose, backend = parse_arguments_shared(args)
 
 
 def lookup_sbom_details(args: Namespace) -> None:
+    output, verbose, backend = parse_arguments_shared(args)
     repo_name = parse_lookup_arguments(args)
-    print(f"{repo_name = }")
-
 
 
 def run_cli():
@@ -457,7 +462,6 @@ def run_cli():
     """
     parser: ArgumentParser = create_parser()
     args: Namespace = parser.parse_args()
-    output, verbose = parse_arguments_shared(args)
 
     if args.analyze:
         analyze_sbom(args)
