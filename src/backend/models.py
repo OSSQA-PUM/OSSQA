@@ -90,7 +90,7 @@ class SBOM(db.Model):
     """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     serial_number = db.Column(db.String(60), unique=False)
-    version = db.Column(db.String(255), unique=False)
+    version = db.Column(db.Integer, unique=False)
     repo_name = db.Column(db.String(255), unique=False)
     repo_version = db.Column(db.String(255), unique=False)
 
@@ -105,6 +105,8 @@ class SBOM(db.Model):
             dict: The dict representing the SBOM.
         """
         return {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.2",
             "serialNumber": self.serial_number,
             "version": self.version,
             "metadata": {
