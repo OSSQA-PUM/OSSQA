@@ -67,12 +67,16 @@ def create_parser() -> ArgumentParser:
     """
 
     run_type_group.add_argument(
-        "-a", "--analyze",
-        action="store_true", help="Analyze SBOM file."
+        "-a", "--analyze", action="store_true",
+        help="Analyze SBOM file."
+    )
+    run_type_group.add_argument(
+        "-s", "--sboms", action="store_true",
+        help="Lookup repository names of SBOMs in the database."
     )
     run_type_group.add_argument(
         "-l", "--lookup", action="store_true",
-        help="Lookup SBOM in database."
+        help="Lookup details of an SBOM in the database."
     )
 
 
@@ -128,8 +132,8 @@ def create_parser() -> ArgumentParser:
 
     # Lookup command
     parser.add_argument(
-        "-i", "--id", metavar='\b', type=int,
-        help="    The ID of the SBOM."
+        "-n", "--name", metavar='\b', type=str,
+        help="    The repository name of the SBOM."
     )
 
     # Shared
@@ -279,23 +283,23 @@ def parse_analyze_arguments(args: Namespace) -> tuple[str, UserRequirements]:
 
 def parse_lookup_arguments(args: Namespace) -> int:
     """
-    Parses the lookup arguments and returns the ID.
+    Parses the lookup arguments and returns the repository name.
 
     Args:
         args (Namespace): The parsed command-line arguments.
 
     Returns:
-        int: The ID extracted from the arguments.
+        str: The repository name extracted from the arguments.
 
     Raises:
-        SystemExit: If the required argument [-i | --id] is missing.
+        SystemExit: If the required argument [-n | --name] is missing.
     """
-    if not args.id:
-        print("Please add the argument [-i | --id] [ID]")
+    if not args.name:
+        print("Please add the argument [-n | --name] [NAME]")
         exit(1)
 
-    smob_id: int = args.id
-    return smob_id
+    repo_name: str = args.name
+    return repo_name
 
 
 def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
@@ -405,8 +409,7 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
     return colored_scores
 
 
-def analyze(args: Namespace) -> None:
-    print("Analyzing")
+def analyze_sbom(args: Namespace) -> None:
     path, requirements = parse_analyze_arguments(args)
     with open(path, encoding='utf-8') as f:
         sbom_dict: dict = json.load(f)
@@ -438,9 +441,14 @@ def analyze(args: Namespace) -> None:
         print(json.dumps(json_results))
 
 
-def lookup(args: Namespace):
-    print("Looking up")
-    sbom_id = parse_lookup_arguments(args)
+def lookup_sbom_names(args: Namespace) -> None:
+    pass
+
+
+def lookup_sbom_details(args: Namespace) -> None:
+    repo_name = parse_lookup_arguments(args)
+    print(f"{repo_name = }")
+
 
 
 def run_cli():
@@ -452,9 +460,11 @@ def run_cli():
     output, verbose = parse_arguments_shared(args)
 
     if args.analyze:
-        analyze(args)
+        analyze_sbom(args)
+    elif args.sboms:
+        lookup_sbom_names(args)
     elif args.lookup:
-        lookup(args)
+        lookup_sbom_details(args)
 
 
 def fill_with_test_scores(dependencies: list[Dependency]) -> list[Dependency]:
