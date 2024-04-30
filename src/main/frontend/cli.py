@@ -449,6 +449,14 @@ def analyze_sbom(args: Namespace) -> None:
 
 def lookup_sbom_names(args: Namespace) -> None:
     output, verbose, backend = parse_arguments_shared(args)
+    front_end_api = FrontEndAPI(backend)
+    sbom_names = front_end_api.lookup_stored_sboms()
+
+    if output != "json":
+        table = tabulate([sbom_names], headers=["Repository Names"])
+        print(table)
+    else:
+        print(json.dumps(sbom_names))
 
 
 def lookup_sbom_details(args: Namespace) -> None:
