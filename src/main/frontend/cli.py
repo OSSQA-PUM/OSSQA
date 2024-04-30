@@ -462,6 +462,36 @@ def lookup_sbom_names(args: Namespace) -> None:
 def lookup_sbom_details(args: Namespace) -> None:
     output, verbose, backend = parse_arguments_shared(args)
     repo_name = parse_lookup_arguments(args)
+    front_end_api = FrontEndAPI(backend)
+    sboms = front_end_api.lookup_previous_sboms(repo_name)
+
+    if output != "json":
+        table_data = []
+        for sbom in sboms:
+            dependencies = sbom.dependency_manager.get_dependencies_by_filter(
+                lambda _: True
+            )
+            sbom_data = [
+                sbom.serial_number,
+                sbom.version,
+                sbom.repo_name,
+                sbom.repo_version,
+                len(dependencies),
+            ]
+            table_data.append(sbom_data)
+
+        table_headers = [
+            "Serial number",
+            "Version",
+            "Repo name",
+            "Repo version",
+            "Dependency count"
+        ]
+        table = tabulate(table_data, headers=table_headers)
+        print(table)
+    else:
+        sbom_dicts = [sbom.to_dict() for sbom in sboms]
+        print(json.dumps(sbom_dicts))
 
 
 def run_cli():
