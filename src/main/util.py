@@ -46,7 +46,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
         # Sort the release tags in descending order
         release_tags.sort(
-            key=lambda tag: version_parser.parse(tag),
+            key=version_parser.parse,
             reverse=True
             )
 
@@ -59,11 +59,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
         return None
 
     # Get the GitHub authentication token
-    token = os.environ.get('GITHUB_AUTH_TOKEN')
-    if not token:
-        raise ValueError(
-            "GitHub authentication token not found in environment"
-            )
+    token = get_github_token()
     headers = {'Authorization': f'token {token}'} if token else {}
 
     # Check that the release version exists
@@ -126,3 +122,18 @@ def is_valid_sha1(sha1_str: str) -> bool:
     if not re.match('^[0-9A-Fa-f]{40}$', sha1_str):
         return False
     return True
+
+
+def get_github_token() -> str:
+    """
+    Gets the GitHub authentication token from the environment.
+
+    Returns:
+        str: The GitHub authentication token.
+    """
+    token = os.environ.get('GITHUB_AUTH_TOKEN')
+    if not token:
+        raise ValueError(
+            "GitHub authentication token not found in environment"
+            )
+    return token
