@@ -185,8 +185,11 @@ class BackendFetcher(DependencyScorer):
             name = dependency["name"]
             version = dependency["version"]
             scorecard = Scorecard(dependency["scorecard"])
-
-            dep_obj = Dependency(name=name,
+            # TODO Fix the name of Dependency.
+            # Should perhaps store name of CycloneDX component
+            # in database and git_url separately.
+            dep_obj = Dependency(name=name,  # TODO FIX
+                                 git_url=name,  # TODO FIX
                                  version=version,
                                  dependency_score=scorecard
                                  )
