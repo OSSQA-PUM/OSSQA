@@ -6,11 +6,12 @@ Classes:
 - Sbom: Represents a Software Bill of Materials (SBOM) object.
 """
 
-from re import match
+from re import match, search
 from urllib.parse import urlparse
+import requests
 from main.data_types.sbom_types.dependency_manager import DependencyManager
 from main.data_types.sbom_types.dependency import Dependency
-import requests
+from main.util import get_github_token
 
 
 class Sbom:
@@ -126,47 +127,94 @@ class Sbom:
         Returns:
             list[Dependency]: A list of parsed Dependency objects.
         """
-        dependencies: list[Dependency] = []
+        dependencies: list[tuple] = []
         for component in components:
-            dependency = self._parse_component(component)
-            dependencies.append(dependency)
-        return dependencies
+            # 1. Parse the component. Get name and version
+            try:
+                url = self._parse_component_name(component)
+            except (KeyError, ValueError) as e:
+                print(f"Could not find name in component {component} with "
+                      f"error {e}")
+                continue
+            version = component.get("version")
+            name = component.get("name")
 
-    def _parse_component(self, component: dict) -> Dependency:
+            if url is None or version is None or name is None:
+                continue
+
+            # 2. Check if the dependency is a duplicate
+            if self._is_duplicate(url, version, dependencies):
+                continue
+            if not url.startswith("github.com"):
+                continue
+
+            # Takes a long time to request data for all dependencies
+            lookup_path_on_github = False
+            if lookup_path_on_github:
+                try:
+                    self._try_git_api_connection(url)
+                except ConnectionError as e:
+                    print(f"Could not connect to {url} with error {e}")
+                    continue
+
+            dependencies.append((name, url, version))
+
+        # Create dependency object for each component
+        new_dependencies = []
+        for dependency in dependencies:
+            dependency = Dependency(
+                name=dependency[0],
+                git_url=dependency[1],
+                version=dependency[2])
+            new_dependencies.append(dependency)
+        return new_dependencies
+
+    def _is_duplicate(
+            self, name: str, version: str, dependencies: list[tuple]
+            ) -> bool:
         """
-        Parses a component dictionary.
+        Checks if a dependency is a duplicate.
+
+        Args:
+            name (str): The name of the dependency.
+            version (str): The version of the dependency.
+            dependencies (list[tuple]): The list of dependencies.
+
+        Returns:
+            bool: True if the dependency is a duplicate, False otherwise.
+        """
+        for dependency in dependencies:
+            if name == dependency[0] and version == dependency[1]:
+                return True
+        return False
+
+    def _parse_component_name(self, component: dict) -> str:
+        """
+        Parses the name of a component from a component dictionary.
 
         Args:
             component (dict): The component dictionary.
 
         Returns:
-            Dependency: The parsed Dependency object.
+            str: The name of the component.
         """
-        failure_reason = None
-        name = ""
-        version = ""
-        try:
-            # TODO: The name of the component is not in the url.
-            #       According to the CycloneDX documentation,
-            #       each component has a name that can be accessed via
-            #       component["name"].
-            #       This should be fixed, preferably by storing the
-            #       URL in it's own variable in Dependency, so
-            #       that OSSQA adheres to the CycloneDX format,
-            #       which in turn makes the behavior of the program
-            #       more predictable.
-            name = self._parse_git_url(
-                self._get_component_url(component=component)
-                )
-            version = component["version"]
-        except (ConnectionError, KeyError, NameError, ValueError) as e:
-            failure_reason = e
-        dependency = Dependency(name=name, version=version)
-        if failure_reason:
-            dependency.failure_reason = failure_reason
-        return dependency
+        if "externalReferences" not in component:
+            raise KeyError("externalReferences not found in component")
+        external_ref = component["externalReferences"]
+        urls = []
+        for ref in external_ref:
+            if "url" not in ref:
+                continue
+            try:
+                github_url = self._parse_github_url(ref["url"])
+            except ValueError:
+                continue
+            urls.append(github_url)
+        if not urls:
+            raise ValueError("No valid URLs found in externalReferences")
+        return urls[0]
 
-    def _parse_git_url(self, url: str) -> str:
+    def _parse_github_url(self, url: str) -> str:
         """
         Parses the git URL and returns the platform,
         repository owner, and repository name.
@@ -179,60 +227,40 @@ class Sbom:
 
         Raises:
             ValueError: If the platform is not supported.
+            ConnectionError: If the connection could not be established.
         """
         url_split = urlparse(url)
         platform = url_split.netloc
 
         if platform != "github.com":
             raise ValueError("Platform not supported")
+        git_repo_path = url_split.path.removesuffix(".git")
+        pattern = r"\/([^\/]+)\/([^\/]+)"  # Match /owner/repo
+        _match = search(pattern, git_repo_path)
+        if _match:
+            git_repo_path = _match.group(0)
+        github_url = platform + git_repo_path
+        return github_url
 
-        name = platform + url_split.path
-        return name
-
-    def _get_component_url(self, component: dict) -> str:
+    def _try_git_api_connection(self, url: str) -> None:
         """
-        Retrieves the URL of a component from its external references.
+        Tries to connect to the GitHub API.
 
         Args:
-            component (dict): The component dictionary.
-
-        Returns:
-            str: The URL of the component.
+            url (str): The URL to connect to.
 
         Raises:
-            KeyError:
-            If no external references are found.
-
-            ConnectionError:
-            If there is a connection error while accessing the URL.
-
-            NameError:
-            If no VCS (Version Control System) external reference is found.
+            ConnectionError: If the connection could not be established.
         """
-        external_refs = component.get("externalReferences")
-        if external_refs:
-            print(external_refs)
-        if not external_refs:
-            raise KeyError("No external references found")
-        for external_ref in external_refs:
-            if external_ref["type"] != "vcs":
-                continue
-
-            url = external_ref["url"]
-
-            pattern = r'https://[^/]+\.com/[^/]+/[^/]+'
-            if not match(pattern, url):
-                raise ValueError("Invalid URL")
-            try:
-                response = requests.get(url, timeout=5)
-            except (requests.ConnectTimeout, requests.ReadTimeout) as e:
-                raise ConnectionError(f"Connection to {url} timed out") from e
-            except requests.ConnectionError as e:
-                raise ConnectionError(f"Failed to connect to {url}") from e
-
+        token = get_github_token()
+        headers = {'Authorization': f'Bearer {token}'} if token else {}
+        url = url.removeprefix("github.com")
+        url = f"https://api.github.com/repos{url}"
+        try:
+            response = requests.get(url, headers=headers, timeout=5)
             if response.status_code != 200:
-                raise ConnectionError(f"Failed to connect to {url}")
-
-            response_url = response.url
-            return response_url
-        raise NameError("No VCS external reference found")
+                print(f"Could not connect to {url} {response.text}")
+                raise ConnectionError(
+                    f"Could not connect to GitHub API for {url}")
+        except requests.exceptions.ConnectionError as e:
+            raise e
