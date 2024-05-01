@@ -191,7 +191,7 @@ class Sbom:
                 continue
 
             # 2. Check if the dependency is a duplicate
-            if self._is_duplicate(url, version, dependencies):
+            if self._is_duplicate(name, url, version, dependencies):
                 continue
             if not url.startswith("github.com"):
                 continue
@@ -218,7 +218,11 @@ class Sbom:
         return new_dependencies
 
     def _is_duplicate(
-            self, name: str, version: str, dependencies: list[tuple]
+            self,
+            name: str,
+            git_url: str,
+            version: str,
+            dependencies: list[tuple]
             ) -> bool:
         """
         Checks if a dependency is a duplicate.
@@ -232,7 +236,8 @@ class Sbom:
             bool: True if the dependency is a duplicate, False otherwise.
         """
         for dependency in dependencies:
-            if name == dependency[0] and version == dependency[1]:
+            if name == dependency[0] and git_url == dependency[1] \
+                    and version == dependency[2]:
                 return True
         return False
 
@@ -285,8 +290,9 @@ class Sbom:
         git_repo_path = url_split.path.removesuffix(".git")
         pattern = r"\/([^\/]+)\/([^\/]+)"  # Match /owner/repo
         _match = search(pattern, git_repo_path)
-        if _match:
-            git_repo_path = _match.group(0)
+        if not _match:
+            raise ValueError("Could not parse git URL")
+        git_repo_path = _match.group(0)
         github_url = platform + git_repo_path
         return github_url
 
