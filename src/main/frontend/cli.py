@@ -49,7 +49,7 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     return mean_score
 
 
-def get_mean_scores(dependencies:list[Dependency]) -> \
+def calculate_mean_scores(dependencies:list[Dependency]) -> \
                                                 list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
@@ -109,28 +109,6 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
         colored_score = color_score(score[0], score[1])
         colored_scores.append(colored_score)
     return colored_scores
-
-
-def get_failed_dependencies(dependencies:list[Dependency]) -> \
-                                                list[list[Dependency, str]]:
-    """
-    Get all the failed dependencies and their failure reason.
-
-    Args:
-        dependencies (list[Dependency]): The dependencies to get the
-        failure reason for.
-
-    Returns:
-        list[list[Dependency, float]]: A list of lists containing the
-        dependency and their failure reason.
-    """
-    failed_dependencies = []
-
-    for dependency in dependencies:
-        dep_result = [dependency.name, dependency.failure_reason]
-        failed_dependencies.append(dep_result)
-
-    return failed_dependencies
 
 
 def parse_requirements(**kwargs) -> UserRequirements:
@@ -242,11 +220,11 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
         scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
         failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
 
-        mean_scores = get_mean_scores(scored_deps)
+        mean_scores = calculate_mean_scores(scored_deps)
         mean_scores = sorted(mean_scores, key=lambda x: x[1])
         mean_scores = color_scores(mean_scores)
 
-        failed_deps = get_failed_dependencies(failed_deps)
+        failed_deps = [[dep.name, dep.failure_reason] for dep in failed_deps]
 
         print(
             tabulate(mean_scores, headers=["Successful Dependencies", "Average Score"])
