@@ -3,3 +3,4 @@ flask
 tabulate
 packaging
 click
+validators

@@ -18,6 +18,7 @@ from pathlib import Path
 
 import click
 import requests
+import validators
 from tabulate import tabulate
 
 import main.constants as constants
@@ -140,8 +141,13 @@ def validate_backend(_ctx, _param, value: str):
     """
     Validates that the backend URL is a valid URL.
     """
-    # TODO: make sure backend URL is valid
-    return value
+    value = value.replace("localhost", "127.0.0.1")
+    validation_res = validators.url(value)
+    if isinstance(validation_res, validators.ValidationError):
+        print(validation_res)
+        raise click.BadParameter("Invalid backend URL.")
+    else:
+        return value
 
 
 def validate_git_token(_ctx, _param, value: str):
@@ -166,7 +172,6 @@ def ossqa_cli():
     """
     The entry point of the program.
     """
-    pass
 
 
 @ossqa_cli.command(help="Analyze the given SBOM.")
