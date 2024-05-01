@@ -65,6 +65,54 @@ class Sbom:
 
         return res
 
+    def get_scored_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_scored_dependencies()
+
+    def get_unscored_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_unscored_dependencies()
+
+    def get_failed_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_failed_dependencies()
+
+    def get_dependencies_by_filter(self, dependency_filter: callable) \
+            -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_dependencies_by_filter(
+            dependency_filter
+            )
+
+    def update_dependencies(self, dependencies: list[Dependency]) -> None:
+        """
+        Updates the dependencies of the SBOM.
+
+        Args:
+            dependencies (list[Dependency]): The dependencies to update.
+        """
+        self.dependency_manager.update(dependencies)
+
     def _check_format_of_sbom(self, sbom_file: dict) -> None:
         """
         Checks the format of the SBOM file.
