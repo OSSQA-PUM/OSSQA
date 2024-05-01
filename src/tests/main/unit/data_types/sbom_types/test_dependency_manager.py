@@ -28,11 +28,21 @@ def dependency_manager_5_dependencies():
     """
     Fixture to create a DependencyManager with 5 dependencies.
     """
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
-    dep2 = Dependency(name="github.com/repo/path", version="2.0")
-    dep3 = Dependency(name="github.com/repo/path", version="3.0")
-    dep4 = Dependency(name="github.com/repo/path", version="4.0")
-    dep5 = Dependency(name="github.com/repo/path", version="5.0")
+    dep1 = Dependency(
+        name="dep1", git_url="github.com/repo/path", version="1.0"
+        )
+    dep2 = Dependency(
+        name="dep2", git_url="github.com/repo/path", version="2.0"
+        )
+    dep3 = Dependency(
+        name="dep3", git_url="github.com/repo/path", version="3.0"
+        )
+    dep4 = Dependency(
+        name="dep4", git_url="github.com/repo/path", version="4.0"
+        )
+    dep5 = Dependency(
+        name="dep5", git_url="github.com/repo/path", version="5.0"
+        )
     dependencies = [dep1, dep2, dep3, dep4, dep5]
     dependency_manager = DependencyManager()
     dependency_manager.update(dependencies)
@@ -44,7 +54,7 @@ def dependency_manager_with_score():
     """
     Fixture to create a DependencyManager with a scored dependency.
     """
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
+    dep1 = Dependency(name="d1", git_url="github.com/repo/path", version="1.0")
     with (open(PATHS[0], "r", encoding="utf-8")) as file:
         scorecard = Scorecard(json.load(file))
     dep1.dependency_score = scorecard
@@ -58,7 +68,7 @@ def dependency_manager_failed_dependency():
     """
     Fixture to create a DependencyManager with a failed dependency.
     """
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
+    dep1 = Dependency(name="d1", git_url="github.com/repo/path", version="1.0")
     dep1.failure_reason = Exception("Failed to fetch dependency")
     dependency_manager = DependencyManager()
     dependency_manager.update([dep1])
@@ -70,14 +80,20 @@ def dep_mangr_with_distict_deps():
     """
     Fixture to create a DependencyManager with scored, unscored, and failed
     dependencies."""
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
+    dep1 = Dependency(
+        name="dep1", git_url="github.com/repo/path", version="1.0"
+        )
     with (open(PATHS[1], "r", encoding="utf-8")) as file:
         scorecard = Scorecard(json.load(file))
     dep1.dependency_score = scorecard
-    dep2 = Dependency(name="github.com/repo/path", version="2.0")
+    dep2 = Dependency(
+        name="dep2", git_url="github.com/repo/path", version="1.0"
+        )
     dep2.failure_reason = Exception("Failed to fetch dependency")
     dependency_manager = DependencyManager()
-    dep3 = Dependency(name="github.com/repo/path", version="3.0")
+    dep3 = Dependency(
+        name="dep3", git_url="github.com/repo/path", version="1.0"
+        )
     dependency_manager.update([dep1, dep2, dep3])
     return dependency_manager
 
@@ -104,7 +120,9 @@ def test_dependency_manager_update():
     Test the update method of the DependencyManager class when the manager is
     updated with a new dependency."""
     dependency_manager = DependencyManager()
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
+    dep1 = Dependency(
+        name="dep1", git_url="github.com/repo/path", version="1.0"
+        )
     dependency_manager.update([dep1])
     assert len(dependency_manager.get_unscored_dependencies()) == 1
 
@@ -153,7 +171,9 @@ def test_dependency_manager_update_same_dependency(
     Test the update method of the DependencyManager class when the same
     dependency is updated multiple times."""
     dependency_manager = dependency_manager_5_dependencies
-    new_dep = Dependency(name="github.com/repo/path", version="5.0")
+    new_dep = Dependency(
+        name="dep5", git_url="github.com/repo/path", version="5.0"
+        )
     dependency_manager.update([new_dep])
     dependency_manager.update([new_dep])
     dependency_manager.update([new_dep])
@@ -169,7 +189,9 @@ def test_dependency_manager_replace_scored_with_unscored(
     dependency is replaced with an unscored dependency.
     """
     dependency_manager = dependency_manager_with_score
-    new_dep = Dependency(name="github.com/repo/path", version="1.0")
+    new_dep = Dependency(
+        name="d1", git_url="github.com/repo/path", version="1.0"
+        )
     dependency_manager.update([new_dep])
     assert len(dependency_manager.get_unscored_dependencies()) == 0
     assert len(dependency_manager.get_scored_dependencies()) == 1
@@ -186,10 +208,12 @@ def test_dependency_manager_to_dict_filled(
     with (open(expected_paths[0], "r", encoding="utf-8")) as file:
         expected = json.load(file)
     dep_dict = dependency_manager.to_dict()
+    print(dep_dict)
     assert dep_dict["scored_dependencies"][0]["dependency_score"] == expected
     assert dep_dict["unscored_dependencies"] == \
-        [{'name': 'github.com/repo/path',
-          'version': '3.0',
+        [{'name': 'dep3',
+          'git_url': 'github.com/repo/path',
+          'version': '1.0',
           'dependency_score': None,
           'failure_reason': None}]
     assert isinstance(

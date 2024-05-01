@@ -84,6 +84,17 @@ def test_sbom_validation(sbom_bad):
         Sbom(sbom_bad)
 
 
+def test_sbom_dependency_manager(sbom_from_json):
+    """
+    Test that the dependency manager is correctly initialized.
+    """
+    sbom = Sbom(sbom_from_json)
+    assert sbom.dependency_manager is not None
+    assert len(sbom.dependency_manager.get_failed_dependencies()) == 0
+    assert len(sbom.dependency_manager.get_scored_dependencies()) == 0
+    assert len(sbom.dependency_manager.get_unscored_dependencies()) == 13
+
+
 def test_parse_git_url(sbom_component_url):
     """
     Test that the `_parse_git_url` method returns the correct URL.
@@ -91,11 +102,11 @@ def test_parse_git_url(sbom_component_url):
     sbom = Sbom(DUMMY_SBOM)
 
     if sbom_component_url.startswith("https://"):
-        parsed_url = sbom._parse_git_url(sbom_component_url)
+        parsed_url = sbom._parse_github_url(sbom_component_url)
         assert sbom_component_url.lstrip("https:/") == parsed_url
     else:
         with pytest.raises(Exception):
-            sbom._parse_git_url(sbom_component_url)
+            sbom._parse_github_url(sbom_component_url)
 
 
 def test_get_component_url(sbom_component):
@@ -103,10 +114,11 @@ def test_get_component_url(sbom_component):
     Test that the `_get_component_url` method returns the correct URL.
     """
     sbom = Sbom(DUMMY_SBOM)
-    component_url = sbom._get_component_url(sbom_component)
+    component_url = sbom._parse_component_name(sbom_component)
+    print(component_url)
     assert component_url is not None
     assert re.match(
-        r"https:\/\/github.com\/[^\/]+\/[^\/]+", component_url
+        r"github.com\/[^\/]+\/[^\/]+", component_url
         ) is not None
 
 
@@ -117,4 +129,4 @@ def test_get_component_url_bad():
     """
     sbom = Sbom(DUMMY_SBOM)
     with pytest.raises(Exception):
-        sbom._get_component_url({"bad": "component"})
+        sbom._parse_component_name({"bad": "component"})
