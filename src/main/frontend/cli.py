@@ -414,6 +414,12 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
 
 
 def analyze_sbom(args: Namespace) -> None:
+    """
+    Executes the command that analyzes an SBOM.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
     output, verbose, backend = parse_arguments_shared(args)
     path, requirements = parse_analyze_arguments(args)
 
@@ -448,6 +454,12 @@ def analyze_sbom(args: Namespace) -> None:
 
 
 def lookup_sbom_names(args: Namespace) -> None:
+    """
+    Executes the command that fetches all SBOM names from the backend.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
     output, verbose, backend = parse_arguments_shared(args)
     front_end_api = FrontEndAPI(backend)
     sbom_names = front_end_api.lookup_stored_sboms()
@@ -460,6 +472,13 @@ def lookup_sbom_names(args: Namespace) -> None:
 
 
 def lookup_sbom_details(args: Namespace) -> None:
+    """
+    Executes the command that fetches all SBOMs of a specific name
+    from the backend.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
     output, verbose, backend = parse_arguments_shared(args)
     repo_name = parse_lookup_arguments(args)
     front_end_api = FrontEndAPI(backend)
