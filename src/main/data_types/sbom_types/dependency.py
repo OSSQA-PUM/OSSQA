@@ -23,6 +23,7 @@ class Dependency:
     """
     component_name: str
     name: str
+    git_url: str  # Format: platform.repo/path
     version: str
     dependency_score: Scorecard = None
     failure_reason: Exception = None
@@ -37,7 +38,9 @@ class Dependency:
         Returns:
             bool: True if the dependencies are equal, False otherwise.
         """
-        return self.name == other.name and self.version == other.version
+        return self.name == other.name \
+            and self.git_url == other.git_url \
+            and self.version == other.version
 
     @property
     def platform(self) -> str:
@@ -47,7 +50,7 @@ class Dependency:
         Returns:
             str: The platform of the dependency.
         """
-        return self.name.split("/", maxsplit=1)[0]
+        return self.git_url.split("/", maxsplit=1)[0]
 
     @property
     def repo_path(self) -> str:
@@ -57,7 +60,7 @@ class Dependency:
         Returns:
             str: The repo path of the dependency.
         """
-        return self.name.split("/", maxsplit=1)[1]
+        return self.git_url.split("/", maxsplit=1)[1]
 
     @property
     def url(self) -> str:
@@ -67,7 +70,7 @@ class Dependency:
         Returns:
             str: The URL of the dependency.
         """
-        return f"https://{self.name}"
+        return f"https://{self.git_url}"
 
     def to_dict(self) -> dict:
         """
@@ -78,6 +81,7 @@ class Dependency:
         """
         return {
             "name": self.name,
+            "git_url": self.git_url,
             "version": self.version,
             "dependency_score": self.dependency_score.to_dict()
             if self.dependency_score else None,
