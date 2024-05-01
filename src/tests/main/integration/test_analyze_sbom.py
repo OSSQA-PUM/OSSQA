@@ -11,7 +11,7 @@ import pytest
 import requests
 
 from main.backend_communication import BackendCommunication
-from main.frontend.cli import run_cli
+from main.frontend.cli import ossqa_cli
 from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessor
 from main.data_types.dependency_scorer import StepResponse
@@ -142,16 +142,20 @@ class TestAnalyzeSBOM:
     def test_cli(self, sbom_path: Path, git_token: str):
         before_test()
 
-        # Temporarily overwrite sys.argv, then call cli::run_cli
+        # Temporarily overwrite sys.argv, then run the CLI
         mock_args = [
             "prog",
-            "-a",
-            "-p", str(sbom_path),
+            "analyze",
             "-g", git_token,
             "--backend", HOST,
+            str(sbom_path),
         ]
         with patch("sys.argv", mock_args):
             assert sys.argv == mock_args
-            run_cli()
+            try:
+                ossqa_cli()
+            except SystemExit as e:
+                # Click explicitly calls sys.exit, so this needs to be caught
+                assert e.code == 0
 
         after_test()
