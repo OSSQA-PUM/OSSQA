@@ -65,6 +65,8 @@ def test_dependency_not_eq():
     dep3 = Dependency(name="dep1", component_name="com2", version="1.1")
     assert dep1 != dep2
     assert dep1 != dep3
+    assert dep1 != dep4
+    assert dep4 != dep5
 
 
 def test_dependency_platform(dependency_basic):
@@ -85,7 +87,7 @@ def test_dependency_url(dependency_basic):
     """
     Test that the url property of a Dependency object is correct.
     """
-    assert dependency_basic.url == f"https://{DEPENDENCY_NAME}"
+    assert dependency_basic.url == f"https://{DEPENDENCY_URL}"
 
 
 def test_dependency_basic_to_dict(dependency_basic):
@@ -97,6 +99,7 @@ def test_dependency_basic_to_dict(dependency_basic):
     assert "name" in dep_dict
     assert "version" in dep_dict
     assert dep_dict["name"] == DEPENDENCY_NAME
+    assert dep_dict["git_url"] == DEPENDENCY_URL
     assert dep_dict["version"] == "1.0"
 
 
@@ -108,6 +111,7 @@ def test_dependency_scorecard_to_dict(dependency_scorecard):
     dep_dict = dependency_scorecard.to_dict()
     assert "name" in dep_dict
     assert "version" in dep_dict
+    assert "git_url" in dep_dict
     assert dep_dict["name"] == DEPENDENCY_NAME
     assert dep_dict["version"] == "1.0"
     assert "dependency_score" in dep_dict

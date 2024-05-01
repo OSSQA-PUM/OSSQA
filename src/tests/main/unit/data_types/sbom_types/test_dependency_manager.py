@@ -186,10 +186,12 @@ def test_dependency_manager_to_dict_filled(
     with (open(expected_paths[0], "r", encoding="utf-8")) as file:
         expected = json.load(file)
     dep_dict = dependency_manager.to_dict()
+    print(dep_dict)
     assert dep_dict["scored_dependencies"][0]["dependency_score"] == expected
     assert dep_dict["unscored_dependencies"] == \
-        [{'name': 'github.com/repo/path',
-          'version': '3.0',
+        [{'name': 'dep3',
+          'git_url': 'github.com/repo/path',
+          'version': '1.0',
           'dependency_score': None,
           'failure_reason': None}]
     assert isinstance(
