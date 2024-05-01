@@ -101,7 +101,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         return jsonify(list(names)), 200
 
 
-    @app.route("/sbom/<repo_name>", methods=["GET"])
+    @app.route("/sbom/<path:repo_name>", methods=["GET"])
     def get_sboms_by_name(repo_name: str):
         """
         Gets a list of SBOMs with a specific name.

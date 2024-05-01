@@ -137,7 +137,10 @@ class SbomProcessor:
             list[str]: The list of the SBOM names
         """
         # Look up stored SBOMs
-        return self.backend_communication.get_sbom_names()
+        self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
+        sbom_names = self.backend_communication.get_sbom_names()
+        self._set_event_state(SbomProcessorStates.COMPLETED)
+        return sbom_names
 
     def lookup_previous_sboms(self, name: str) -> list[Sbom]:
         """
@@ -149,4 +152,7 @@ class SbomProcessor:
         Returns:
             list[dict]: The list of the SBOMs with the same name.
         """
-        return self.backend_communication.get_sboms_by_name(name)
+        self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
+        sboms = self.backend_communication.get_sboms_by_name(name)
+        self._set_event_state(SbomProcessorStates.COMPLETED)
+        return sboms

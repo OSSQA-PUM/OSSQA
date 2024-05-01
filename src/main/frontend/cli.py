@@ -67,12 +67,16 @@ def create_parser() -> ArgumentParser:
     """
 
     run_type_group.add_argument(
-        "-a", "--analyze",
-        action="store_true", help="Analyze SBOM file."
+        "-a", "--analyze", action="store_true",
+        help="Analyze SBOM file."
+    )
+    run_type_group.add_argument(
+        "-s", "--sboms", action="store_true",
+        help="Lookup repository names of SBOMs in the database."
     )
     run_type_group.add_argument(
         "-l", "--lookup", action="store_true",
-        help="Lookup SBOM in database."
+        help="Lookup details of an SBOM in the database."
     )
 
 
@@ -119,17 +123,11 @@ def create_parser() -> ArgumentParser:
         help="    The git token."
     )
 
-    parser.add_argument(
-        "--backend", metavar='\b', type=str,
-        default=constants.HOST,
-        help="The URL of the backend."
-    )
-
 
     # Lookup command
     parser.add_argument(
-        "-i", "--id", metavar='\b', type=int,
-        help="    The ID of the SBOM."
+        "-n", "--name", metavar='\b', type=str,
+        help="    The repository name of the SBOM."
     )
 
     # Shared
@@ -142,6 +140,12 @@ def create_parser() -> ArgumentParser:
     parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="Verbose output."
+    )
+
+    parser.add_argument(
+        "--backend", metavar='\b', type=str,
+        default=constants.HOST,
+        help="The URL of the backend."
     )
 
     return parser
@@ -279,23 +283,23 @@ def parse_analyze_arguments(args: Namespace) -> tuple[str, UserRequirements]:
 
 def parse_lookup_arguments(args: Namespace) -> int:
     """
-    Parses the lookup arguments and returns the ID.
+    Parses the lookup arguments and returns the repository name.
 
     Args:
         args (Namespace): The parsed command-line arguments.
 
     Returns:
-        int: The ID extracted from the arguments.
+        str: The repository name extracted from the arguments.
 
     Raises:
-        SystemExit: If the required argument [-i | --id] is missing.
+        SystemExit: If the required argument [-n | --name] is missing.
     """
-    if not args.id:
-        print("Please add the argument [-i | --id] [ID]")
+    if not args.name:
+        print("Please add the argument [-n | --name] [NAME]")
         exit(1)
 
-    smob_id: int = args.id
-    return smob_id
+    repo_name: str = args.name
+    return repo_name
 
 
 def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
@@ -311,6 +315,7 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
     """
     output: str = "table"
     verbose: bool = False
+    backend: str = constants.HOST
 
     if args.output:
         output: str = args.output
@@ -318,7 +323,10 @@ def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
     if args.verbose:
         verbose: bool = args.verbose
 
-    return output, verbose
+    if args.backend:
+        backend: str = args.backend
+
+    return output, verbose, backend
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
@@ -405,49 +413,119 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
     return colored_scores
 
 
+def analyze_sbom(args: Namespace) -> None:
+    """
+    Executes the command that analyzes an SBOM.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
+    output, verbose, backend = parse_arguments_shared(args)
+    path, requirements = parse_analyze_arguments(args)
+
+    with open(path, encoding='utf-8') as f:
+        sbom_dict: dict = json.load(f)
+        sbom = Sbom(sbom_dict)
+
+    # print(sbom.to_dict())
+    api = FrontEndAPI(backend)
+    # TODO handle errors
+
+    scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
+
+    scores = scored_sbom.dependency_manager.get_scored_dependencies()
+
+    # TEMPORARY: Fill with test scores
+    # scores = scored_sbom.dependency_manager.get_unscored_dependencies()
+    # scores = fill_with_test_scores(scores)
+    # END TEMPORARY
+
+    if output != "json":
+        mean_scores = get_mean_scores(scores)
+        mean_scores = sorted(mean_scores, key=lambda x: x[1])
+        mean_scores = color_scores(mean_scores)
+
+        print(
+            tabulate(mean_scores, headers=["Dependency", "Average Score"])
+        )
+    else:
+        json_results = scored_sbom.dependency_manager.to_dict()
+        print(json.dumps(json_results))
+
+
+def lookup_sbom_names(args: Namespace) -> None:
+    """
+    Executes the command that fetches all SBOM names from the backend.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
+    output, verbose, backend = parse_arguments_shared(args)
+    front_end_api = FrontEndAPI(backend)
+    sbom_names = front_end_api.lookup_stored_sboms()
+
+    if output != "json":
+        table = tabulate([sbom_names], headers=["Repository Names"])
+        print(table)
+    else:
+        print(json.dumps(sbom_names))
+
+
+def lookup_sbom_details(args: Namespace) -> None:
+    """
+    Executes the command that fetches all SBOMs of a specific name
+    from the backend.
+
+    Args:
+        args (Namespace): The parsed arguments of the program.
+    """
+    output, verbose, backend = parse_arguments_shared(args)
+    repo_name = parse_lookup_arguments(args)
+    front_end_api = FrontEndAPI(backend)
+    sboms = front_end_api.lookup_previous_sboms(repo_name)
+
+    if output != "json":
+        table_data = []
+        for sbom in sboms:
+            dependencies = sbom.dependency_manager.get_dependencies_by_filter(
+                lambda _: True
+            )
+            sbom_data = [
+                sbom.serial_number,
+                sbom.version,
+                sbom.repo_name,
+                sbom.repo_version,
+                len(dependencies),
+            ]
+            table_data.append(sbom_data)
+
+        table_headers = [
+            "Serial number",
+            "Version",
+            "Repo name",
+            "Repo version",
+            "Dependency count"
+        ]
+        table = tabulate(table_data, headers=table_headers)
+        print(table)
+    else:
+        sbom_dicts = [sbom.to_dict() for sbom in sboms]
+        print(json.dumps(sbom_dicts))
+
+
 def run_cli():
     """
     Main function that handles the execution of the program.
     """
     parser: ArgumentParser = create_parser()
     args: Namespace = parser.parse_args()
-    output, verbose = parse_arguments_shared(args)
 
     if args.analyze:
-        path, requirements = parse_analyze_arguments(args)
-        with open(path, encoding='utf-8') as f:
-            sbom_dict: dict = json.load(f)
-            sbom = Sbom(sbom_dict)
-
-        # print(sbom.to_dict())
-        api = FrontEndAPI(args.backend)
-        # TODO handle errors
-        
-        scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
-
-        scores = scored_sbom.dependency_manager.get_scored_dependencies()
-
-        # TEMPORARY: Fill with test scores
-        # scores = scored_sbom.dependency_manager.get_unscored_dependencies()
-        # scores = fill_with_test_scores(scores)
-        # END TEMPORARY
-
-        if args.output != "json":
-            mean_scores = get_mean_scores(scores)
-            mean_scores = sorted(mean_scores, key=lambda x: x[1])
-            mean_scores = color_scores(mean_scores)
-
-            print(
-                tabulate(mean_scores, headers=["Dependency", "Average Score"])
-            )
-        else:
-            json_results = scored_sbom.dependency_manager.to_dict()
-            print(json.dumps(json_results))
-        return
-
-    sbom_id = parse_lookup_arguments(args)
-    print(sbom_id)
-    print(output, verbose)
+        analyze_sbom(args)
+    elif args.sboms:
+        lookup_sbom_names(args)
+    elif args.lookup:
+        lookup_sbom_details(args)
 
 
 def fill_with_test_scores(dependencies: list[Dependency]) -> list[Dependency]:

@@ -108,7 +108,7 @@ class Sbom:
 
         # Checks if name of SBOM exists
         try:
-            name = sbom_file["metadata"]["tools"][0]["name"]
+            name = sbom_file["metadata"]["component"]["name"]
         except (IndexError, KeyError):
             name = ""
 
@@ -145,6 +145,15 @@ class Sbom:
         name = ""
         version = ""
         try:
+            # TODO: The name of the component is not in the url.
+            #       According to the CycloneDX documentation,
+            #       each component has a name that can be accessed via
+            #       component["name"].
+            #       This should be fixed, preferably by storing the
+            #       URL in it's own variable in Dependency, so
+            #       that OSSQA adheres to the CycloneDX format,
+            #       which in turn makes the behavior of the program
+            #       more predictable.
             name = self._parse_git_url(
                 self._get_component_url(component=component)
                 )

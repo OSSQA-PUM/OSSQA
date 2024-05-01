@@ -41,7 +41,7 @@ class BackendCommunication:
         try:
             resp = requests.post(
                 self.host + "/sbom", json=sbom.to_dict(), timeout=5
-                )
+            )
             if resp.status_code == 500:
                 self.on_status_changed.invoke(
                     StepResponse(0, 0, 0, 0, "The sbom could not be uploaded")
@@ -69,10 +69,13 @@ class BackendCommunication:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
                 StepResponse(0, 0, 0, 0, "The request timed out")
-                )
+            )
 
         result: list[Sbom] = []
         if response.status_code != 200:
+            self.on_status_changed.invoke(
+                StepResponse(0, 0, 0, 0, "An error occurred in the database")
+            )
             return result
 
         for sbom in response.json():
@@ -94,8 +97,15 @@ class BackendCommunication:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
                 StepResponse(0, 0, 0, 0, "The request timed out")
-                )
-        return response.json() if response.status_code == 200 else []
+            )
+
+        if response.status_code != 200:
+            self.on_status_changed.invoke(
+                StepResponse(0, 0, 0, 0, "An error occurred in the database")
+            )
+            return []
+
+        return response.json()
 
 
 class BackendFetcher(DependencyScorer):
