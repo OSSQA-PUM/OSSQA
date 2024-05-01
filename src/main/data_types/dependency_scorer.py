@@ -77,28 +77,24 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        """
         with Pool() as pool:
             for index, dependency in enumerate(
                     pool.imap(self._request_ssf_api, dependencies)
                     ):
-        """
-        for index, dependency in enumerate(dependencies):
-            dependency = self._request_ssf_api(dependency)
-            if dependency.dependency_score:
-                successful_items += 1
-            else:
-                failed_items += 1
+                if dependency.dependency_score:
+                    successful_items += 1
+                else:
+                    failed_items += 1
 
-            new_dependencies.append(dependency)
-            self.on_step_complete.invoke(
-                StepResponse(
-                    batch_size,
-                    index + 1,
-                    successful_items,
-                    failed_items
+                new_dependencies.append(dependency)
+                self.on_step_complete.invoke(
+                    StepResponse(
+                        batch_size,
+                        index + 1,
+                        successful_items,
+                        failed_items
+                    )
                 )
-            )
 
         return new_dependencies
 
