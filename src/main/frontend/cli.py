@@ -160,7 +160,7 @@ def validate_git_token(_ctx, _param, value: str):
                                  "provide a non-empty string.")
 
     url = "https://api.github.com/user"
-    headers = {"Authorization": f"token {value}"}
+    headers = {"Authorization": f"Bearer {value}"}
     response = requests.get(url, headers=headers, timeout=5)
 
     # TODO: Could do more extensive error-checking here.
