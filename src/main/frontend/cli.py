@@ -167,7 +167,7 @@ def validate_git_token(_ctx, _param, value: str):
         return value
 
 
-@click.group(context_settings={"max_content_width": 100})
+@click.group(context_settings={"max_content_width": 120, "show_default": True})
 def ossqa_cli():
     """
     The entry point of the program.
@@ -178,8 +178,9 @@ def ossqa_cli():
 @click.argument("path", required=True,
                 type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.option("-g", "--git-token", type=str, envvar="GITHUB_AUTH_TOKEN",
-              required=True, callback=validate_git_token,
-              help="GitHub Personal Access Token.")
+              callback=validate_git_token,
+              help=("GitHub Personal Access Token."
+                    "  [default: GITHUB_AUTH_TOKEN env variable]"))
 
 @click.option("-wc", "--code-vulnerabilities", type=click.IntRange(0, 10),
               required=False, default=10,
