@@ -181,8 +181,6 @@ def ossqa_cli():
               required=True, callback=validate_git_token,
               help="GitHub Personal Access Token.")
 
-#@click.option("-r", "--requirements", type=str, required=False,
-#              default="[10,10,10,10,10]", help="OpenSSF Scorecard category weights.")
 @click.option("-wc", "--code-vulnerabilities", type=click.IntRange(0, 10),
               required=False, default=10,
               help="Weight for Code Vulnerabilities category.")
