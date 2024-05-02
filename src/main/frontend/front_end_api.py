@@ -88,4 +88,5 @@ class FrontEndAPI:
         Returns:
             list[Sbom]: The list of SBOMs with the specified name.
         """
+        print("frontend api lookup_previous_sboms")
         return self.sbom_processor.lookup_previous_sboms(name)
