@@ -154,6 +154,11 @@ def validate_git_token(_ctx, _param, value: str):
     """
     Validates that a GitHub Personal Access Token is valid.
     """
+    if not value:
+        raise click.BadParameter("The token cannot be empty, please set "
+                                 "environment variable 'GITHUB_AUTH_TOKEN' or "
+                                 "provide a non-empty string.")
+
     url = "https://api.github.com/user"
     headers = {"Authorization": f"token {value}"}
     response = requests.get(url, headers=headers, timeout=5)
