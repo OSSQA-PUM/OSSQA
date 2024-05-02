@@ -79,7 +79,9 @@ class BackendCommunication:
             return result
 
         for sbom in response.json():
+            print("before")
             sbom_obj = Sbom(sbom=sbom)
+            print("after")
             result.append(sbom_obj)
 
         return result

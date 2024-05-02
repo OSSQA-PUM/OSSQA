@@ -152,7 +152,9 @@ class SbomProcessor:
         Returns:
             list[dict]: The list of the SBOMs with the same name.
         """
+        print("sbom processor lookup_previous_sboms")
         self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
         sboms = self.backend_communication.get_sboms_by_name(name)
         self._set_event_state(SbomProcessorStates.COMPLETED)
+        print("sbom returns to frontend api")
         return sboms
