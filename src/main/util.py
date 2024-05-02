@@ -7,8 +7,8 @@ Functions:
 """
 import re
 import os
+import datetime
 import requests
-from datetime import datetime
 from packaging import version as version_parser
 
 
@@ -69,16 +69,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
     # Check if the rate limit is exceeded
     if response.status_code == 403 \
             and "API rate limit exceeded" in response.json()["message"]:
-        reset_time = response.headers.get("X-RateLimit-Reset")
-
-        # Convert the reset time to a human-readable format
-        reset_time = datetime.datetime.fromtimestamp(int(reset_time))
-        reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
-
-        raise ConnectionRefusedError(
-            (f"GitHub API rate limit exceeded. Try again later."
-             f"Rate limit resets at {reset_time}.")
-            )
+        github_token_refused(response)
 
     # Check if the response is successful
     if response.status_code != 200:
@@ -137,3 +128,19 @@ def get_github_token() -> str:
             "GitHub authentication token not found in environment"
             )
     return token
+
+
+def github_token_refused(response: requests.Response) -> None:
+    """
+    Raises an error if the GitHub API rate limit is exceeded.
+    """
+    reset_time = response.headers.get("X-RateLimit-Reset")
+
+    # Convert the reset time to a human-readable format
+    reset_time = datetime.datetime.fromtimestamp(int(reset_time))
+    reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
+
+    raise ConnectionRefusedError(
+        (f"GitHub API rate limit exceeded. Try again later. "
+            f"Rate limit resets at {reset_time}.")
+            )
