@@ -15,11 +15,11 @@ import json
 import copy
 import os
 from time import sleep
+import requests
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.event import Event
 from main.util import get_git_sha1
-import requests
 
 
 @dataclass
@@ -39,11 +39,13 @@ class DependencyScorer(ABC):
     Represents a dependency scorer.
     """
     on_step_complete: Event[StepResponse]
+    _scored_dependencies: list[Dependency]
 
     def __init__(self, callback: Callable[[StepResponse], Any]) -> None:
         super().__init__()
         self.on_step_complete = Event[StepResponse]()
         self.on_step_complete.subscribe(callback)
+        self._scored_dependencies = []
 
     @abstractmethod
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
@@ -56,6 +58,27 @@ class DependencyScorer(ABC):
         Returns:
             list[Dependency]: The scored dependencies.
         """
+
+    def _check_if_scored(self, dependency: Dependency) -> bool:
+        """
+        Checks if a dependency has already been scored.
+        Also updates the dependency with the score if it has been scored.
+
+        Args:
+            dependency (Dependency): The dependency to check.
+
+        Returns:
+            bool: True if the dependency has already been scored,
+                  False otherwise.
+        """
+        for scored_dep in self._scored_dependencies:
+            if (dependency.git_url == scored_dep.git_url and
+                    dependency.component_version ==
+                    scored_dep.component_version):
+                dependency.dependency_score = scored_dep.dependency_score
+                dependency.failure_reason = scored_dep.failure_reason
+                return True
+        return False
 
 
 class SSFAPIFetcher(DependencyScorer):
@@ -114,7 +137,12 @@ class SSFAPIFetcher(DependencyScorer):
 
         new_dependency: Dependency = copy.deepcopy(dependency)
 
+        # Check if the dependency has already been scored
+        if self._check_if_scored(new_dependency):
+            return new_dependency
+
         try:
+<<<<<<< HEAD
             sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
                                 dependency.component_name, "release")
         except (ConnectionRefusedError, AssertionError, ValueError):
@@ -125,10 +153,25 @@ class SSFAPIFetcher(DependencyScorer):
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
+=======
+            sha1 = get_git_sha1(dependency.repo_path,
+                                dependency.component_version)
+        except (ConnectionRefusedError,
+                AssertionError,
+                ValueError,
+                KeyError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+>>>>>>> d693922 (Add variable to DependencyScorer for already found scores)
 
         try:
-            score = self._lookup_ssf_api(dependency.url.lstrip("htps:/"), sha1)
+            score = self._lookup_ssf_api(
+                dependency.git_url.lstrip("htps:/"),
+                sha1
+                )
             new_dependency.dependency_score = score
+            self._scored_dependencies.append(new_dependency)
             new_dependency.failure_reason = None
             return new_dependency
         except requests.exceptions.RequestException as e:
@@ -150,7 +193,7 @@ class SSFAPIFetcher(DependencyScorer):
         try:
             score = requests.get(
                 ("https://api.securityscorecards.dev/projects/"
-                 f"{git_url}/?commit={sha1}"),
+                    f"{git_url}/?commit={sha1}"),
                 timeout=10
                 )
             # TODO: Currently not checking version or commit
@@ -158,7 +201,8 @@ class SSFAPIFetcher(DependencyScorer):
             # that the version used was not the version entered.
             if score.status_code != 200:
                 score = requests.get(
-                    f"https://api.securityscorecards.dev/projects/{git_url}",
+                    (f"https://api.securityscorecards.dev"
+                        f"/projects/{git_url}"),
                     timeout=10
                 )
             if score.status_code != 200:
@@ -240,8 +284,14 @@ class ScorecardAnalyzer(DependencyScorer):
             f"dependency: {dependency} is not a Dependency object"
 
         new_dependency: Dependency = copy.deepcopy(dependency)
+
+        # Check if the dependency has already been scored
+        if self._check_if_scored(new_dependency):
+            return new_dependency
+
         try:
             version_git_sha1: str = get_git_sha1(
+<<<<<<< HEAD
                 new_dependency.repo_path, new_dependency.version, 
                 dependency.component_name, "release"
             )
@@ -255,6 +305,17 @@ class ScorecardAnalyzer(DependencyScorer):
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
+=======
+                new_dependency.repo_path, new_dependency.component_version
+                )
+        except (ConnectionRefusedError,
+                AssertionError,
+                ValueError,
+                KeyError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+>>>>>>> d693922 (Add variable to DependencyScorer for already found scores)
 
         remaining_tries: int = 3
         retry_interval: int = 3
@@ -263,16 +324,19 @@ class ScorecardAnalyzer(DependencyScorer):
             try:
                 remaining_tries -= 1
                 scorecard: Scorecard = self._execute_scorecard(
-                    new_dependency.url, version_git_sha1
+                    new_dependency.git_url, version_git_sha1
                     )
+
                 new_dependency.dependency_score = scorecard
+                self._scored_dependencies.append(new_dependency)
+
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
                     json.JSONDecodeError, ValueError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
-                sleep(retry_interval)
+                sleep(retry_interval)  # Wait before retrying
                 continue
 
         # Successful execution of scorecard
