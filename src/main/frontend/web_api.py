@@ -34,7 +34,6 @@ def analyze():
         user_reqs_param = data['user_reqs']
     except (KeyError, TypeError):
         user_reqs_param = "[10, 10, 10, 10, 10,10, 10, 10, 10, 10,10, 10, 10, 10, 10, 10, 10, 10]"
-    print(user_reqs_param)
     user_reqs_param = json.loads(user_reqs_param)
     user_reqs_dict = {
         RequirementsType.VULNERABILITIES: user_reqs_param["Vulnerabilities"],

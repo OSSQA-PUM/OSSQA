@@ -119,7 +119,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Gets a list of SBOMs with a specific name.
 
         Args:
-            name (str): The name to query the database with.
+            repo_name (str): The name to query the database with.
 
         Returns:
             json (array): The list of SBOMs.
