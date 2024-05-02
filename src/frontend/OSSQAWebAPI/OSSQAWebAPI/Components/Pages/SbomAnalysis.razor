@@ -45,7 +45,7 @@
 else
 {
     <div class="d-flex flex-column align-items-center justify-content-center">
-        <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
+        <MatButton Raised="true" OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
     </div>
 }
 @* show failed dependencies and reason, not working at the moment*@
@@ -70,7 +70,7 @@ else
     private float score = 0;
     Dictionary<string, string> statusInfo = new();
     string status = "";
-    private string fullSBOM = "";
+    private string fullSBOM = "full sbom";
     private Status statusObj;
     Sbom sbom;
     [Parameter]
@@ -100,7 +100,6 @@ else
             {
                 SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
-                fullSBOM = SBOMString;
 
                 try
                 {
