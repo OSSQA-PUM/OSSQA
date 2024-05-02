@@ -22,7 +22,7 @@ class Check(db.Model):
     name = db.Column(db.String(255), unique=False)
     score = db.Column(db.Integer, unique=False)
     reason = db.Column(db.String(255), unique=False)
-    # TODO details
+    details = db.Column(db.String(255), unique=False)
 
     scorecard_id = db.Column(db.Integer, db.ForeignKey("scorecard.id"),
                              nullable=False)
@@ -30,9 +30,9 @@ class Check(db.Model):
     def to_dict(self) -> dict:
         return {
             "name": self.name,
-            "score": self.name,
+            "score": self.score,
             "reason": self.reason,
-            # TODO details,
+            "details": self.details
         }
 
 
