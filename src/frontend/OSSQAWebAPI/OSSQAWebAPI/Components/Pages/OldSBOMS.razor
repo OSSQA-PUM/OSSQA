@@ -1,0 +1,76 @@
+﻿@inject NavigationManager _navigationManager
+@using System.Text.Json
+@using System.Text;
+@using static SbomAnalysis
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <h4 style="margin-bottom:3em; margin-top:3em;">Look up Previously Analyzed SBOMs in the Database</h4>
+    <div class ="d-flex justify-content-center align-items-center">
+        <MatTextField Label="input SBOM version number" Value="@versionNumber" Style="margin-right:2em; max-height:5em; width:30vw;"></MatTextField>
+        <h4>OR</h4>
+        <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@ChosenSbom.ToString()></MatFileUpload>
+    </div>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" OnClick='()=> GetPrevious()'>Get previous</MatButton>
+    <p> @versionNumber</p>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:10em;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
+</div>
+
+@code {
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    private int versionNumber = -1;
+    private IMatFileUploadEntry? file;
+    private bool loadedFile = false;
+    public StringBuilder ChosenSbom = new StringBuilder();
+    protected override void OnParametersSet()
+    {
+        if (ChosenSbom.Length == 0)
+        {
+            ChosenSbom.Append("Drag SBOM here or browse");
+        }
+
+    }
+    private async Task LoadSBOM()
+    {
+
+        using var memoryStream = new MemoryStream();
+        if (file == null)
+        {
+            return;
+        }
+        await file.WriteToStreamAsync(memoryStream);
+
+        string sbomString = Encoding.UTF8.GetString(memoryStream.ToArray());
+        try
+        {
+            Sbom sbom = JsonSerializer.Deserialize<Sbom>(sbomString);
+            versionNumber = sbom.version;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw(e);
+        }
+        loadedFile = true;
+        StateHasChangedCallback.Invoke();
+    }
+
+    private void GetInput(IMatFileUploadEntry[] files)
+    {
+        foreach (var f in files)
+        {
+            file = f;
+        }
+        ChosenSbom.Clear();
+        ChosenSbom.Append(file?.Name ?? "Drag SBOM here or browse");
+        _ = LoadSBOM();
+    }
+    private void GetPrevious()
+    {
+        if (versionNumber == -1)
+        {
+            return;
+        }
+    }
+
+}

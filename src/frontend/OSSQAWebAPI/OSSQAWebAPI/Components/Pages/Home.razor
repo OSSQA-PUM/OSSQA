@@ -1,15 +1,13 @@
-﻿@page "/"
+﻿@*This class stores all information that will otherwise get wiped when refreshing components *@
+@page "/"
 
 @using System.Diagnostics
 @rendermode InteractiveServer
 @using System.Text
-@using static SbomAnalysis.Check
-@using static SbomAnalysis.Dependency
-@using static SbomAnalysis.Status
-<PageTitle>OSSQA</PageTitle>
-<MatThemeProvider Theme="@theme">
-@*This class stores all information that will otherwise get wiped when refreshing components *@
+@using static SbomAnalysis
 
+
+<MatThemeProvider Theme="@theme">
     @*shows correct tabs if analysis is complete*@
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
 {
@@ -37,39 +35,60 @@
     @* if the user has not chosen sbom or requirements *@
 else if(!ready)
 {
-    <MatTabGroup @bind-ActiveIndex="@activeTab">
-        <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
-            <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
-        </MatTab>
+    if (viewOld)
+    {
+            <OldSBOMS StateHasChangedCallback="StateHasChangedCallback" />
+    }
+    else
+    {
+        <MatTabGroup @bind-ActiveIndex="@activeTab">
+            <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
+                <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
+            </MatTab>
             <MatTab Label="Specify Requirements" @onclick="()=>activeTab = 1">
-            <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
-        </MatTab>
-    </MatTabGroup>
+                <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
+            </MatTab>
+        </MatTabGroup>
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
+        </div>
+    }
+
 }
+
     @* start analysis if done *@
 else
 {
         <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />
 }
 
+
+
+
+
 </MatThemeProvider>
 
 
+
+
 @code {
-    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
+    private Dictionary<string, List<Check>> SbomResult = new();
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
-    private List<SbomAnalysis.Dependency> FailedDependencies = new();
+    private List<Dependency> FailedDependencies = new();
+    public int activeTab = 0;
+    private Dictionary<string, string> PostData = new();
+    private string SBOM = "";
+    bool ready = false;
+    bool viewOld = false;
+    
     private Action StateHasChangedCallback =>()=>
     {
         UpdateTab();
         InvokeAsync(StateHasChanged);
     };
-    public int activeTab = 0;
-    private Dictionary<string, string> PostData = new();
-    private string SBOM = "";
-    bool ready = false;
+
 
     private void UpdateTab()
     {
