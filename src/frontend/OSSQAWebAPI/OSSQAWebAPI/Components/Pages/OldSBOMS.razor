@@ -21,6 +21,7 @@
 
 @if(Analyzing.CurrentCount == 1)
 {
+    <p>previous sboms</p>
     <div class="d-flex flex-wrap justify-content-evenly">
         @foreach (var sbom in sboms)
         {
@@ -93,7 +94,7 @@
         {
             return;
         }
-        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/get_previous_sbom", PostData);
+        var analyzeTask = Http.GetAsync("http://host.docker.internal:98/get_previous_sbom/"+ name);
 
         Analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
