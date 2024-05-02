@@ -86,8 +86,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         db.session.commit()
         return "", 201
 
-
-    @app.route("/sbom", methods=["GET"])
+    @app.route("/get_all_sboms", methods=["GET"])
     def get_sbom_names():
         """
         Gets the name of every SBOM in the database.
@@ -100,20 +99,27 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             names.add(sbom.repo_name)
         return jsonify(list(names)), 200
 
-
-    @app.route("/sbom/<path:repo_name>", methods=["GET"])
-    def get_sboms_by_name(repo_name: str):
+    @app.route("/get_sbom", methods=["GET", "POST"])
+    def get_sboms_by_name():
         """
         Gets a list of SBOMs with a specific name.
 
         Args:
-            name (str): The name to query the database with.
+            repo_name (str): The name to query the database with.
 
         Returns:
             json (array): The list of SBOMs.
         """
-        sboms = SBOM.query.filter_by(repo_name=repo_name).all()
+
+        print("looking for sbom in database")
+        if not request.is_json:
+            return "", 400
+        sbom_name = request.json["name"]
+        print(sbom_name)
+        sboms = SBOM.query.filter_by(repo_name=sbom_name).all()
+
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
+        print("found" + str(len(sbom_dicts)) + "sboms in database")
         return jsonify(sbom_dicts), 200
 
     @app.route("/dependency/existing", methods=["GET"])
