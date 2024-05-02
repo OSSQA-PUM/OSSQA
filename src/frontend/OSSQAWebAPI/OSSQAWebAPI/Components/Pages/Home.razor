@@ -11,7 +11,7 @@
     @*shows correct tabs if analysis is complete*@
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
 {
-    <MatTabGroup>
+    <MatTabGroup Style="margin-bottom:2em;">
         <MatTab Label="Home">
             <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
         </MatTab>
@@ -29,8 +29,14 @@
         </MatTab>
         <MatTab Label="Build Risk Assessment">
             <ViewResults SbomResult="SbomResult" Tests='[ "Pinned-Dependencies", "Token-Permissions"]' />
+        </MatTab>
+            @if(FailedComponents.Count > 0)
+            {
+                <MatTab Label="Failed Components">
+                    <ShowFailedComponents FailedComponents="FailedComponents" />
                 </MatTab>
-    </MatTabGroup>
+            }
+        </MatTabGroup>
 }
     @* if the user has not chosen sbom or requirements *@
 else if(!ready)
@@ -58,7 +64,7 @@ else if(!ready)
     @* start analysis if done *@
 else
 {
-        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />
+        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedComponents="FailedComponents" />
 }
 
 </MatThemeProvider>
@@ -71,7 +77,7 @@ else
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<int> Requirements = new() { 0, 0, 0, 0, 0 };
-    private List<Dependency> FailedDependencies = new();
+    private List<Dependency> FailedComponents = new();
     public int activeTab = 0;
     private Dictionary<string, string> PostData = new();
     private string SBOM = "";

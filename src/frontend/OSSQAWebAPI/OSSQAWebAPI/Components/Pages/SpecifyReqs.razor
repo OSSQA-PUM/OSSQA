@@ -3,16 +3,15 @@
 @* this component handles user requirement inputs*@
 
 
-<ViewLogo />
 <div class="d-flex justify-content-center align-items-center flex-column">
-    <h2 style="margin-bottom:1em;">Specify requirement weights</h2>
+    <h3 style="margin-bottom:1em;margin-top:1em;">Specify requirement weights</h3>
     <MatDivider></MatDivider>
     @for(int i = 0; i < requirementCategories.Length; i++)
     {
         int j = i; // Required to avoid issue where every bind occurs on i instead of a new integer
-        <h3>@requirementCategories[j]</h3>
+        <h4>@requirementCategories[j]</h4>
         <div class="d-flex justify-content-center">
-            <MatTextField @bind-Value="@Requirements[j]" Style="max-width:4em; margin-right:2em;" Label="Input" OnFocusOut="()=>SetRequirement()"></MatTextField>
+            <MatTextField @bind-Value="@Requirements[j]" Style="max-width:4em; margin-right:2em;" Label="Weight" OnFocusOut="()=>SetRequirement()"></MatTextField>
             <MatSlider @bind-Value="@Requirements[j]" Discrete="true" Pin="true" TValue="int" ValueMin="0" ValueMax="10" Style="width:30vw;"></MatSlider>
         </div>
     }
