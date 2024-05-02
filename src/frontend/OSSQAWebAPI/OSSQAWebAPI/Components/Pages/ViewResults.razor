@@ -9,20 +9,36 @@
     <div class="d-flex flex-wrap justify-content-evenly">
         @foreach (var test in Tests)
         {
-            <div style=" min-width:0.3vw; margin-bottom:3em;">
-                <h3>@test</h3>
+            <div style=" min-width:0.2vw;">
+                <h3 class="d-flex justify-content-center" style="margin-bottom:1em;">@test</h3>
+                
                 @if (SbomResult.ContainsKey(test))
                 {
                     List<SbomAnalysis.Check> values = SbomResult[test];
                     values.Sort((x, y) => x.score.CompareTo(y.score));
-                    foreach (var check in values)
+                    int count = 0;
+                    <MatList>
+                    @foreach (var check in values)
                     {
+                        count++;
                         if(check.dependency.name != null)
                         {
                             var url = $"https://{check.dependency.name}";
-                            <p>Score: @check.score/10 URL: <a href="@url">@check.dependency.name</a> </p>
+                                
+                            <MatListItem>
+                                    <h5 style="margin-right:1em;">Score: @check.score/10 </h5>
+                            </MatListItem>
+                            <MatListItem>
+                                    Component URL: <a style="margin-left:1em;" href="@url">@check.dependency.name</a>
+                            </MatListItem>
+                            <MatListItem>
+                                Reason: @check.reason
+                            </MatListItem>
+                            <MatListDivider></MatListDivider>
+                           
                         }
                     }
+                    </MatList>
                 }
             </div>
         }
