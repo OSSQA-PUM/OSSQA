@@ -8,7 +8,10 @@
 <div class="d-flex flex-column justify-content-center align-items-center">
     <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@ChosenSbom.ToString()></MatFileUpload>
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="LoadSBOM">Continue</MatButton>
+    
 </div>
+
+
 
 @code {
     private IMatFileUploadEntry? file;
@@ -20,7 +23,7 @@
     public Action StateHasChangedCallback { get; set; }
     [Parameter]
     public StringBuilder ChosenSbom { get; set; }
-
+    
     protected override void OnParametersSet()
     {
         if(ChosenSbom.Length == 0)
@@ -54,6 +57,7 @@
         }
         ChosenSbom.Clear();
         ChosenSbom.Append(file?.Name ?? "Drag SBOM here or browse");
-        LoadSBOM();
+        _=LoadSBOM();
     }
+
 }
