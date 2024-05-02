@@ -11,8 +11,15 @@ class DependencyManager:
     """
     _dependencies: list[Dependency]
 
-    def __init__(self):
-        self._dependencies = []
+    def __init__(self, sbom_components: list[dict]):
+        """
+        Initialize the dependency manager.
+
+        Args:
+            sbom_components (list[dict]): The components of the SBOM.
+        """
+        self._dependencies = \
+            [Dependency(component) for component in sbom_components]
 
     def update(self, dependencies: list[Dependency]):
         """

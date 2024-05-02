@@ -142,7 +142,6 @@ class SSFAPIFetcher(DependencyScorer):
             return new_dependency
 
         try:
-<<<<<<< HEAD
             sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
                                 dependency.component_name, "release")
         except (ConnectionRefusedError, AssertionError, ValueError):
@@ -153,17 +152,6 @@ class SSFAPIFetcher(DependencyScorer):
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
-=======
-            sha1 = get_git_sha1(dependency.repo_path,
-                                dependency.component_version)
-        except (ConnectionRefusedError,
-                AssertionError,
-                ValueError,
-                KeyError) as e:
-            error_message = f"Failed to get git sha1 due to: {e}"
-            new_dependency.failure_reason = type(e)(error_message)
-            return new_dependency
->>>>>>> d693922 (Add variable to DependencyScorer for already found scores)
 
         try:
             score = self._lookup_ssf_api(
@@ -291,7 +279,6 @@ class ScorecardAnalyzer(DependencyScorer):
 
         try:
             version_git_sha1: str = get_git_sha1(
-<<<<<<< HEAD
                 new_dependency.repo_path, new_dependency.version, 
                 dependency.component_name, "release"
             )
@@ -305,17 +292,6 @@ class ScorecardAnalyzer(DependencyScorer):
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
-=======
-                new_dependency.repo_path, new_dependency.component_version
-                )
-        except (ConnectionRefusedError,
-                AssertionError,
-                ValueError,
-                KeyError) as e:
-            error_message = f"Failed to get git sha1 due to: {e}"
-            new_dependency.failure_reason = type(e)(error_message)
-            return new_dependency
->>>>>>> d693922 (Add variable to DependencyScorer for already found scores)
 
         remaining_tries: int = 3
         retry_interval: int = 3
