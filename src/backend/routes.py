@@ -119,13 +119,21 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         Gets a list of SBOMs with a specific name.
 
         Args:
-            name (str): The name to query the database with.
+            repo_name (str): The name to query the database with.
 
         Returns:
             json (array): The list of SBOMs.
         """
-        sboms = SBOM.query.filter_by(repo_name=repo_name).all()
+
+        print("looking for sbom in database")
+        if not request.is_json:
+            return "", 400
+        sbom_name = request.json["name"]
+        print(sbom_name)
+        sboms = SBOM.query.filter_by(repo_name=sbom_name).all()
+
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
+        print("found" + str(len(sbom_dicts)) + "sboms in database")
         return jsonify(sbom_dicts), 200
 
     @app.route("/dependency/existing", methods=["GET"])

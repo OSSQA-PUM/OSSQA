@@ -32,7 +32,7 @@ def analyze():
     data = request.get_json()
     try:
         user_reqs_param = data['user_reqs']
-    except KeyError:
+    except (KeyError, TypeError):
         user_reqs_param = "[10, 10, 10, 10, 10]"
     user_reqs_param = json.loads(user_reqs_param)
     user_reqs_dict = {
@@ -48,7 +48,10 @@ def analyze():
     except (AssertionError, ValueError):
         return "Invalid user requirements", 415
 
-    sbom = Sbom(json.loads(data['sbom']))
+    try:
+        sbom = Sbom(json.loads(data['sbom']))
+    except (KeyError, TypeError):
+        return "Invalid SBOM", 415
     frontend_api.subscribe_to_state_change(update_current_status)
     result_sbom: Sbom = frontend_api.analyze_sbom(sbom, user_reqs)
 
@@ -70,12 +73,17 @@ def update_current_status(update: SbomProcessorStatus):
     status = update
 
 
-
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
     global status
     print(f"Status updated: {asdict(status)}")
     return json.dumps(asdict(status))
+
+
+@app.route("/get_previous_sbom", methods=['GET'])
+def get_previous_sboms():
+    data = request.get_json()
+    return frontend_api.lookup_previous_sboms(data['name'])
 
 
 def run():

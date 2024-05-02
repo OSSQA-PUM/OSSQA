@@ -66,7 +66,7 @@ class BackendCommunication:
             list[Sbom]: A list containing the SBOM:s.
         """
         try:
-            response = requests.get(self.host + f"/sbom/{name}", timeout=5)
+            response = requests.get(self.host + "/get_sbom", timeout=5, json={"name": name})
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(
@@ -94,7 +94,7 @@ class BackendCommunication:
             list[str]: A list containing the names of all SBOM:s
         """
         try:
-            response = requests.get(self.host + "/sbom", timeout=5)
+            response = requests.get(self.host + "/get_all_sboms", timeout=5)
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_status_changed.invoke(

@@ -1,29 +1,50 @@
 ﻿@inject NavigationManager _navigationManager
 @using System.Text.Json
 @using System.Text;
-@using static SbomAnalysis
+@inject HttpClient Http
+@inject HttpClient httpClient
+
 
 <div class="d-flex flex-column justify-content-center align-items-center">
     <h4 style="margin-bottom:3em; margin-top:3em;">Look up Previously Analyzed SBOMs in the Database</h4>
     <div class ="d-flex justify-content-center align-items-center">
-        <MatTextField Label="input SBOM version number" Value="@versionNumber" Style="margin-right:2em; max-height:5em; width:30vw;"></MatTextField>
+        <MatTextField Label="Input SBOM repo" PlaceHolder="github.com/user/example" Value="@name" Style="margin-right:2em; max-height:5em; width:30vw;"></MatTextField>
         <h4>OR</h4>
         <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@ChosenSbom.ToString()></MatFileUpload>
     </div>
+
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" OnClick='()=> GetPrevious()'>Get previous</MatButton>
-    <p> @versionNumber</p>
+    <p> @name</p>
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:10em;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
 </div>
 
+
+@if(Analyzing.CurrentCount == 1)
+{
+    <div class="d-flex flex-wrap justify-content-evenly">
+        @foreach (var sbom in sboms)
+        {
+            <div style=" min-width:0.3vw; margin-bottom:3em;">
+                <h3>@sbom.metadata.component.name</h3>
+            </div>
+        }
+    </div>
+}
 @code {
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
-    private int versionNumber = -1;
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set; }
+    [Parameter]
+    public SemaphoreSlim Analyzing { get; set; }
+    private string name = "";
     private IMatFileUploadEntry? file;
     private bool loadedFile = false;
     public StringBuilder ChosenSbom = new StringBuilder();
+    private List<Sbom> sboms = new();
     protected override void OnParametersSet()
     {
+        PostData.Clear();
         if (ChosenSbom.Length == 0)
         {
             ChosenSbom.Append("Drag SBOM here or browse");
@@ -44,7 +65,7 @@
         try
         {
             Sbom sbom = JsonSerializer.Deserialize<Sbom>(sbomString);
-            versionNumber = sbom.version;
+            name = sbom.metadata.component.name;
         }
         catch (Exception e)
         {
@@ -65,12 +86,66 @@
         ChosenSbom.Append(file?.Name ?? "Drag SBOM here or browse");
         _ = LoadSBOM();
     }
+
     private void GetPrevious()
     {
-        if (versionNumber == -1)
+        if (name.Length == 0)
         {
             return;
         }
+        var analyzeTask = Http.PostAsJsonAsync("http://host.docker.internal:98/get_previous_sbom", PostData);
+
+        Analyzing.Wait();
+        _ = analyzeTask.ContinueWith(async t =>
+        {
+            Analyzing.Release();
+            HttpResponseMessage result = await t;
+            if (result.IsSuccessStatusCode)
+            {
+                var previousSboms = await result.Content.ReadAsStringAsync();
+                try
+                {
+                    sboms = JsonSerializer.Deserialize<List<Sbom>>(previousSboms);
+
+                }
+                catch (Exception e)
+                {
+                    throw (e);
+                }
+                StateHasChangedCallback.Invoke();
+                _ = InvokeAsync(StateHasChanged);
+            }
+        });
     }
 
+    public class Sbom
+    {
+        public string bomFormat { get; set; }
+        public string specVersion { get; set; }
+        public Metadata metadata { get; set; }
+        public Sbom(string bomFormat, string specVersion, Metadata metadata)
+        {
+            this.bomFormat = bomFormat;
+            this.specVersion = specVersion;
+            this.metadata = metadata;
+        }
+    }
+
+    public class Metadata
+    {
+        public Component component { get; set; }
+        public Metadata(Component component)
+        {
+            this.component = component;
+        }
+    }
+
+    public class Component
+    {
+        public string name { get; set; }
+        public Component(string name)
+        {
+            this.name = name;
+        }
+    }
 }
