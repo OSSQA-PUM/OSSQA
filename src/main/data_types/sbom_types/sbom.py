@@ -180,7 +180,6 @@ class Sbom:
         try:
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code != 200:
-                print(f"Could not connect to {url} {response.text}")
                 raise ConnectionError(
                     f"Could not connect to GitHub API for {url}")
         except requests.exceptions.ConnectionError as e:
