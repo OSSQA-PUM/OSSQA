@@ -22,17 +22,23 @@ class Check(db.Model):
     name = db.Column(db.String(255), unique=False)
     score = db.Column(db.Integer, unique=False)
     reason = db.Column(db.String(255), unique=False)
-    # TODO details
+    details = db.Column(db.String(255), unique=False)
 
     scorecard_id = db.Column(db.Integer, db.ForeignKey("scorecard.id"),
                              nullable=False)
 
     def to_dict(self) -> dict:
+        """
+        Converts the Check to a dictionary representation.
+
+        Returns:
+            dict: A dictionary representation of the Check.
+        """
         return {
             "name": self.name,
-            "score": self.name,
+            "score": self.score,
             "reason": self.reason,
-            # TODO details,
+            "details": self.details,
         }
 
 
@@ -50,6 +56,12 @@ class Scorecard(db.Model):
                               nullable=False)
 
     def to_dict(self) -> dict:
+        """
+        Convert the Scorecard to a dictionary representation.
+
+        Returns:
+            dict: A dictionary representation of the Scorecard.
+        """
         return {
             "date": self.date,
             "score": self.aggregate_score,

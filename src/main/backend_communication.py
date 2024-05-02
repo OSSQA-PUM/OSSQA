@@ -145,15 +145,12 @@ class BackendFetcher(DependencyScorer):
         Returns:
             list[Dependency]: The existing dependencies in the database
         """
-        dependency_primary_keys = []
+        dependency_primary_keys = {}
         for dependency in dependencies:
-            dependency_primary_keys.append({
-                dependency.name,
-                dependency.version,
-            })
+            dependency_primary_keys[dependency.name] = dependency.version
 
         try:
-            response = requests.get(self.host + "/get_existing_dependencies",
+            response = requests.get(self.host + "/dependency/existing",
                                     json=dependency_primary_keys,
                                     timeout=5
                                     )
