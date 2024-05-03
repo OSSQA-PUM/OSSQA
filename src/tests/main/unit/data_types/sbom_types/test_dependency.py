@@ -40,15 +40,15 @@ def test_dependency_initialization():
     """
     Test that a Dependency object can be initialized.
     """
-    assert Dependency(name="", version="")
+    assert Dependency(name="", component_name="", version="")
 
 
 def test_dependency_eq():
     """
     Test that two Dependency objects are equal if they have the same name
     and version."""
-    dep1 = Dependency(name="dep1", version="1.0")
-    dep2 = Dependency(name="dep1", version="1.0")
+    dep1 = Dependency(name="dep1", component_name="com1", version="1.0")
+    dep2 = Dependency(name="dep1", component_name="com1", version="1.0")
     assert dep1 == dep2
 
 
@@ -56,9 +56,12 @@ def test_dependency_not_eq():
     """
     Test that two Dependency objects are not equal if they have different
     names or versions."""
-    dep1 = Dependency(name="dep1", version="1.0")
-    dep2 = Dependency(name="dep2", version="1.0")
-    dep3 = Dependency(name="dep1", version="1.1")
+    dep1 = Dependency(name="dep1", component_name="com1", version="1.0")
+    dep1 = Dependency(name="dep1", component_name="com2", version="1.0")
+    dep2 = Dependency(name="dep2", component_name="com1", version="1.0")
+    dep2 = Dependency(name="dep2", component_name="com2", version="1.0")
+    dep3 = Dependency(name="dep1", component_name="com1", version="1.1")
+    dep3 = Dependency(name="dep1", component_name="com2", version="1.1")
     assert dep1 != dep2
     assert dep1 != dep3
 

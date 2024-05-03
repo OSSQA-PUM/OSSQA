@@ -104,7 +104,7 @@ def test_dependency_manager_update():
     Test the update method of the DependencyManager class when the manager is
     updated with a new dependency."""
     dependency_manager = DependencyManager()
-    dep1 = Dependency(name="github.com/repo/path", version="1.0")
+    dep1 = Dependency(name="github.com/repo/path", component_name="path", version="1.0")
     dependency_manager.update([dep1])
     assert len(dependency_manager.get_unscored_dependencies()) == 1
 
