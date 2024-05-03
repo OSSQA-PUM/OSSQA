@@ -165,8 +165,6 @@ def validate_git_token(_ctx, _param, value: str):
     response = requests.get(url, headers=headers, timeout=5)
 
     match response.status_code:
-        case 403:
-            raise_github_token_refused(response)
         case 401:
             raise click.BadParameter("Your GitHub token could not be "
                                      "authenticated (HTTP 401).")
