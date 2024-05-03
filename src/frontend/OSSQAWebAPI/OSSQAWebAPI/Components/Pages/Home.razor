@@ -12,24 +12,25 @@
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
 {
     <MatTabGroup Style="margin-bottom:2em;">
-        <MatTab Label="Home">
-            <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
-        </MatTab>
-        <MatTab Label="Code Vulnerabilities">
-            <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
-        </MatTab>
-        <MatTab Label="Maintenance">
-            <ViewResults SbomResult="SbomResult" Tests='[ "License", "Security-Policy"]' />
-        </MatTab>
-        <MatTab Label="Continuous Testing">
-            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests"]' />
-        </MatTab>
-        <MatTab Label="Source Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Code-Review", "Dangerous-Workflow"]' />
-        </MatTab>
-        <MatTab Label="Build Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='[ "Pinned-Dependencies", "Token-Permissions"]' />
-        </MatTab>
+            <MatTab Label="Home">
+                <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
+            </MatTab>
+
+            <MatTab Label="Code Vulnerabilities">
+                <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
+            </MatTab>
+            <MatTab Label="Maintenance">
+                <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
+            </MatTab>
+            <MatTab Label="Continuous Testing">
+                <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
+            </MatTab>
+            <MatTab Label="Source Risk Assessment">
+                <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
+            </MatTab>
+            <MatTab Label="Build Risk Assessment">
+                <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
+            </MatTab>
             @if(FailedComponents.Count > 0)
             {
                 <MatTab Label="Failed Components">
