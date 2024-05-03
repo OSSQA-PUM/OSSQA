@@ -163,18 +163,18 @@ def validate_git_token(_ctx, _param, value: str):
     url = "https://api.github.com/user"
     headers = {"Authorization": f"Bearer {value}"}
     response = requests.get(url, headers=headers, timeout=5)
+    status_code = response.status_code
+
+    if status_code == 401 or status_code == 403:
+        raise click.BadParameter("Your GitHub token could not be "
+                                 f"authenticated (HTTP {status_code}).")
 
     try:
         github_token_refused(response)
     except ConnectionRefusedError as e:
         raise click.BadParameter(str(e))
 
-    match response.status_code:
-        case 200 | 304:
-            return value
-        case status_code:
-            raise click.BadParameter("Your GitHub token could not be "
-                                     f"authenticated (HTTP {status_code}).")
+    return value
 
 
 @click.group(context_settings={"max_content_width": 120, "show_default": True})
