@@ -147,13 +147,13 @@ class BackendFetcher(DependencyScorer):
         """
         dependency_primary_keys = []
         for dependency in dependencies:
-            dependency_primary_keys.append({
+            dependency_primary_keys.append([
                 dependency.name,
                 dependency.version,
-            })
+            ])
 
         try:
-            response = requests.get(self.host + "/get_existing_dependencies",
+            response = requests.get(self.host + "/dependency/existing",
                                     json=dependency_primary_keys,
                                     timeout=5
                                     )
