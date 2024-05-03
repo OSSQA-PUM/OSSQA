@@ -26,6 +26,7 @@ from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import RequirementsType, UserRequirements
 from main.frontend.front_end_api import FrontEndAPI
+from main.util import github_token_refused
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
@@ -163,13 +164,17 @@ def validate_git_token(_ctx, _param, value: str):
     headers = {"Authorization": f"Bearer {value}"}
     response = requests.get(url, headers=headers, timeout=5)
 
-    # TODO: Could do more extensive error-checking here.
-    #       For example, different messages for different status codes.
-    if response.status_code != 200:
-        raise click.BadParameter("Failed to authenticate token. "
-                                 + f"Status code: {response.status_code}")
-    else:
-        return value
+    try:
+        github_token_refused(response)
+    except ConnectionRefusedError as e:
+        raise click.BadParameter(str(e))
+
+    match response.status_code:
+        case 200 | 304:
+            return value
+        case status_code:
+            raise click.BadParameter("Your GitHub token could not be "
+                                     f"authenticated (HTTP {status_code}).")
 
 
 @click.group(context_settings={"max_content_width": 120, "show_default": True})
