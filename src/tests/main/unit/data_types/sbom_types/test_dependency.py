@@ -15,6 +15,7 @@ from main.data_types.sbom_types.scorecard import Scorecard
 from tests.main.unit.scorecards.scorecards import PATHS
 
 DEPENDENCY_NAME = "github.com/repo/path"
+COMPONENT_NAME = "path"
 
 
 @pytest.fixture
@@ -22,7 +23,7 @@ def dependency_basic():
     """
     Fixture to create a basic Dependency object.
     """
-    return Dependency(name=DEPENDENCY_NAME, version="1.0")
+    return Dependency(name=DEPENDENCY_NAME, component_name=COMPONENT_NAME, version="1.0")
 
 
 @pytest.fixture(params=PATHS)
@@ -32,7 +33,7 @@ def dependency_scorecard(request):
     """
     with open(request.param, "r", encoding="utf-8") as file:
         scorecard = json.load(file)
-    return Dependency(name=DEPENDENCY_NAME, version="1.0",
+    return Dependency(name=DEPENDENCY_NAME, component_name=COMPONENT_NAME, version="1.0",
                       dependency_score=Scorecard(scorecard))
 
 
