@@ -22,7 +22,7 @@ class Check(db.Model):
     name = db.Column(db.String(255), unique=False)
     score = db.Column(db.Integer, unique=False)
     reason = db.Column(db.String(255), unique=False)
-    details = db.Column(db.String(255), unique=False)
+    details = db.Column(db.Text, unique=False)
 
     scorecard_id = db.Column(db.Integer, db.ForeignKey("scorecard.id"),
                              nullable=False)
