@@ -48,9 +48,10 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             db.session.add(sbom)
 
         for dep_json in sbom_json["scored_dependencies"]:
+            dep_component_json = _parse_dependency_component(dep_json)
+
             dep: Dependency = Dependency.query.filter_by(
-                name=dep_json["name"],
-                version=dep_json["version"],
+                component=dep_component_json,
             ).first()
             scorecard_json = dep_json["dependency_score"]
 
@@ -61,14 +62,15 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 db.session.delete(scorecard)
             else:
                 dep = Dependency(
-                    name=dep_json["name"],
-                    version=dep_json["version"],
+                    component=dep_component_json
                 )
                 sbom.dependencies.append(dep)
                 db.session.add(dep)
 
             scorecard = Scorecard(
                 date=scorecard_json["date"],
+                repo=scorecard_json["repo"],
+                scorecard=scorecard_json["scorecard"],
                 aggregate_score=scorecard_json["score"],
             )
             dep.scorecard = scorecard
@@ -116,28 +118,30 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
         return jsonify(sbom_dicts), 200
 
-    @app.route("/dependency/existing", methods=["GET"])
-    def get_existing_dependencies():
+    @app.route("/scorecard/existing", methods=["GET"])
+    def get_existing_scorecards():
         """
-        Gets a list of dependencies, based on the specified primary
+        Gets a list of scorecards, based on the specified primary
         keys.
 
         Args:
-            json (array): A list containing tuples with the name and version
-                of each dependency.
+            json (array): A list containing the repo and commit hash of each
+                          scorecard to fetch
 
         Returns:
-            json (array): The list of dependecies.
+            json (array): The list of scorecards.
         """
         if not request.is_json:
             return jsonify([]), 400
 
-        dependencies = []
-        for name, version in request.json:
-            dependency = Dependency.query.filter_by(name=name, version=version).first()
-            if dependency:
-                dependencies.append(dependency.to_dict())
-        return jsonify(dependencies), 200
+        scorecards = []
+        for scorecard_repo in request.json:
+            scorecard: Scorecard = Scorecard.query.filter_by(
+                repo=scorecard_repo["repo"]
+            ).first()
+            if scorecard:
+                scorecards.append(scorecard.to_dict())
+        return jsonify(scorecards), 200
 
 
 def register_test_endpoints(app: Flask, db: SQLAlchemy):
@@ -154,3 +158,22 @@ def register_test_endpoints(app: Flask, db: SQLAlchemy):
         db.drop_all()
         db.create_all()
         return "", 200
+
+
+def _parse_dependency_component(dependency: dict) -> dict:
+    """
+    Parses a dependency component.
+
+    Args:
+        dependency (dict): The dependency component.
+
+    Returns:
+        dict: The parsed dependency component.
+    """
+    dep_component = {}
+    for key, value in dependency.items():
+        if (key != "dependency_score"
+                or key != "failure_reason"
+                or key != "passed"):
+            dep_component[key] = value
+    return dep_component

@@ -24,6 +24,7 @@ class Dependency:
 
     dependency_score: Scorecard = None
     failure_reason: Exception = None
+    passed: bool = False
 
     def __init__(self, dependency: dict):
         for dependency_attr in dependency:
@@ -44,7 +45,7 @@ class Dependency:
         # Loop over all attributes of the dependency
         for attr in self.__dict__:
             # If the attribute is not the same in both dependencies
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in ("dependency_score", "failure_reason", "passed"):
                 try:
                     other_attr = getattr(other, attr)
                 except AttributeError:

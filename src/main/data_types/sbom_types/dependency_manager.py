@@ -39,6 +39,15 @@ class DependencyManager:
             except ValueError:
                 self._dependencies.append(dependency)
 
+    def get_all_dependencies(self) -> list[Dependency]:
+        """
+        Get all dependencies.
+
+        Returns:
+            list[Dependency]: All dependencies.
+        """
+        return self._dependencies
+
     def get_scored_dependencies(self) -> list[Dependency]:
         """
         Get the scored dependencies.
@@ -101,19 +110,8 @@ class DependencyManager:
         Convert the object to a dictionary.
 
         Returns:
-            dict: A dictionary containing
-                scored_dependencies: list[dict],
-                unscored_dependencies: list[dict],
-                failed_dependencies: list[dict].
+            dict: A dictionary containing components:
+                  A list of dictionaries representing the dependencies.
         """
-        return {
-            'scored_dependencies':
-                [dependency.to_dict() for dependency
-                    in self.get_scored_dependencies()],
-            'unscored_dependencies':
-                [dependency.to_dict() for dependency
-                    in self.get_unscored_dependencies()],
-            'failed_dependencies':
-                [dependency.to_dict() for dependency
-                    in self.get_failed_dependencies()]
-        }
+        return {"components":
+                [dependency.to_dict() for dependency in self._dependencies]}

@@ -62,6 +62,15 @@ class Sbom:
             res[key] = value
 
         return res
+    
+    def get_all_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_all_dependencies()
 
     def get_scored_dependencies(self) -> list[Dependency]:
         """

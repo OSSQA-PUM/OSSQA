@@ -8,12 +8,15 @@ Functions:
 - get_existing_dependencies: Gets saved dependencies from the database.
 """
 from typing import Any, Callable
+import copy
 import requests
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.dependency_scorer import DependencyScorer, StepResponse
 from main.data_types.event import Event
+from main.util import get_git_sha1
+
 
 
 class BackendCommunication:
@@ -127,7 +130,7 @@ class BackendFetcher(DependencyScorer):
         Returns:
             list[Dependency]: The scored dependencies.
         """
-        new_dependencies = self._get_existing_dependencies(dependencies)
+        new_dependencies = self._get_existing_scorecards(dependencies)
         step_response: StepResponse = StepResponse(
             len(dependencies), len(dependencies),
             len(new_dependencies), len(dependencies) - len(new_dependencies)
@@ -135,27 +138,48 @@ class BackendFetcher(DependencyScorer):
         self.on_step_complete.invoke(step_response)
         return new_dependencies
 
-    def _get_existing_dependencies(self, dependencies: list[Dependency]) \
+    def _get_existing_scorecards(self, dependencies: list[Dependency]) \
             -> list[Dependency]:
         """
-        Gets saved dependencies from the database
+        Gets saved scorecards from the database
 
         Args:
         dependencies (list[Dependency]): The dependencies to check
 
         Returns:
-            list[Dependency]: The existing dependencies in the database
+            list[Dependency]: The dependencies with added scorecards
+                              from the database
         """
-        dependency_primary_keys = []
+        scorecard_primary_key = {"repo":
+                                 {"name": "",
+                                  "commmit": ""}}
+        new_dependencies: list[Dependency] = []
+        commit_map = {}
         for dependency in dependencies:
-            dependency_primary_keys.append([
-                dependency.name,
-                dependency.version,
-            ])
+            new_dependency = copy.deepcopy(dependency)
+            try:
+                git_url = dependency.git_url
+            except (ValueError, KeyError) as e:
+                new_dependency.failure_reason = e
+                new_dependencies.append(new_dependency)
+                continue
+            try:
+                commit = get_git_sha1(
+                    new_dependency.git_url, new_dependency.component_version
+                    )
+                commit_map.update({commit: new_dependency})
+            except (ValueError, AssertionError, ConnectionRefusedError) as e:
+                new_dependency.failure_reason = e
+                new_dependencies.append(new_dependency)
+                continue
+
+            scorecard_primary_key["repo"]["name"] = git_url
+            scorecard_primary_key["repo"]["commit"] = commit
+            new_dependencies.append(new_dependency)
 
         try:
-            response = requests.get(self.host + "/dependency/existing",
-                                    json=dependency_primary_keys,
+            response = requests.get(self.host + "/scorecard/existing",
+                                    json=scorecard_primary_key,
                                     timeout=5
                                     )
         except requests.exceptions.Timeout:
@@ -163,35 +187,24 @@ class BackendFetcher(DependencyScorer):
             self.on_step_complete.invoke(
                 StepResponse(0, 0, 0, 0, "The request timed out")
                 )
-            return []
+            return new_dependencies
         except TypeError:
             # Tell the user that the response was not JSON
             self.on_step_complete.invoke(
                 StepResponse(0, 0, 0, 0, "The response was not JSON")
                 )
-            return []
+            return new_dependencies
         except requests.exceptions.ConnectionError as e:
             # Tell the user that the connection was refused
             self.on_step_complete.invoke(
                 StepResponse(0, 0, 0, 0, str(e))
                 )
-            return []
-
-        result: list[Dependency] = []
+            return new_dependencies
         if not response or response.status_code != 200:
-            return result
+            return new_dependencies
 
-        for dependency in response.json():
-            name = dependency["name"]
-            version = dependency["version"]
-            scorecard = Scorecard(dependency["scorecard"])
-            # TODO Fix the name of Dependency.
-            # Should perhaps store name of CycloneDX component
-            # in database and git_url separately.
-            dep_obj = Dependency(name=name,  # TODO FIX
-                                 git_url=name,  # TODO FIX
-                                 version=version,
-                                 dependency_score=scorecard
-                                 )
-            result.append(dep_obj)
-        return result
+        for scorecard in response.json():
+            commit = scorecard["repo"]["commit"]
+            dependency: Dependency = commit_map[commit]
+            dependency.dependency_score = Scorecard(scorecard)
+        return new_dependencies

@@ -118,6 +118,8 @@ class Scorecard:
         self._validate(ssf_scorecard)
         self.date = ssf_scorecard["date"]
         self.score = ssf_scorecard["score"]
+        self.repo = ssf_scorecard["repo"]
+        self.scorecard = ssf_scorecard["scorecard"]
         self.checks = []
         for check in ssf_scorecard["checks"]:
             name = check["name"]

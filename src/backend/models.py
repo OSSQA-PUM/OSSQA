@@ -36,12 +36,13 @@ class Check(db.Model):
         }
 
 
-
 class Scorecard(db.Model):
     """
     A model representing a OpenSSF Scorecard.
     """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    repo = db.Column(db.Text, unique=False)
+    scorecard = db.Column(db.Text, unique=False)
     date = db.Column(db.String(10), unique=False)
     aggregate_score = db.Column(db.Double, unique=False)
 
@@ -50,8 +51,16 @@ class Scorecard(db.Model):
                               nullable=False)
 
     def to_dict(self) -> dict:
+        """
+        Represent the scorecard as a dict resembling its original json format.
+
+        Returns
+            dict: The dict representing the scorecard.
+        """
         return {
             "date": self.date,
+            "repo": self.repo,
+            "scorecard": self.scorecard,
             "score": self.aggregate_score,
             "checks": [check.to_dict() for check in self.checks],
         }
@@ -62,8 +71,7 @@ class Dependency(db.Model):
     A dependency with a score from OpenSSF Scorecard.
     """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(255), unique=False)
-    version = db.Column(db.String(255), unique=False)
+    component = db.Column(db.Text, unique=False)
     # TODO: Should also store external references, at least of type "vcs".
 
     scorecard = db.relationship("Scorecard", backref="dependency", lazy=True,
@@ -79,8 +87,7 @@ class Dependency(db.Model):
             dict: The dict representing the dependency.
         """
         return {
-            "name": self.name,
-            "version": self.version,
+            "component": self.component,
             "scorecard": self.scorecard.to_dict(),
         }
 
