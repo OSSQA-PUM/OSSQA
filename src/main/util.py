@@ -69,7 +69,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
     # Check if the rate limit is exceeded
     if response.status_code == 403 \
             and "API rate limit exceeded" in response.json()["message"]:
-        github_token_refused(response)
+        raise_github_token_refused(response)
 
     # Check if the response is successful
     if response.status_code != 200:
@@ -130,7 +130,7 @@ def get_github_token() -> str:
     return token
 
 
-def github_token_refused(response: requests.Response) -> None:
+def raise_github_token_refused(response: requests.Response) -> None:
     """
     Raises an error if the GitHub API rate limit is exceeded.
     """

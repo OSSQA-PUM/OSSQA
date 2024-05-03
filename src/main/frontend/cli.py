@@ -12,321 +12,21 @@ and verbosity.
 The lookup command takes the ID of the SBOM as an argument.
 The script also includes helper functions to parse and validate the arguments.
 """
-
-import os
 import json
-from argparse import ArgumentParser, Namespace
-from argparse import RawTextHelpFormatter
-from tabulate import tabulate
+import os
+from pathlib import Path
+
+import click
 import requests
+import validators
+from tabulate import tabulate
+
 import main.constants as constants
-from main.data_types.user_requirements import UserRequirements, \
-                                                RequirementsType
-from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.dependency import Dependency
+from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.user_requirements import RequirementsType, UserRequirements
 from main.frontend.front_end_api import FrontEndAPI
-
-def create_parser() -> ArgumentParser:
-    """
-    Create the argument parser.
-
-    Returns:
-        ArgumentParser: The argument parser.
-    """
-    parser = ArgumentParser(description=
-    """Open Source Security and Quality Assessment
-
-    This program will help ensure security and high quality of software.
-    By iterating a SBOM in CycloneDX format it will give you a result
-    from the OpenSSF Scorecards scores of every involved component.""",
-    formatter_class=RawTextHelpFormatter)
-
-    run_type_group = parser.add_mutually_exclusive_group(required=True)
-
-    parser.usage = \
-    f"""python3 arg_parser.py [-h --help] [-a --analyze] [-l --lookup] [flags]
-
-    Analyze flags:
-        -p   --path                     (required)
-        -r   --requirements
-        -wc  --code-vulnerabilities
-        -wm  --maintenance
-        -wt  --continuous-testing
-        -ws  --source-risk-assessment
-        -wb  --build-risk-assessment
-        -g   --git-token                (required)
-        -o   --output
-        -v   --verbose
-             --backend                  (default: \"{constants.HOST}\")
-
-    Lookup flags:
-        -i   --id                       (required)
-        -o   --output
-        -v   --verbose
-
-    """
-
-    run_type_group.add_argument(
-        "-a", "--analyze", action="store_true",
-        help="Analyze SBOM file."
-    )
-    run_type_group.add_argument(
-        "-s", "--sboms", action="store_true",
-        help="Lookup repository names of SBOMs in the database."
-    )
-    run_type_group.add_argument(
-        "-l", "--lookup", action="store_true",
-        help="Lookup details of an SBOM in the database."
-    )
-
-
-    # Analyze command
-    parser.add_argument(
-        "-p", "--path", metavar='\b', type=str,
-        help="    The file path to the SBOM JSON file."
-    )
-
-    parser.add_argument(
-        "-r", "--requirements", metavar='\b', type=str,
-        help=
-    """The user requirements for the software. Input a list of weights,
-    integers between 0-10. Like the following: [wc, wm, wt, ws, wb]"""
-    )
-
-    parser.add_argument(
-        "-wc", "--code-vulnerabilities", metavar='\b', type=int,
-        help = "Weight of vulnerability checks. Integer between 0-10."
-    )
-
-    parser.add_argument(
-        "-wm", "--maintenance", metavar='\b', type=int,
-        help = "Weight of maintenance checks. Integer between 0-10."
-    )
-
-    parser.add_argument(
-        "-wt", "--continuous-testing", metavar='\b', type=int,
-        help = "Weight of continuous testing checks. Integer between 0-10."
-    )
-
-    parser.add_argument(
-        "-ws", "--source-risk-assessment", metavar='\b', type=int,
-        help = "Weight of source risk assessment checks. Integer between 0-10."
-    )
-
-    parser.add_argument(
-        "-wb", "--build-risk-assessment", metavar='\b', type=int,
-        help = "Weight of build risk assessment checks. Integer between 0-10."
-    )
-
-    parser.add_argument(
-        "-g", "--git-token", metavar='\b', type=str,
-        help="    The git token."
-    )
-
-
-    # Lookup command
-    parser.add_argument(
-        "-n", "--name", metavar='\b', type=str,
-        help="    The repository name of the SBOM."
-    )
-
-    # Shared
-    parser.add_argument(
-        "-o", "--output", metavar='\b', type=str,
-        help=\
-        "    Type of output to be returned. Choose 'simplified' or 'json'."
-    )
-
-    parser.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Verbose output."
-    )
-
-    parser.add_argument(
-        "--backend", metavar='\b', type=str,
-        default=constants.HOST,
-        help="The URL of the backend."
-    )
-
-    return parser
-
-
-def parse_requirements(args:Namespace) -> UserRequirements:
-    """
-    Parse the requirements from the arguments.
-
-    Args:
-        args (Namespace): The arguments.
-
-    Returns:
-        UserRequirements: The user requirements.
-
-    Raises:
-        SystemExit: If the requirements are invalid.
-    """
-    requirements: list[int] = args.requirements.replace(" ", "") \
-                                        .replace("[", "").replace("]", "") \
-                                        .split(",")
-
-    if args.code_vulnerabilities:
-        requirements[0] = args.code_vulnerabilities
-    if args.maintenance:
-        requirements[1] = args.maintenance
-    if args.continuous_testing:
-        requirements[2] = args.continuous_testing
-    if args.source_risk_assessment:
-        requirements[3] = args.source_risk_assessment
-    if args.build_risk_assessment:
-        requirements[4] = args.build_risk_assessment
-
-    try:
-        assert len(requirements) == 5
-
-        for i, req in enumerate(requirements):
-            requirements[i] = int(req)
-            assert 0 <= requirements[i] <= 10
-    except (AssertionError, ValueError):
-        print("requirements must be a list of 5 integers between 0 and 10.\n"+\
-              "Example: --requirements [10,10,3,4,5]")
-        exit(1)
-
-    requirements: UserRequirements = UserRequirements(
-        {
-            RequirementsType.CODE_VULNERABILITIES: requirements[0],
-            RequirementsType.MAINTENANCE: requirements[1],
-            RequirementsType.CONTINUOUS_TESTING: requirements[2],
-            RequirementsType.SOURCE_RISK_ASSESSMENT: requirements[3],
-            RequirementsType.BUILD_RISK_ASSESSMENT: requirements[4]
-        }
-    )
-
-    return requirements
-
-
-def check_token_usage(git_token: str = None):
-    """
-    Check the usage of the GitHub Personal Access Token.
-
-    Returns:
-        dict: A dictionary containing the token usage information,
-              including the limit, used, and remaining counts.
-              Returns None if the authentication fails.
-
-    Raises:
-        ValueError: If the authentication fails.
-    """
-
-    # Replace 'your_token_here' with your actual GitHub Personal Access Token
-    if not git_token:
-        token = os.environ.get('GITHUB_AUTH_TOKEN')
-    else:
-        token = git_token
-
-    # The GitHub API URL for the authenticated user
-    url = 'https://api.github.com/user'
-
-    # Make a GET request to the GitHub API with your token for authentication
-    headers = {'Authorization': f'token {token}'}
-    response = requests.get(url, headers=headers, timeout=5)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        user_data = response.headers
-
-        return {
-            "limit": user_data['X-RateLimit-Limit'],
-            "used": user_data['x-ratelimit-used'],
-            "remaining": user_data['X-RateLimit-Remaining']
-        }
-
-    raise ValueError("Failed to authenticate token. "
-                     + f"Status code: {response.status_code}")
-
-
-def parse_analyze_arguments(args: Namespace) -> tuple[str, UserRequirements]:
-    """
-    Parses and analyzes the command line arguments.
-
-    Args:
-        args (Namespace): The command line arguments.
-
-    Returns:
-        Tuple[str, UserRequirements]:
-            A tuple containing the path and user requirements.
-
-    Raises:
-        SystemExit: If the required argument [-p | --path] is missing.
-    """
-    if not args.path:
-        print("Please add the argument [-p | --path] [PATH]")
-        exit(1)
-
-    path: str = args.path
-
-    if not args.requirements:
-        args.requirements = "10,10,10,10,10"
-
-    requirements: UserRequirements = parse_requirements(args)
-
-    git_token: str = args.git_token
-    if not check_token_usage(git_token):
-        print(
-            "Invalid git token, add argument [-g | --git-token] [YOUR TOKEN]"
-        )
-        exit(1)
-
-    if git_token:
-        os.environ["GITHUB_AUTH_TOKEN"] = git_token
-
-    return path, requirements
-
-
-def parse_lookup_arguments(args: Namespace) -> int:
-    """
-    Parses the lookup arguments and returns the repository name.
-
-    Args:
-        args (Namespace): The parsed command-line arguments.
-
-    Returns:
-        str: The repository name extracted from the arguments.
-
-    Raises:
-        SystemExit: If the required argument [-n | --name] is missing.
-    """
-    if not args.name:
-        print("Please add the argument [-n | --name] [NAME]")
-        exit(1)
-
-    repo_name: str = args.name
-    return repo_name
-
-
-def parse_arguments_shared(args: Namespace) -> tuple[str, bool]:
-    """
-    Parses the shared arguments and returns the output and verbose values.
-
-    Args:
-        args (Namespace): The parsed command-line arguments.
-
-    Returns:
-        Tuple[str, bool]: A tuple containing the output value and
-        verbose value.
-    """
-    output: str = "table"
-    verbose: bool = False
-    backend: str = constants.HOST
-
-    if args.output:
-        output: str = args.output
-
-    if args.verbose:
-        verbose: bool = args.verbose
-
-    if args.backend:
-        backend: str = args.backend
-
-    return output, verbose, backend
+from main.util import raise_github_token_refused
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
@@ -351,7 +51,7 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     return mean_score
 
 
-def get_mean_scores(dependencies:list[Dependency]) -> \
+def calculate_mean_scores(dependencies:list[Dependency]) -> \
                                                 list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
@@ -413,80 +113,185 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
     return colored_scores
 
 
-def analyze_sbom(args: Namespace) -> None:
+def parse_requirements(**kwargs) -> UserRequirements:
     """
-    Executes the command that analyzes an SBOM.
+    Parses the requirements from the arguments.
 
     Args:
-        args (Namespace): The parsed arguments of the program.
+        **kwargs (Any): The arguments.
+
+    Returns:
+        UserRequirements: The parsed user requirements.
     """
-    output, verbose, backend = parse_arguments_shared(args)
-    path, requirements = parse_analyze_arguments(args)
+    code_vulnerabilities: int = kwargs.get("code_vulnerabilities")
+    maintenance: int = kwargs.get("maintenance")
+    continuous_testing: int = kwargs.get("continuous_testing")
+    source_risk_assessment: int = kwargs.get("source_risk_assessment")
+    build_risk_assessment: int = kwargs.get("build_risk_assessment")
 
-    with open(path, encoding='utf-8') as f:
-        sbom_dict: dict = json.load(f)
-        sbom = Sbom(sbom_dict)
+    return UserRequirements({
+        RequirementsType.CODE_VULNERABILITIES: code_vulnerabilities,
+        RequirementsType.MAINTENANCE: maintenance,
+        RequirementsType.CONTINUOUS_TESTING: continuous_testing,
+        RequirementsType.SOURCE_RISK_ASSESSMENT: source_risk_assessment,
+        RequirementsType.BUILD_RISK_ASSESSMENT: build_risk_assessment,
+    })
 
-    # print(sbom.to_dict())
-    api = FrontEndAPI(backend)
-    # TODO handle errors
 
-    scored_sbom: Sbom = api.analyze_sbom(sbom, requirements)
+def validate_backend(_ctx, _param, value: str):
+    """
+    Validates that the backend URL is a valid URL.
+    """
+    value = value.replace("localhost", "127.0.0.1")
+    validation_res = validators.url(value)
+    if isinstance(validation_res, validators.ValidationError):
+        print(validation_res)
+        raise click.BadParameter("Invalid backend URL.")
+    else:
+        return value
 
-    scores = scored_sbom.dependency_manager.get_scored_dependencies()
 
-    # TEMPORARY: Fill with test scores
-    # scores = scored_sbom.dependency_manager.get_unscored_dependencies()
-    # scores = fill_with_test_scores(scores)
-    # END TEMPORARY
+def validate_git_token(_ctx, _param, value: str):
+    """
+    Validates that a GitHub Personal Access Token is valid.
+    """
+    if not value:
+        raise click.BadParameter("Please set environment variable "
+                                 "'GITHUB_AUTH_TOKEN' or provide a "
+                                 "non-empty string.")
 
-    if output != "json":
-        mean_scores = get_mean_scores(scores)
+    url = "https://api.github.com/user"
+    headers = {"Authorization": f"Bearer {value}"}
+    response = requests.get(url, headers=headers, timeout=5)
+
+    match response.status_code:
+        case 401:
+            raise click.BadParameter("Your GitHub token could not be "
+                                     "authenticated (HTTP 401).")
+        case _:
+            return value
+
+
+@click.group(context_settings={"max_content_width": 120, "show_default": True})
+def ossqa_cli():
+    """
+    The entry point of the program.
+    """
+
+
+@ossqa_cli.command(help="Analyze the given SBOM.")
+@click.argument("path", required=True,
+                type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.option("-g", "--git-token", type=str, envvar="GITHUB_AUTH_TOKEN",
+              callback=validate_git_token,
+              help=("GitHub Personal Access Token."
+                    "  [default: GITHUB_AUTH_TOKEN env variable]"))
+
+@click.option("-wc", "--code-vulnerabilities", type=click.IntRange(0, 10),
+              required=False, default=10,
+              help="Weight for Code Vulnerabilities category.")
+@click.option("-wm", "--maintenance", type=click.IntRange(0, 10),
+              required=False, default=10,
+              help="Weight for Maintenance category.")
+@click.option("-wt", "--continuous-testing", type=click.IntRange(0, 10),
+              required=False, default=10,
+              help="Weight for Continuous Testing category.")
+@click.option("-ws", "--source-risk-assessment", type=click.IntRange(0, 10),
+              required=False, default=10,
+              help="Weight for Source Risk Assessment category.")
+@click.option("-wb", "--build-risk-assessment", type=click.IntRange(0, 10),
+              required=False, default=10,
+              help="Weight for Build Risk Assesment category.")
+
+@click.option("-b", "--backend", type=str, callback=validate_backend,
+              default=constants.HOST, help="URL of the database server.")
+@click.option("-o", "--output", type=click.Choice(["table", "json"]),
+              required=False, default="table",
+              help="Output format.")
+@click.option("-v", "--verbose", is_flag=True, default=False, required=False,
+              help="Verbose output.")
+def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
+    """
+    Executes the command that analyzes an SBOM.
+    """
+    requirements = parse_requirements(**kwargs)
+    with open(path, "r", encoding="utf-8") as file:
+        unscored_sbom = Sbom(json.load(file))
+
+    # TODO: git_token should be sent to the frontend API, instead of setting
+    #       os.environ, to be more traceable
+    os.environ["GITHUB_AUTH_TOKEN"] = git_token
+
+    front_end_api = FrontEndAPI(backend)
+    scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
+
+    if output == "table":
+        scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
+        failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
+
+        mean_scores = calculate_mean_scores(scored_deps)
         mean_scores = sorted(mean_scores, key=lambda x: x[1])
         mean_scores = color_scores(mean_scores)
 
+        failed_deps = [[dep.name, dep.failure_reason] for dep in failed_deps]
+
         print(
-            tabulate(mean_scores, headers=["Dependency", "Average Score"])
+            tabulate(mean_scores, headers=["Successful Dependencies", "Average Score"])
         )
+        print(
+            tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])
+        )
+    elif output == "json":
+        deps_dict = scored_sbom.dependency_manager.to_dict()
+        print(json.dumps(deps_dict))
     else:
-        json_results = scored_sbom.dependency_manager.to_dict()
-        print(json.dumps(json_results))
+        print("This code should be unreachable.")
 
 
-def lookup_sbom_names(args: Namespace) -> None:
+@ossqa_cli.command(help="Lookup names of SBOMs in the database.")
+@click.option("-b", "--backend", type=str, callback=validate_backend,
+              default=constants.HOST, help="URL of the database server.")
+@click.option("-o", "--output", type=click.Choice(["table", "json"]),
+              required=False, default="table",
+              help="Output format.")
+@click.option("-v", "--verbose", is_flag=True, default=False, required=False,
+              help="Verbose output.")
+def sboms(backend: str, output: str, verbose: str):
     """
     Executes the command that fetches all SBOM names from the backend.
-
-    Args:
-        args (Namespace): The parsed arguments of the program.
     """
-    output, verbose, backend = parse_arguments_shared(args)
     front_end_api = FrontEndAPI(backend)
     sbom_names = front_end_api.lookup_stored_sboms()
 
-    if output != "json":
+    if output == "table":
         table = tabulate([sbom_names], headers=["Repository Names"])
         print(table)
-    else:
+    elif output == "json":
         print(json.dumps(sbom_names))
+    else:
+        print("This code should be unreachable.")
 
 
-def lookup_sbom_details(args: Namespace) -> None:
+@ossqa_cli.command(help="Lookup SBOMs with a given name.")
+@click.argument("name", required=True, type=str)
+@click.option("-b", "--backend", type=str, callback=validate_backend,
+              default=constants.HOST, help="URL of the database server.")
+@click.option("-o", "--output", type=click.Choice(["table", "json"]),
+              required=False, default="table",
+              help="Output format.")
+@click.option("-v", "--verbose", is_flag=True, default=False, required=False,
+              help="Verbose output.")
+def lookup(name: str, backend: str, output: str, verbose: str):
     """
     Executes the command that fetches all SBOMs of a specific name
     from the backend.
-
-    Args:
-        args (Namespace): The parsed arguments of the program.
     """
-    output, verbose, backend = parse_arguments_shared(args)
-    repo_name = parse_lookup_arguments(args)
     front_end_api = FrontEndAPI(backend)
-    sboms = front_end_api.lookup_previous_sboms(repo_name)
+    found_sboms = front_end_api.lookup_previous_sboms(name)
 
-    if output != "json":
+    if output == "table":
         table_data = []
-        for sbom in sboms:
+        for sbom in found_sboms:
             dependencies = sbom.dependency_manager.get_dependencies_by_filter(
                 lambda _: True
             )
@@ -508,58 +313,8 @@ def lookup_sbom_details(args: Namespace) -> None:
         ]
         table = tabulate(table_data, headers=table_headers)
         print(table)
-    else:
-        sbom_dicts = [sbom.to_dict() for sbom in sboms]
+    elif output == "json":
+        sbom_dicts = [sbom.to_dict() for sbom in found_sboms]
         print(json.dumps(sbom_dicts))
-
-
-def run_cli():
-    """
-    Main function that handles the execution of the program.
-    """
-    parser: ArgumentParser = create_parser()
-    args: Namespace = parser.parse_args()
-
-    if args.analyze:
-        analyze_sbom(args)
-    elif args.sboms:
-        lookup_sbom_names(args)
-    elif args.lookup:
-        lookup_sbom_details(args)
-
-
-def fill_with_test_scores(dependencies: list[Dependency]) -> list[Dependency]:
-    """
-    Fill the dependencies with test scores.
-
-    Args:
-        dependencies (list[Dependency]):
-            The dependencies to fill with test scores.
-
-    Returns:
-        list[Dependency]:
-            The dependencies filled with test scores.
-    """
-    from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
-    for i, dep in enumerate(dependencies):
-        dep.dependency_score = Scorecard(
-            {
-                "date": "2021-10-10",
-                "score": i,
-                "checks": [
-                    {
-                        "name": ScorecardChecks.BINARY_ARTIFACTS,
-                        "score": i,
-                        "reason": "No binary artifacts found",
-                        "details": "No binary artifacts found"
-                    },
-                    {
-                        "name": ScorecardChecks.CI_TESTS.value,
-                        "score": i,
-                        "reason": "No CI tests found",
-                        "details": "No CI tests found"
-                    }
-                ]
-            }
-        )
-    return dependencies
+    else:
+        print("This code should be unreachable.")
