@@ -78,6 +78,14 @@ class TestGetNamedSboms:
 
     def test_backend_comm(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+        def callback(response: StepResponse):
+            assert response.message != "The request timed out"
+            assert response.message != "An error occurred in the database"
+        backend_comm = BackendCommunication(callback, HOST)
+        sboms = backend_comm.get_sboms_by_name(name)
+        assert isinstance(sboms, list)
+        assert len(sboms) != 0
+        assert sboms[0].repo_name == name
 
     def test_sbom_processor(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
