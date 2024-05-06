@@ -15,7 +15,7 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.frontend.cli import ossqa_cli
 from main.frontend.front_end_api import FrontEndAPI
-from main.sbom_processor import SbomProcessor
+from main.sbom_processor import SbomProcessor, SbomProcessorStatus
 
 from tests.main.integration.constants import HOST
 from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
@@ -79,15 +79,23 @@ class TestGetSbomNames:
         assert len(names) != 0
 
     def test_sbom_processor(self):
-        # TODO: could test on_status_update in some way
+        def callback(status: SbomProcessorStatus):
+            if response := status.step_response:
+                assert response.message != "The request timed out"
+                assert response.message != "An error occurred in the database"
         sbom_proc = SbomProcessor(HOST)
+        sbom_proc.on_status_update.subscribe(callback)
         names = sbom_proc.lookup_stored_sboms()
         assert isinstance(names, list)
         assert len(names) != 0
 
     def test_front_end_api(self):
-        # TODO: could test on_status_update in some way
+        def callback(status: SbomProcessorStatus):
+            if response := status.step_response:
+                assert response.message != "The request timed out"
+                assert response.message != "An error occurred in the database"
         front_end_api = FrontEndAPI(HOST)
+        front_end_api.on_sbom_processor_status_update.subscribe(callback)
         names = front_end_api.lookup_stored_sboms()
         assert isinstance(names, list)
         assert len(names) != 0
