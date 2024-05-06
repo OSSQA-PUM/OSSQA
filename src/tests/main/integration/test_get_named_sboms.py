@@ -117,3 +117,13 @@ class TestGetNamedSboms:
 
     def test_cli(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+        # Temporarily overwrite sys.argv, then run the CLI
+        mock_args = ["prog", "lookup", "--backend", HOST, name]
+        with patch("sys.argv", mock_args):
+            assert sys.argv == mock_args
+            try:
+                ossqa_cli()
+                # TODO: test this more extensively. maybe catch stdout?
+            except SystemExit as e:
+                # Click explicitly calls sys.exit, so this needs to be caught
+                assert e.code == 0
