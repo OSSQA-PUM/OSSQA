@@ -16,7 +16,7 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.frontend.cli import ossqa_cli
 from main.frontend.front_end_api import FrontEndAPI
-from main.sbom_processor import SbomProcessor
+from main.sbom_processor import SbomProcessor, SbomProcessorStatus
 
 from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
 from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
@@ -89,6 +89,17 @@ class TestGetNamedSboms:
 
     def test_sbom_processor(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+        def callback(status: SbomProcessorStatus):
+            if response := status.step_response:
+                assert response.message != "The request timed out"
+                assert response.message != "An error occurred in the database"
+        sbom_proc = SbomProcessor(HOST)
+        sbom_proc.on_status_update.subscribe(callback)
+        sboms = sbom_proc.lookup_previous_sboms(name)
+        assert isinstance(sboms, list)
+        assert len(sboms) != 0
+        assert sboms[0].repo_name == name
+
 
     def test_front_end_api(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
