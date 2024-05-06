@@ -103,6 +103,17 @@ class TestGetNamedSboms:
 
     def test_front_end_api(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+        def callback(status: SbomProcessorStatus):
+            if response := status.step_response:
+                assert response.message != "The request timed out"
+                assert response.message != "An error occurred in the database"
+        front_end_api = FrontEndAPI(HOST)
+        front_end_api.on_sbom_processor_status_update.subscribe(callback)
+        sboms = front_end_api.lookup_previous_sboms(name)
+        assert isinstance(sboms, list)
+        assert len(sboms) != 0
+        assert sboms[0].repo_name == name
+
 
     def test_cli(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
