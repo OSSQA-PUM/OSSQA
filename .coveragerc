@@ -2,13 +2,33 @@
 omit =
     src/tests/*
     tests/*
+
     src/backend/server.py
     backend/server.py
+
     src/backend_main.py
     backend_main.py
+
     src/cli_main.py
     cli_main.py
+
     src/test_backend_main.py
     test_backend_main.py
+
     src/web_main.py
     web_main.py
+
+    src/backend/__init__.py
+    backend/__init__.py
+
+    src/main/__init__.py
+    main/__init__.py
+
+    src/main/data_types/__init__.py
+    main/data_types/__init__.py
+
+    src/main/data_types/sbom_types/__init__.py
+    main/data_types/sbom_types/__init__.py
+
+    src/main/frontend/__init__.py
+    main/frontend/__init__.py
