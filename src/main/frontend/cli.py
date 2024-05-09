@@ -68,12 +68,12 @@ def calculate_mean_scores(dependencies:list[Dependency]) -> \
 
     for dependency in dependencies:
         mean_score = calculate_mean_score(dependency)
-        dep_result = [dependency.name, mean_score]
+        dep_result = [dependency.component_name, mean_score, dependency.reach_requirement]
         mean_scores.append(dep_result)
     return mean_scores
 
 
-def color_score(name: str, score: float) -> list[str, str]:
+def color_score(name: str, score: float, requirement: str) -> list[str, str, str]:
     """
     Color the score based on the value.
 
@@ -86,15 +86,15 @@ def color_score(name: str, score: float) -> list[str, str]:
         the colored score.
     """
     if score >= 7:
-        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m"]
+        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m", f"\033[92m{requirement}\033[0m"]
     elif score >= 3:
-        return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m"]
+        return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m", f"\033[93m{requirement}\033[0m"]
     else:
-        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m"]
+        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m", f"\033[91m{requirement}\033[0m"]
 
 
-def color_scores(scores: list[list[Dependency, float]]) -> \
-                                                        list[list[str, str]]:
+def color_scores(scores: list[list[Dependency, float, str]]) -> \
+                                                        list[list[str, str, str]]:
     """
     Color the scores based on the values.
 
@@ -108,7 +108,7 @@ def color_scores(scores: list[list[Dependency, float]]) -> \
     colored_scores: list = []
 
     for score in scores:
-        colored_score = color_score(score[0], score[1])
+        colored_score = color_score(score[0], score[1], score[2])
         colored_scores.append(colored_score)
     return colored_scores
 
@@ -123,18 +123,44 @@ def parse_requirements(**kwargs) -> UserRequirements:
     Returns:
         UserRequirements: The parsed user requirements.
     """
-    code_vulnerabilities: int = kwargs.get("code_vulnerabilities")
-    maintenance: int = kwargs.get("maintenance")
-    continuous_testing: int = kwargs.get("continuous_testing")
-    source_risk_assessment: int = kwargs.get("source_risk_assessment")
-    build_risk_assessment: int = kwargs.get("build_risk_assessment")
+    vulnerabilities: int = kwargs.get("vulnerabilities")
+    dependency_update_tool: int = kwargs.get("dependency_update_tool")
+    maintained: int = kwargs.get("maintained")
+    security_policy: int = kwargs.get("security_policy")
+    license: int = kwargs.get("license")
+    cii_best_practices: int = kwargs.get("cii_best_practices")
+    ci_tests: int = kwargs.get("ci_tests")
+    fuzzing: int = kwargs.get("fuzzing")
+    sast: int = kwargs.get("sast")
+    binary_artifacts: int = kwargs.get("binary_artifacts")
+    branch_protection: int = kwargs.get("branch_protection")
+    dangerous_workflow: int = kwargs.get("dangerous_workflow")
+    code_review: int = kwargs.get("code_review")
+    contributors: int = kwargs.get("contributors")
+    pinned_dependencies: int = kwargs.get("pinned_dependencies")
+    token_permissions: int = kwargs.get("token_permissions")
+    packaging: int = kwargs.get("packaging")
+    signed_releases: int = kwargs.get("signed_releases")
 
     return UserRequirements({
-        RequirementsType.CODE_VULNERABILITIES: code_vulnerabilities,
-        RequirementsType.MAINTENANCE: maintenance,
-        RequirementsType.CONTINUOUS_TESTING: continuous_testing,
-        RequirementsType.SOURCE_RISK_ASSESSMENT: source_risk_assessment,
-        RequirementsType.BUILD_RISK_ASSESSMENT: build_risk_assessment,
+        RequirementsType.VULNERABILITIES: vulnerabilities,
+        RequirementsType.DEPENDENCY_UPDATE_TOOL: dependency_update_tool,
+        RequirementsType.MAINTAINED: maintained,
+        RequirementsType.SECURITY_POLICY: security_policy,
+        RequirementsType.LICENCE: license,
+        RequirementsType.CII_BEST_PRACTICES: cii_best_practices,
+        RequirementsType.CI_TESTS: ci_tests,
+        RequirementsType.FUZZING: fuzzing,
+        RequirementsType.SAST: sast,
+        RequirementsType.BINARY_ARTIFACTS: binary_artifacts,
+        RequirementsType.BRANCH_PROTECTION: branch_protection,
+        RequirementsType.DANGEROUS_WORKFLOW: dangerous_workflow,
+        RequirementsType.CODE_REVIEW: code_review,
+        RequirementsType.CONTRIBUTORS: contributors,
+        RequirementsType.PINNED_DEPENDENCIES: pinned_dependencies,
+        RequirementsType.TOKEN_PERMISSIONS: token_permissions,
+        RequirementsType.PACKAGING: packaging,
+        RequirementsType.SIGNED_RELEASES: signed_releases
     })
 
 
@@ -187,21 +213,61 @@ def ossqa_cli():
               help=("GitHub Personal Access Token."
                     "  [default: GITHUB_AUTH_TOKEN env variable]"))
 
-@click.option("-wc", "--code-vulnerabilities", type=click.IntRange(0, 10),
-              required=False, default=10,
-              help="Weight for Code Vulnerabilities category.")
-@click.option("-wm", "--maintenance", type=click.IntRange(0, 10),
-              required=False, default=10,
-              help="Weight for Maintenance category.")
-@click.option("-wt", "--continuous-testing", type=click.IntRange(0, 10),
-              required=False, default=10,
-              help="Weight for Continuous Testing category.")
-@click.option("-ws", "--source-risk-assessment", type=click.IntRange(0, 10),
-              required=False, default=10,
-              help="Weight for Source Risk Assessment category.")
-@click.option("-wb", "--build-risk-assessment", type=click.IntRange(0, 10),
-              required=False, default=10,
-              help="Weight for Build Risk Assesment category.")
+@click.option("-v", "--vulnerabilities", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for vulnerabilities.")
+@click.option("-dut", "--dependency-update-tool", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for dependency update tool.")
+@click.option("-m", "--maintained", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for maintained.")
+@click.option("-sp", "--security-policy", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Reuirement for security policy.")
+@click.option("-l", "--license", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Reuirement for license.")
+@click.option("-cbp", "--cii-best-practices", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for CII best practices.")
+@click.option("-ct", "--ci-tests", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for CI tests.")
+@click.option("-f", "--fuzzing", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for fuzzing.")
+@click.option("-s", "--sast", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for SAST.")
+@click.option("-ba", "--binary-artifacts", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for binary artifacts.")
+@click.option("-bp", "--branch-protection", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for branch protection.")
+@click.option("-dw", "--dangerous-workflow", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for dangerous workflow.")
+@click.option("-cr", "--code-review", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for code review.")
+@click.option("-c", "--contributors", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for contributors.")
+@click.option("-pd", "--pinned-dependencies", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for pinned dependencies.")
+@click.option("-tp", "--token-permissions", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for contributors.")
+@click.option("-p", "--packaging", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for packaging.")
+@click.option("-sr", "--signed-releases", type=click.IntRange(-1, 10),
+              required=False, default=-1,
+              help="Requirement for signed releases.")
+
 
 @click.option("-b", "--backend", type=str, callback=validate_backend,
               default=constants.HOST, help="URL of the database server.")
@@ -224,7 +290,7 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
 
     front_end_api = FrontEndAPI(backend)
     scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
-
+    
     if output == "table":
         scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
         failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
@@ -232,11 +298,12 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
         mean_scores = calculate_mean_scores(scored_deps)
         mean_scores = sorted(mean_scores, key=lambda x: x[1])
         mean_scores = color_scores(mean_scores)
+        print(mean_scores)
 
-        failed_deps = [[dep.name, dep.failure_reason] for dep in failed_deps]
+        failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
 
         print(
-            tabulate(mean_scores, headers=["Successful Dependencies", "Average Score"])
+            tabulate(mean_scores, headers=["Successful Dependencies", "Average Score", "Meet requirements?"])
         )
         print(
             tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])

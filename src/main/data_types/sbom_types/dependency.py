@@ -20,12 +20,14 @@ class Dependency:
         dependency_score (Scorecard): The scorecard related to the dependency.
         failure_reason (Exception): The reason for any failure
                                     related to the dependency.
+        reach_requirement (str): If requirement is reached.
     """
     component_name: str
     name: str
     version: str
     dependency_score: Scorecard = None
     failure_reason: Exception = None
+    reach_requirement: str = None
 
     def __eq__(self, other):
         """
