@@ -7,7 +7,7 @@ from enum import StrEnum
 
 class RequirementsType(StrEnum):
     """
-    Mappings between strings and OpenSSF Scorecard check categories.
+    Mappings between strings and OpenSSF Scorecard tests.
     """
     VULNERABILITIES = "vulnerabilities"
     DEPENDENCY_UPDATE_TOOL = "dependency_update_tool"
@@ -32,14 +32,37 @@ class RequirementsType(StrEnum):
 class UserRequirements:
     """
     Represents the weights/priorities of the OpenSSF Scorecard
-    check categories.
+    tests.
 
     Attributes:
         source_risk_assessment (int): The risk assessment of the source.
+        includes:
+            vulnerabilities (int): The vulnerabilities of the project.
         maintenance (int): The maintenance of the project.
+        includes:
+            dependency_update_tool (int): The dependency update tool of the project.
+            maintained (int): The maintenance of the project.
+            security_policy (int): The security policy of the project.
+            licence (int): The licence of the project.
+            cii_best_practices (int): The CII best practices of the project.
         build_risk_assessment (int): The risk assessment of the build.
+        includes:
+            ci_tests (int): The CI tests of the project.
+            fuzzing (int): The fuzzing of the project.
+            sast (int): The SAST of the project.
         continuous_testing (int): The continuous testing of the project.
+        includes:
+            binary_artifacts (int): The binary artifacts of the project.
+            branch_protection (int): The branch protection of the project.
+            dangerous_workflow (int): The dangerous workflow of the project.
+            code_review (int): The code review of the project.
+            contributors (int): The contributors of the project.
         code_vulnerabilities (int): The code vulnerabilities of the project.
+        includes:
+            pinned_dependencies (int): The pinned dependencies of the project.
+            token_permissions (int): The token permissions of the project.
+            packaging (int): The packaging of the project.
+            signed_releases (int): The signed releases of the project.
     """
     vulnerabilities: int = -1
     dependency_update_tool: int = -1
