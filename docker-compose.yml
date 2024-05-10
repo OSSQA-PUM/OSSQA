@@ -44,6 +44,10 @@ services:
       dockerfile: src/main/frontend/cli.Dockerfile
     depends_on:
       - ossqa-database
+    volumes:
+      - type: bind
+        source: ./sboms
+        target: /sboms
     env_file: .env
 
   ossqa-web:
