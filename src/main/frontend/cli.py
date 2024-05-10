@@ -196,6 +196,60 @@ def validate_git_token(_ctx, _param, value: str):
                                      "authenticated (HTTP 401).")
         case _:
             return value
+        
+
+def table_output(scored_sbom: Sbom):
+    """
+    Print the output in a table format.
+
+    Args:
+        scored_sbom (Sbom): The scored SBOM.
+    """
+    scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
+    failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
+    mean_scores = calculate_mean_scores(scored_deps)
+    mean_scores = sorted(mean_scores, key=lambda x: x[1])
+    mean_scores = color_scores(mean_scores)
+    failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
+    print(
+        tabulate(mean_scores, headers=["Successful Dependencies", "Average Score", "Meet requirements?"])
+    )
+    print(
+        tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])
+    )
+
+
+def json_output(scored_sbom: Sbom):
+    """
+    Print the output in a JSON format.
+
+    Args:
+        scored_sbom (Sbom): The scored SBOM.
+    """
+    deps_dict = scored_sbom.dependency_manager.to_dict()
+    print(json.dumps(deps_dict))
+
+
+def simplified_output(scored_sbom: Sbom):
+    """
+    Print the output in a simplified format.
+    
+    Args:
+        scored_sbom (Sbom): The scored SBOM.
+    """
+    scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
+    failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
+    mean_scores = calculate_mean_scores(scored_deps)
+    mean_scores = sorted(mean_scores, key=lambda x: x[1])
+    failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
+    
+    print("Successfull dependencies:")
+    for dep in mean_scores:
+        print(f"{dep[0]},{dep[1]},{dep[2]}")
+
+    print("\nFailed dependencies:")
+    for dep in failed_deps:
+        print(f"{dep[0]},{dep[1]}")
 
 
 @click.group(context_settings={"max_content_width": 120, "show_default": True})
@@ -271,7 +325,7 @@ def ossqa_cli():
 
 @click.option("-b", "--backend", type=str, callback=validate_backend,
               default=constants.HOST, help="URL of the database server.")
-@click.option("-o", "--output", type=click.Choice(["table", "json"]),
+@click.option("-o", "--output", type=click.Choice(["table", "simplified", "json"]),
               required=False, default="table",
               help="Output format.")
 @click.option("-v", "--verbose", is_flag=True, default=False, required=False,
@@ -290,28 +344,16 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
 
     front_end_api = FrontEndAPI(backend)
     scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
-    
-    if output == "table":
-        scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
-        failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
 
-        mean_scores = calculate_mean_scores(scored_deps)
-        mean_scores = sorted(mean_scores, key=lambda x: x[1])
-        mean_scores = color_scores(mean_scores)
-
-        failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
-
-        print(
-            tabulate(mean_scores, headers=["Successful Dependencies", "Average Score", "Meet requirements?"])
-        )
-        print(
-            tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])
-        )
-    elif output == "json":
-        deps_dict = scored_sbom.dependency_manager.to_dict()
-        print(json.dumps(deps_dict))
-    else:
-        print("This code should be unreachable.")
+    match output:
+        case "table":
+            table_output(scored_sbom)
+        case "json":
+            json_output(scored_sbom)
+        case "simplified":
+            simplified_output(scored_sbom)
+        case _:
+            print("Unrecognized output format.")
 
 
 @ossqa_cli.command(help="Lookup names of SBOMs in the database.")
