@@ -117,32 +117,72 @@ def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
             release_tag = response.json()["name"]
 
     # Get the commit SHA1 hash for the release tag
-    sha1 = get_sha1_from_url({git_url},{release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+    try:
+        # Get the commit SHA1 hash for the release tag
+        url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{release_tag}"
+        reponse = requests.get(url, headers=headers, timeout=10)
+        sha1 = ""
+        if reponse.status_code == 200:
+            sha1 = reponse.json()["object"]["sha"]
 
-    sha1 = get_sha1_from_url({git_url},{name + "-" + release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+        assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+    except AssertionError:
+        try:
+            # Get the commit SHA1 hash for the release tag
+            url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{name + "-" + release_tag}"
+            reponse = requests.get(url, headers=headers, timeout=10)
+            sha1 = ""
+            if reponse.status_code == 200:
+                sha1 = reponse.json()["object"]["sha"]
 
-    sha1 = get_sha1_from_url({git_url},{name + "-v" + release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+            assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+        except AssertionError:
+            try:
+                # Get the commit SHA1 hash for the release tag
+                url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
+                       f"{name + "-v" + release_tag}")
+                reponse = requests.get(url, headers=headers, timeout=10)
+                sha1 = ""
+                if reponse.status_code == 200:
+                    sha1 = reponse.json()["object"]["sha"]
 
-    sha1 = get_sha1_from_url({git_url},{"v" + release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+                assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+            except AssertionError:
+                try:
+                    # Get the commit SHA1 hash for the release tag
+                    url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{"v" + release_tag}"
+                    reponse = requests.get(url, headers=headers, timeout=10)
+                    sha1 = ""
+                    if reponse.status_code == 200:
+                        sha1 = reponse.json()["object"]["sha"]
 
-    sha1 = get_sha1_from_url({git_url},{name + "@40" + release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+                    assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+                except AssertionError:
+                    try:
+                        # Get the commit SHA1 hash for the release tag
+                        url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
+                               f"{name + "@40" + release_tag}")
+                        reponse = requests.get(url, headers=headers, timeout=10)
+                        sha1 = ""
+                        if reponse.status_code == 200:
+                            sha1 = reponse.json()["object"]["sha"]
 
-    sha1 = get_sha1_from_url({git_url},{name + "@40v" + release_tag}, headers)
-    if is_valid_sha1(sha1):
-        return sha1
+                        assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+                    except AssertionError:
+                        try:
+                            # Get the commit SHA1 hash for the release tag
+                            url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
+                                   f"{name + "@40v" + release_tag}")
+                            reponse = requests.get(url, headers=headers, timeout=10)
+                            sha1 = ""
+                            if reponse.status_code == 200:
+                                sha1 = reponse.json()["object"]["sha"]
 
-    raise AssertionError(f"Failed to get commit SHA1 hash for {release_tag}")
-
+                            assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
+                        except AssertionError as e:
+                            raise AssertionError((f"Failed to get commit SHA1 hash for "
+                                                  f"{release_tag}")) from e
+    return sha1
 
 
 
