@@ -4,8 +4,9 @@ This module contains the function to calculate the final scores for the dependen
 import copy
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import UserRequirements
+from main.data_types.sbom_types.dependency import Dependency
 
-def calculate_final_scores(sbom: Sbom, user_requirements: UserRequirements) -> Sbom:
+def grade_dependencies(sbom: Sbom, user_requirements: UserRequirements) -> Sbom:
     """
     Calculates the final scores for the dependencies in the SBOM.
 
@@ -18,36 +19,38 @@ def calculate_final_scores(sbom: Sbom, user_requirements: UserRequirements) -> S
         Sbom: The SBOM with the final scores calculated.
     """
     sbom_copy = copy.deepcopy(sbom)
-    listed_requirements = user_requirements.get_listed_requirements()
-    checks = []
-    check_names = []
-    names_score = []
 
     for dependency in sbom_copy.dependency_manager.get_scored_dependencies():
-        for check in dependency.dependency_score.checks:
-            check_names.append(check.name)
-
-        for check in dependency.dependency_score.checks:
-            names_score.append(check.name)
-            names_score.append(check.score)
-            copy_names_score = names_score.copy()
-            checks.append(copy_names_score)
-            names_score.clear()
-
-        for requirement in listed_requirements:
-            if not requirement[0] in check_names:
-                if requirement[1] > -1:
-                    dependency.reach_requirement = "Test result not found"
-            else:
-                for check in checks:
-                    if check[0] == requirement[0]:
-                        if (requirement[1] <= check[1] and
-                            dependency.reach_requirement != "No" and 
-                            dependency.reach_requirement != "Test result not found"):
-                            dependency.reach_requirement = "Yes"
-                        else:
-                            if requirement[1] > check[1]:
-                                dependency.reach_requirement = "No"
-        checks.clear()
-        
+        dependency.reach_requirement = _grade_dependency(dependency, user_requirements)
     return sbom_copy
+
+def _grade_dependency(dependency: Dependency, user_requirements: UserRequirements) -> str:
+    """
+    Grades the dependency based on the user requirements.
+
+    Args:
+        dependency (Dependency): The dependency to grade.
+        user_requirements (UserRequirements): The user requirements.
+
+    Returns:
+        str: The grade of the dependency.
+    """
+    requirements_dict: dict = user_requirements.to_dict()
+
+    req_not_found: bool = False
+
+    # Check if dependency failed
+    for check in dependency.dependency_score.checks:
+        passing_treshould:int = requirements_dict.get(check.name, None)
+        if passing_treshould is None:
+            req_not_found = True
+            continue
+
+        if passing_treshould > check.score:
+            return "No"
+
+    # Check if result not found
+    if req_not_found:
+        return "Test result not found"
+
+    return "Yes"

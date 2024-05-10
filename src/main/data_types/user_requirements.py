@@ -199,3 +199,31 @@ class UserRequirements:
                 ["Contributors", self.contributors],["Pinned-Dependencies", self.pinned_dependencies],
                 ["Token-Permissions", self.token_permissions],["Packaging", self.packaging],
                 ["Signed-Releases", self.signed_releases]]
+    
+    def to_dict(self) -> dict:
+        """
+        Get a dictionary of the requirements.
+
+        Returns:
+            dict: The dictionary of requirements.
+        """
+        return {
+            "Vulnerabilities": self.vulnerabilities,
+            "Dependency-Update-Tool": self.dependency_update_tool,
+            "Maintained": self.maintained,
+            "Security-Policy": self.security_policy,
+            "License": self.licence,
+            "CII-Best-Practices": self.cii_best_practices,
+            "CI-Tests": self.ci_tests,
+            "Fuzzing": self.fuzzing,
+            "SAST": self.sast,
+            "Binary-Artifacts": self.binary_artifacts,
+            "Branch-Protection": self.branch_protection,
+            "Dangerous-Workflow": self.dangerous_workflow,
+            "Code-Review": self.code_review,
+            "Contributors": self.contributors,
+            "Pinned-Dependencies": self.pinned_dependencies,
+            "Token-Permissions": self.token_permissions,
+            "Packaging": self.packaging,
+            "Signed-Releases": self.signed_releases
+        }
