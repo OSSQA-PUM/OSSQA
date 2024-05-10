@@ -160,7 +160,7 @@ class Sbom:
             version = component["version"]
         except (ConnectionError, KeyError, NameError, ValueError) as e:
             failure_reason = e
-        dependency = Dependency(name=name, version=version)
+        dependency = Dependency(name=name, component_name=component["name"], version=version)
         if failure_reason:
             dependency.failure_reason = failure_reason
         return dependency

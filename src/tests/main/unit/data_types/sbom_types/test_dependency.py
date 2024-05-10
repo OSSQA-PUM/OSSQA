@@ -15,6 +15,7 @@ from main.data_types.sbom_types.scorecard import Scorecard
 from tests.main.unit.scorecards.scorecards import PATHS
 
 DEPENDENCY_NAME = "github.com/repo/path"
+COMPONENT_NAME = "path"
 
 
 @pytest.fixture
@@ -22,7 +23,7 @@ def dependency_basic():
     """
     Fixture to create a basic Dependency object.
     """
-    return Dependency(name=DEPENDENCY_NAME, version="1.0")
+    return Dependency(name=DEPENDENCY_NAME, component_name=COMPONENT_NAME, version="1.0")
 
 
 @pytest.fixture(params=PATHS)
@@ -32,7 +33,7 @@ def dependency_scorecard(request):
     """
     with open(request.param, "r", encoding="utf-8") as file:
         scorecard = json.load(file)
-    return Dependency(name=DEPENDENCY_NAME, version="1.0",
+    return Dependency(name=DEPENDENCY_NAME, component_name=COMPONENT_NAME, version="1.0",
                       dependency_score=Scorecard(scorecard))
 
 
@@ -40,15 +41,15 @@ def test_dependency_initialization():
     """
     Test that a Dependency object can be initialized.
     """
-    assert Dependency(name="", version="")
+    assert Dependency(name="", component_name="", version="")
 
 
 def test_dependency_eq():
     """
     Test that two Dependency objects are equal if they have the same name
     and version."""
-    dep1 = Dependency(name="dep1", version="1.0")
-    dep2 = Dependency(name="dep1", version="1.0")
+    dep1 = Dependency(name="dep1", component_name="com1", version="1.0")
+    dep2 = Dependency(name="dep1", component_name="com1", version="1.0")
     assert dep1 == dep2
 
 
@@ -56,9 +57,12 @@ def test_dependency_not_eq():
     """
     Test that two Dependency objects are not equal if they have different
     names or versions."""
-    dep1 = Dependency(name="dep1", version="1.0")
-    dep2 = Dependency(name="dep2", version="1.0")
-    dep3 = Dependency(name="dep1", version="1.1")
+    dep1 = Dependency(name="dep1", component_name="com1", version="1.0")
+    dep1 = Dependency(name="dep1", component_name="com2", version="1.0")
+    dep2 = Dependency(name="dep2", component_name="com1", version="1.0")
+    dep2 = Dependency(name="dep2", component_name="com2", version="1.0")
+    dep3 = Dependency(name="dep1", component_name="com1", version="1.1")
+    dep3 = Dependency(name="dep1", component_name="com2", version="1.1")
     assert dep1 != dep2
     assert dep1 != dep3
 

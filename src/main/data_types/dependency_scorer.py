@@ -119,11 +119,16 @@ class SSFAPIFetcher(DependencyScorer):
         new_dependency: Dependency = copy.deepcopy(dependency)
 
         try:
-            sha1 = get_git_sha1(dependency.repo_path, dependency.version)
-        except (ConnectionRefusedError, AssertionError, ValueError) as e:
-            error_message = f"Failed to get git sha1 due to: {e}"
-            new_dependency.failure_reason = type(e)(error_message)
-            return new_dependency
+            sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
+                                dependency.component_name, "release")
+        except (ConnectionRefusedError, AssertionError, ValueError):
+            try:
+                sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
+                                    dependency.component_name, "tag")
+            except (ConnectionRefusedError, AssertionError, ValueError) as e:
+                error_message = f"Failed to get git sha1 due to: {e}"
+                new_dependency.failure_reason = type(e)(error_message)
+                return new_dependency
 
         try:
             score = self._lookup_ssf_api(dependency.url.lstrip("htps:/"), sha1)
@@ -241,12 +246,19 @@ class ScorecardAnalyzer(DependencyScorer):
         new_dependency: Dependency = copy.deepcopy(dependency)
         try:
             version_git_sha1: str = get_git_sha1(
-                new_dependency.repo_path, new_dependency.version
+                new_dependency.repo_path, new_dependency.version, 
+                dependency.component_name, "release"
             )
-        except (ConnectionRefusedError, AssertionError, ValueError) as e:
-            error_message = f"Failed to get git sha1 due to: {e}"
-            new_dependency.failure_reason = type(e)(error_message)
-            return new_dependency
+        except (ConnectionRefusedError, AssertionError, ValueError):
+            try:
+                version_git_sha1: str = get_git_sha1(
+                    new_dependency.repo_path, new_dependency.version, 
+                    dependency.component_name, "tag"
+                )
+            except (ConnectionRefusedError, AssertionError, ValueError) as e:
+                error_message = f"Failed to get git sha1 due to: {e}"
+                new_dependency.failure_reason = type(e)(error_message)
+                return new_dependency
 
         remaining_tries: int = 3
         retry_interval: int = 3

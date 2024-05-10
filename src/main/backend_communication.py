@@ -150,6 +150,7 @@ class BackendFetcher(DependencyScorer):
             dependency_primary_keys.append([
                 dependency.name,
                 dependency.version,
+                dependency.component_name
             ])
 
         try:
@@ -176,11 +177,13 @@ class BackendFetcher(DependencyScorer):
 
         for dependency in response.json():
             name = dependency["name"]
+            component_name = dependency["component_name"]
             version = dependency["version"]
             scorecard = Scorecard(dependency["scorecard"])
 
             dep_obj = Dependency(name=name,
                                  version=version,
+                                 component_name=component_name,
                                  dependency_score=scorecard
                                  )
             result.append(dep_obj)

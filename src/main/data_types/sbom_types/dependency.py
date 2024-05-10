@@ -13,6 +13,7 @@ class Dependency:
     Represents a dependency for a project.
 
     Attributes:
+        component_name (str): The name of the component.
         name (str): The name of the dependency, corresponds to the URL in
                     CycloneDX format.
         version (str): The version of the dependency.
@@ -20,6 +21,7 @@ class Dependency:
         failure_reason (Exception): The reason for any failure
                                     related to the dependency.
     """
+    component_name: str
     name: str
     version: str
     dependency_score: Scorecard = None
