@@ -148,7 +148,6 @@ class Dependency:
         return f"https://{git_url}"
 
     def _get_git_url(self) -> str:
-        print(self.name)
         if "externalReferences" not in dir(self):
             raise KeyError("externalReferences not found in component")
         external_ref = getattr(self, "externalReferences")
