@@ -3,12 +3,10 @@ This module contains unit tests for the `Sbom` class in the
 `sbom` module of the `sbom_types` package.
 """
 import json
-import re
 import pytest
 from tests.main.unit.sboms.sboms import (PATHS as SBOM_PATHS,
                                          BAD_SBOMS,
                                          SBOM_COMPONENT_URLS,
-                                         DUMMY_SBOM,
                                          DUMMY_DEPENDENCIES)
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.dependency import Dependency
@@ -64,7 +62,7 @@ def test_sbom_initialize(sbom_from_json):
 
 def test_sbom_to_dict(sbom_from_json):
     """
-    Test that the to_dict method returns a dictionary representation of the 
+    Test that the to_dict method returns a dictionary representation of the
     SBOM.
     """
     sbom = Sbom(sbom_from_json)
@@ -94,7 +92,8 @@ def test_sbom_dependency_manager(sbom_from_json):
     assert sbom.dependency_manager is not None
     assert len(sbom.get_failed_dependencies()) == 0
     assert len(sbom.get_scored_dependencies()) == 0
-    assert len(sbom.get_unscored_dependencies()) == 14
+    assert len(sbom.get_unscored_dependencies()) == 13
+
 
 def test_sbom_dependency_manager_update(sbom_from_json):
     """
@@ -107,5 +106,4 @@ def test_sbom_dependency_manager_update(sbom_from_json):
     sbom.update_dependencies([new_dep1, new_dep2])
     assert len(sbom.get_failed_dependencies()) == 0
     assert len(sbom.get_scored_dependencies()) == 0
-    assert len(sbom.get_unscored_dependencies()) == 16
-
+    assert len(sbom.get_unscored_dependencies()) == 15

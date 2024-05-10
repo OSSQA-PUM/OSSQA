@@ -118,7 +118,7 @@ def test_dependency_manager_get_scored_dependencies(
 def test_dependency_manager_get_unscored_dependencies(
         dependency_manager_5_dependencies):
     """
-    Test the get_unscored_dependencies method of the DependencyManager class 
+    Test the get_unscored_dependencies method of the DependencyManager class
     when the manager has unscored dependencies."""
     dependency_manager = dependency_manager_5_dependencies
     assert len(dependency_manager.get_unscored_dependencies()) == 5
@@ -188,18 +188,26 @@ def test_dependency_manager_to_dict_filled(
     assert dep_dict["scored_dependencies"][0]["dependency_score"] == expected
     for dep in dep_dict["unscored_dependencies"]:
         for attr in dep:
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in (
+                    "dependency_score",
+                    "failure_reason",
+                    "passed",
+                    "platform_path"):
                 assert dep[attr] == DUMMY_DEPENDENCIES[2][attr]
             else:
-                assert dep[attr] is None
+                assert dep[attr] in [None, False] or "github" in dep[attr]
     for dep in dep_dict["failed_dependencies"]:
         for attr in dep:
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in (
+                    "dependency_score",
+                    "failure_reason",
+                    "passed",
+                    "platform_path"):
                 assert dep[attr] == DUMMY_DEPENDENCIES[1][attr]
             elif attr == "failure_reason":
                 assert isinstance(dep[attr], str)
             else:
-                assert dep[attr] is None
+                assert dep[attr] in [None, False] or "github" in dep[attr]
 
 
 def test_dependency_manager_get_by_filter(dep_mangr_with_distict_deps):

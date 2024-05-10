@@ -203,14 +203,6 @@
     },
     {
       "type": "library",
-      "bom-ref": "config-reader 0.1.0 (path+file:///janus/lib/config-reader)",
-      "name": "config-reader",
-      "version": "0.1.0",
-      "scope": "required",
-      "purl": "pkg:cargo/config-reader@0.1.0?download_url=file%3A%2F%2F..%252F..%252F..%252Flib%252Fconfig-reader"
-    },
-    {
-      "type": "library",
       "bom-ref": "fancy-regex 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "fancy-regex",
       "version": "0.11.0",

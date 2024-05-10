@@ -25,12 +25,14 @@ class Dependency:
 
     dependency_score: Scorecard = None
     failure_reason: Exception = None
+    passed: bool = False
 
     def __init__(self, dependency: dict):
         for dependency_attr in dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
         self.failure_reason = None
+        self.passed = False
 
     def __eq__(self, other):
         """
@@ -45,7 +47,7 @@ class Dependency:
         # Loop over all attributes of the dependency
         for attr in self.__dict__:
             # If the attribute is not the same in both dependencies
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in ("dependency_score", "failure_reason", "passed"):
                 try:
                     other_attr = getattr(other, attr)
                 except AttributeError:
@@ -64,6 +66,21 @@ class Dependency:
 
         Raises:
             KeyError: If the component name is not found in the component.
+        """
+        if "name" not in dir(self):
+            raise KeyError("name not found in component")
+        return getattr(self, "name")
+
+    @property
+    def component_name(self) -> str:
+        """
+        Get the name of the dependency.
+
+        Returns:
+            str: The name of the dependency.
+
+        Raises:
+            KeyError: If the name is not found in the component.
         """
         if "name" not in dir(self):
             raise KeyError("name not found in component")
@@ -131,6 +148,7 @@ class Dependency:
         return f"https://{git_url}"
 
     def _get_git_url(self) -> str:
+        print(self.name)
         if "externalReferences" not in dir(self):
             raise KeyError("externalReferences not found in component")
         external_ref = getattr(self, "externalReferences")
@@ -196,4 +214,13 @@ class Dependency:
                          if self.failure_reason else None
                          }
                 )
+
+        # Only allow path if it is a valid GitHub URL
+        try:
+            platform = self.platform
+            repo_path = self.repo_path
+        except (KeyError, ValueError):
+            return dependency_dict
+
+        dependency_dict.update({"platform_path": platform + repo_path})
         return dependency_dict
