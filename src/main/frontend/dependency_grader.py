@@ -8,15 +8,14 @@ from main.data_types.sbom_types.dependency import Dependency
 
 def grade_dependencies(sbom: Sbom, user_requirements: UserRequirements) -> Sbom:
     """
-    Calculates the final scores for the dependencies in the SBOM.
+    Grades the dependencies in the SBOM based on the user requirements.
 
     Args:
-        sbom (Sbom): The SBOM to calculate the final scores for.
-        user_requirements (UserRequirements): The user requirements
-            to calculate the final scores with.
+        sbom (Sbom): The SBOM to grade.
+        user_requirements (UserRequirements): The user requirements.
 
     Returns:
-        Sbom: The SBOM with the final scores calculated.
+        Sbom: The graded SBOM.
     """
     sbom_copy = copy.deepcopy(sbom)
 
