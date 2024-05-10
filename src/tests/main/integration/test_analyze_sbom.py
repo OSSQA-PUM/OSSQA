@@ -19,10 +19,9 @@ from main.data_types.user_requirements import RequirementsType, UserRequirements
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
 
+from tests.main.integration.constants import HOST
 from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
 from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
-
-HOST = "http://localhost:5091"
 
 
 @pytest.fixture(name="git_token", scope="module")
@@ -95,7 +94,7 @@ def after_test():
     assert len(resp.json()) != 0
 
 
-@pytest.mark.order(-1) # Ensures the tests run after all unit tests
+@pytest.mark.order(-2) # Ensures the tests run after all unit tests
 class TestAnalyzeSBOM:
     """
     These functions test the action of analyzing an SBOM in a
