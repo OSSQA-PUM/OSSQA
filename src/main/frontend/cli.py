@@ -298,7 +298,6 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
         mean_scores = calculate_mean_scores(scored_deps)
         mean_scores = sorted(mean_scores, key=lambda x: x[1])
         mean_scores = color_scores(mean_scores)
-        print(mean_scores)
 
         failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
 
