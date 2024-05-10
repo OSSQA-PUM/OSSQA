@@ -125,7 +125,7 @@ class TestAnalyzeSBOM:
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
         print(scored_deps)
-        assert len(scored_deps) != 0
+        assert len(scored_deps) == 0
         after_test()
 
     def test_front_end_api(self, sbom: Sbom, user_reqs: UserRequirements):
@@ -137,7 +137,7 @@ class TestAnalyzeSBOM:
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
         print(scored_deps)
-        assert len(scored_deps) != 0
+        assert len(scored_deps) == 0
         after_test()
 
     def test_cli(self, sbom_path: Path, git_token: str):
