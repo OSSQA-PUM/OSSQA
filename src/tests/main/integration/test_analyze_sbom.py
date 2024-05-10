@@ -124,6 +124,7 @@ class TestAnalyzeSBOM:
         unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
+        print(scored_deps)
         assert len(scored_deps) != 0
         after_test()
 
@@ -135,6 +136,7 @@ class TestAnalyzeSBOM:
         unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
         scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
         assert len(unscored_deps) == 0
+        print(scored_deps)
         assert len(scored_deps) != 0
         after_test()
 
