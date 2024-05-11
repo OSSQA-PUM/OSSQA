@@ -147,7 +147,7 @@ def parse_requirements(**kwargs) -> UserRequirements:
         RequirementsType.DEPENDENCY_UPDATE_TOOL: dependency_update_tool,
         RequirementsType.MAINTAINED: maintained,
         RequirementsType.SECURITY_POLICY: security_policy,
-        RequirementsType.LICENCE: license,
+        RequirementsType.LICENSE: license,
         RequirementsType.CII_BEST_PRACTICES: cii_best_practices,
         RequirementsType.CI_TESTS: ci_tests,
         RequirementsType.FUZZING: fuzzing,

@@ -13,7 +13,7 @@ class RequirementsType(StrEnum):
     DEPENDENCY_UPDATE_TOOL = "dependency_update_tool"
     MAINTAINED = "maintained"
     SECURITY_POLICY = "security_policy"
-    LICENCE = "licence"
+    LICENSE = "license"
     CII_BEST_PRACTICES = "cii_best_practices"
     CI_TESTS = "ci_tests"
     FUZZING = "fuzzing"
@@ -43,7 +43,7 @@ class UserRequirements:
             dependency_update_tool (int): The dependency update tool of the project.
             maintained (int): The maintenance of the project.
             security_policy (int): The security policy of the project.
-            licence (int): The licence of the project.
+            license (int): The license of the project.
             cii_best_practices (int): The CII best practices of the project.
         build_risk_assessment (int): The risk assessment of the build.
         includes:
@@ -68,7 +68,7 @@ class UserRequirements:
     dependency_update_tool: int = -1
     maintained: int = -1
     security_policy: int = -1
-    licence: int = -1
+    license: int = -1
     cii_best_practices: int = -1
     ci_tests: int = -1
     fuzzing: int = -1
@@ -98,8 +98,8 @@ class UserRequirements:
             RequirementsType.MAINTAINED, -1)
         self.security_policy = requirements.get(
             RequirementsType.SECURITY_POLICY, -1)
-        self.licence = requirements.get(
-            RequirementsType.LICENCE, -1)
+        self.license = requirements.get(
+            RequirementsType.LICENSE, -1)
         self.cii_best_practices = requirements.get(
             RequirementsType.CII_BEST_PRACTICES, -1)
         self.ci_tests = requirements.get(
@@ -145,7 +145,7 @@ class UserRequirements:
                 is_int(self.dependency_update_tool) and
                 is_int(self.maintained) and
                 is_int(self.security_policy) and
-                is_int(self.licence) and
+                is_int(self.license) and
                 is_int(self.cii_best_practices) and
                 is_int(self.ci_tests) and
                 is_int(self.fuzzing) and
@@ -165,7 +165,7 @@ class UserRequirements:
                 -1 <= self.dependency_update_tool <= 10 and
                 -1 <= self.maintained <= 10 and
                 -1 <= self.security_policy <= 10 and
-                -1 <= self.licence <= 10 and
+                -1 <= self.license <= 10 and
                 -1 <= self.cii_best_practices <= 10 and
                 -1 <= self.ci_tests <= 10 and
                 -1 <= self.fuzzing <= 10 and
@@ -192,7 +192,7 @@ class UserRequirements:
         """
         return [["Vulnerabilities", self.vulnerabilities],["Dependency-Update-Tool", self.dependency_update_tool],
                 ["Maintained", self.maintained],["Security-Policy", self.security_policy],
-                ["License", self.licence],["CII-Best-Practices", self.cii_best_practices],
+                ["License", self.license],["CII-Best-Practices", self.cii_best_practices],
                 ["CI-Tests", self.ci_tests],["Fuzzing", self.fuzzing],["SAST", self.sast],
                 ["Binary-Artifacts", self.binary_artifacts],["Branch-Protection", self.branch_protection],
                 ["Dangerous-Workflow", self.dangerous_workflow],["Code-Review", self.code_review],
@@ -212,7 +212,7 @@ class UserRequirements:
             "Dependency-Update-Tool": self.dependency_update_tool,
             "Maintained": self.maintained,
             "Security-Policy": self.security_policy,
-            "License": self.licence,
+            "License": self.license,
             "CII-Best-Practices": self.cii_best_practices,
             "CI-Tests": self.ci_tests,
             "Fuzzing": self.fuzzing,
