@@ -34,22 +34,30 @@ def _grade_dependency(dependency: Dependency, user_requirements: UserRequirement
     Returns:
         str: The grade of the dependency.
     """
-    requirements_dict: dict = user_requirements.to_dict()
+    dependency_scores: dict = dependency.dependency_score.to_dict()
+    checks: dict = {}
 
-    req_not_found: bool = False
+    for check in dependency_scores["checks"]:
+        checks[check["name"]] = check["score"]
+
+    found_all_checks: bool = True
 
     # Check if dependency failed
-    for check in dependency.dependency_score.checks:
-        passing_treshould:int = requirements_dict.get(check.name, None)
-        if passing_treshould is None:
-            req_not_found = True
+    for req_name, req_score in user_requirements.get_listed_requirements():
+        if req_score == -1:
             continue
 
-        if passing_treshould > check.score:
+        check_score = checks.get(req_name, None)
+        if check_score is None:
+            found_all_checks = False
+            continue
+
+        if check_score < req_score:
             return "No"
+            
 
     # Check if result not found
-    if req_not_found:
+    if not found_all_checks:
         return "Test result not found"
-
+    
     return "Yes"
