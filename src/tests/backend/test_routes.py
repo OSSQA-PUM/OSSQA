@@ -84,4 +84,4 @@ def test_get_existing_dependencies(client: FlaskClient, sbom: dict):
     assert resp.status_code == 200
 
     for component in resp.json:
-        assert [component["name"], component["version"]] in dep_name_versions
+        assert [component["name"], component["component_name"], component["version"]] in dep_name_versions

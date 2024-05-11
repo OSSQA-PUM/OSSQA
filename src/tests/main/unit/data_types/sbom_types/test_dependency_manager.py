@@ -189,6 +189,7 @@ def test_dependency_manager_to_dict_filled(
     assert dep_dict["scored_dependencies"][0]["dependency_score"] == expected
     assert dep_dict["unscored_dependencies"] == \
         [{'name': 'github.com/repo/path',
+          'component_name': 'comp',
           'version': '3.0',
           'dependency_score': None,
           'failure_reason': None}]
