@@ -24,7 +24,8 @@ from tabulate import tabulate
 import main.constants as constants
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.sbom import Sbom
-from main.data_types.user_requirements import RequirementsType, UserRequirements
+from main.data_types.user_requirements import \
+                                        RequirementsType, UserRequirements
 from main.frontend.front_end_api import FrontEndAPI
 from main.util import raise_github_token_refused
 
@@ -68,12 +69,17 @@ def calculate_mean_scores(dependencies:list[Dependency]) -> \
 
     for dependency in dependencies:
         mean_score = calculate_mean_score(dependency)
-        dep_result = [dependency.component_name, mean_score, dependency.reach_requirement]
+        dep_result = [
+            dependency.component_name, 
+            mean_score,
+            dependency.reach_requirement
+        ]
         mean_scores.append(dep_result)
     return mean_scores
 
 
-def color_score(name: str, score: float, requirement: str) -> list[str, str, str]:
+def color_score(name: str, score: float, requirement: str) -> \
+                                                        list[str, str, str]:
     """
     Color the score based on the value.
 
@@ -85,16 +91,24 @@ def color_score(name: str, score: float, requirement: str) -> list[str, str, str
         list[str, str]: A list containing the dependency name and
         the colored score.
     """
+    if requirement == "No" or requirement == "Test result not found":
+        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m",
+                f"\033[92m{requirement}\033[0m"]
+    
     if score >= 7:
-        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m", f"\033[92m{requirement}\033[0m"]
-    elif score >= 3:
-        return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m", f"\033[93m{requirement}\033[0m"]
-    else:
-        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m", f"\033[91m{requirement}\033[0m"]
+        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
+                f"\033[91m{requirement}\033[0m"]
+
+    if score >= 3:
+        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
+                f"\033[91m{requirement}\033[0m"]
+
+    return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
+            f"\033[91m{requirement}\033[0m"]
 
 
 def color_scores(scores: list[list[Dependency, float, str]]) -> \
-                                                        list[list[str, str, str]]:
+                                                    list[list[str, str, str]]:
     """
     Color the scores based on the values.
 
@@ -210,12 +224,24 @@ def table_output(scored_sbom: Sbom):
     mean_scores = calculate_mean_scores(scored_deps)
     mean_scores = sorted(mean_scores, key=lambda x: x[1])
     mean_scores = color_scores(mean_scores)
-    failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
+    failed_deps = [
+        [dep.component_name, dep.failure_reason] for dep in failed_deps
+    ]
     print(
-        tabulate(mean_scores, headers=["Successful Dependencies", "Average Score", "Meet requirements?"])
+        tabulate(
+            mean_scores, 
+            headers=[
+                "Successful Dependencies", 
+                "Average Score", 
+                "Meet requirements?"
+            ]
+        )
     )
     print(
-        tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])
+        tabulate(
+            failed_deps, 
+            headers=["Failed Dependencies", "Failure Reason"]
+        )
     )
 
 
@@ -241,7 +267,8 @@ def simplified_output(scored_sbom: Sbom):
     failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
     mean_scores = calculate_mean_scores(scored_deps)
     mean_scores = sorted(mean_scores, key=lambda x: x[1])
-    failed_deps = [[dep.component_name, dep.failure_reason] for dep in failed_deps]
+    failed_deps = [[dep.component_name, dep.failure_reason] 
+                   for dep in failed_deps]
     
     print("Successfull dependencies:")
     for dep in mean_scores:
@@ -325,7 +352,9 @@ def ossqa_cli():
 
 @click.option("-b", "--backend", type=str, callback=validate_backend,
               default=constants.HOST, help="URL of the database server.")
-@click.option("-o", "--output", type=click.Choice(["table", "simplified", "json"]),
+@click.option("-o", "--output", type=click.Choice(["table",
+                                                   "simplified",
+                                                   "json"]),
               required=False, default="table",
               help="Output format.")
 @click.option("-v", "--verbose", is_flag=True, default=False, required=False,
