@@ -6,6 +6,7 @@
     "scored_dependencies": [
         {
             "name": "dep_1",
+            "component_name": "comp1",
             "version": "1.0",
             "dependency_score": {
                 "date": "1984-05-21",
