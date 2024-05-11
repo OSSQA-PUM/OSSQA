@@ -382,16 +382,16 @@ class ScorecardAnalyzer(DependencyScorer):
             if os.name == "nt":
                 output: str = subprocess.check_output(
                     f'scorecard-windows.exe {flags}',
-                    shell=False,
+                    shell=True,
                     timeout=timeout
                 ).decode("utf-8")
             else:
                 output: str = subprocess.check_output(
                     f'scorecard {flags}',
-                    shell=False,
+                    shell=True,
                     timeout=timeout
                 ).decode("utf-8")
-        except subprocess.CalledProcessError as e:
+        except (subprocess.CalledProcessError) as e:
             output = e.output.decode("utf-8")
         except subprocess.TimeoutExpired as e:
             token_data: dict = get_token_data()
