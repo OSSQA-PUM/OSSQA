@@ -8,8 +8,35 @@ Functions:
 import re
 import os
 import datetime
+from time import time, sleep
 import requests
 from packaging import version as version_parser
+
+def get_token_data() -> dict:
+    """
+    Returns:
+        dict: A dictionary containing the user's GitHub API token data 
+    """
+    token = os.environ.get('GITHUB_AUTH_TOKEN')
+    url = 'https://api.github.com/rate_limit'
+
+    # Make a GET request to the GitHub API with your token for authentication
+    headers = {'Authorization': f'token {token}'}
+    response = requests.get(url, headers=headers, timeout=5)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        user_data = response.headers
+
+        return {
+            "limit": int(user_data['X-RateLimit-Limit']),
+            "used": int(user_data['x-ratelimit-used']),
+            "remaining": int(user_data['X-RateLimit-Remaining']),
+            "time_until_reset": int(user_data["X-RateLimit-Reset"]) - time()
+        }
+
+    print(f"Failed to authenticate. Status code: {response.status_code}")
+    return None
 
 def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
     """
@@ -81,14 +108,17 @@ def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
             and "API rate limit exceeded" in response.json()["message"]:
         reset_time = response.headers.get("X-RateLimit-Reset")
 
+        wait_time: float = int(reset_time) - time()
+
         # Convert the reset time to a human-readable format
         reset_time = datetime.datetime.fromtimestamp(int(reset_time))
         reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
-
-        raise ConnectionRefusedError(
-            (f"GitHub API rate limit exceeded. Try again later."
-             f"Rate limit resets at {reset_time}.")
-            )
+        print(f"GitHub API rate limit exceeded. Rate limit resets at {reset_time}.")
+        sleep(wait_time + 10)
+        return get_git_sha1(git_url=git_url,
+                            version=version,
+                            name=name,
+                            check=check)
 
     # Check if the response is successful
     if response.status_code != 200:

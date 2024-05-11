@@ -10,16 +10,16 @@ from typing import Any, Callable
 from dataclasses import dataclass
 import subprocess
 from multiprocessing import Pool
+from time import sleep
 import re
 import json
 import copy
 import os
-from time import sleep
 import requests
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.event import Event
-from main.util import get_git_sha1
+from main.util import get_git_sha1, get_token_data
 
 
 @dataclass
@@ -382,17 +382,25 @@ class ScorecardAnalyzer(DependencyScorer):
             if os.name == "nt":
                 output: str = subprocess.check_output(
                     f'scorecard-windows.exe {flags}',
-                    shell=True,
+                    shell=False,
                     timeout=timeout
                 ).decode("utf-8")
             else:
                 output: str = subprocess.check_output(
                     f'scorecard {flags}',
-                    shell=True,
+                    shell=False,
                     timeout=timeout
                 ).decode("utf-8")
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
+        except subprocess.TimeoutExpired as e:
+            token_data: dict = get_token_data()
+            if token_data.get("remaining") > 0:
+                raise e
+            sleep(token_data.get("time_until_reset") + 10)
+            return self._execute_scorecard(git_url=git_url,
+                                           commit_sha1=commit_sha1,
+                                           timeout=timeout)
 
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
