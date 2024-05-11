@@ -149,8 +149,7 @@ class BackendFetcher(DependencyScorer):
         for dependency in dependencies:
             dependency_primary_keys.append([
                 dependency.name,
-                dependency.version,
-                dependency.component_name
+                dependency.version
             ])
 
         try:
