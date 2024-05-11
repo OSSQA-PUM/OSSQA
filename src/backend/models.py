@@ -20,6 +20,7 @@ class Check(db.Model):
     """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(255), unique=False)
+    component_name = db.Column(db.String(255), unique=False)
     score = db.Column(db.Integer, unique=False)
     reason = db.Column(db.String(255), unique=False)
     details = db.Column(db.Text, unique=False)
@@ -30,6 +31,7 @@ class Check(db.Model):
     def to_dict(self) -> dict:
         return {
             "name": self.name,
+            "component_name": self.component_name,
             "score": self.score,
             "reason": self.reason,
             "details": self.details
@@ -81,9 +83,9 @@ class Dependency(db.Model):
         """
         return {
             "name": self.name,
+            "component_name": self.component_name,
             "version": self.version,
-            "scorecard": self.scorecard.to_dict(),
-            "component_name": self.component_name
+            "scorecard": self.scorecard.to_dict()
         }
 
 

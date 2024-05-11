@@ -80,6 +80,7 @@ class Dependency:
         """
         return {
             "name": self.name,
+            "component_name": self.component_name,
             "version": self.version,
             "dependency_score": self.dependency_score.to_dict()
             if self.dependency_score else None,

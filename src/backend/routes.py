@@ -46,10 +46,10 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 repo_version=sbom_json["repo_version"],
             )
             db.session.add(sbom)
-
         for dep_json in sbom_json["scored_dependencies"]:
             dep: Dependency = Dependency.query.filter_by(
                 name=dep_json["name"],
+                component_name=dep_json["component_name"],
                 version=dep_json["version"],
             ).first()
             scorecard_json = dep_json["dependency_score"]
@@ -62,6 +62,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             else:
                 dep = Dependency(
                     name=dep_json["name"],
+                    component_name=dep_json["component_name"],
                     version=dep_json["version"],
                 )
                 sbom.dependencies.append(dep)
@@ -133,8 +134,8 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             return jsonify([]), 400
 
         dependencies = []
-        for name, version in request.json:
-            dependency = Dependency.query.filter_by(name=name, version=version).first()
+        for name, component_name, version in request.json:
+            dependency = Dependency.query.filter_by(name=name, component_name=component_name, version=version).first()
             if dependency:
                 dependencies.append(dependency.to_dict())
         return jsonify(dependencies), 200

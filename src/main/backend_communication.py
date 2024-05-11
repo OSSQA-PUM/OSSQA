@@ -149,6 +149,7 @@ class BackendFetcher(DependencyScorer):
         for dependency in dependencies:
             dependency_primary_keys.append([
                 dependency.name,
+                dependency.component_name,
                 dependency.version
             ])
 
@@ -181,8 +182,8 @@ class BackendFetcher(DependencyScorer):
             scorecard = Scorecard(dependency["scorecard"])
 
             dep_obj = Dependency(name=name,
-                                 version=version,
                                  component_name=component_name,
+                                 version=version,
                                  dependency_score=scorecard
                                  )
             result.append(dep_obj)
