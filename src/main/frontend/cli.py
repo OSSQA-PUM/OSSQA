@@ -92,16 +92,16 @@ def color_score(name: str, score: float, requirement: str) -> \
         the colored score.
     """
     if requirement == "No" or requirement == "Test result not found":
-        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m",
-                f"\033[92m{requirement}\033[0m"]
-    
-    if score >= 7:
         return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
                 f"\033[91m{requirement}\033[0m"]
 
+    if score >= 7:
+        return [f"\033[92m{name}\033[0m", f"\033[92m{score}\033[0m",
+                f"\033[92m{requirement}\033[0m"]
+
     if score >= 3:
-        return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
-                f"\033[91m{requirement}\033[0m"]
+        return [f"\033[93m{name}\033[0m", f"\033[93m{score}\033[0m",
+                f"\033[93m{requirement}\033[0m"]
 
     return [f"\033[91m{name}\033[0m", f"\033[91m{score}\033[0m",
             f"\033[91m{requirement}\033[0m"]
