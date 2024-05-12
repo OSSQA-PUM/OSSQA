@@ -33,7 +33,7 @@ class Dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
         self.failure_reason = None
-        self.reach_requirement = False
+        self.reach_requirement = None
 
     def __eq__(self, other):
         """
