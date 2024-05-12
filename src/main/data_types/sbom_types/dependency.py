@@ -25,7 +25,6 @@ class Dependency:
 
     dependency_score: Scorecard = None
     failure_reason: Exception = None
-    passed: bool = False
     reach_requirement: str = None
     component_name: str = None
 
@@ -34,7 +33,6 @@ class Dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
         self.failure_reason = None
-        self.passed = False
         self.reach_requirement = False
 
     def __eq__(self, other):

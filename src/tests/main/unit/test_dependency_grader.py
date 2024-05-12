@@ -59,10 +59,10 @@ scorecard_1: Scorecard = Scorecard({
     })
 dep_one = Dependency(
         {
-            "component_name" : "component1",
-            "dependency_score" : scorecard_1
+            "name" : "component1",
         }
     )
+dep_one.dependency_score = scorecard_1
 
 
 scorecard_2: Scorecard = Scorecard({
@@ -91,10 +91,10 @@ scorecard_2: Scorecard = Scorecard({
 })
 dep_two = Dependency(
         {
-            "component_name" : "component2",
-            "dependency_score" : scorecard_2
+            "name" : "component2",
         }
     )
+dep_two.dependency_score = scorecard_2
 
 scorecard_3: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -116,10 +116,10 @@ scorecard_3: Scorecard = Scorecard({
 })
 dep_three = Dependency(
         {
-            "component_name" : "component3",
-            "dependency_score" : scorecard_3
+            "name" : "component3",
         }
     )
+dep_three.dependency_score = scorecard_3
 
 scorecard_4: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -165,10 +165,10 @@ scorecard_4: Scorecard = Scorecard({
 })
 dep_four = Dependency(
         {
-            "component_name" : "component4",
-            "dependency_score" : scorecard_4
+            "name" : "component4",
         }
     )
+dep_four.dependency_score = scorecard_4
 
 
 def test_single_pass():
@@ -188,8 +188,7 @@ def test_single_pass():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements_pass)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "Yes"
 
 
@@ -200,7 +199,7 @@ def test_single_fail():
     """
     sbom: Sbom = Sbom(minimal_sbom_dict)
     sbom.dependency_manager.update([dep_one])
-
+    
     user_requirements_fail:  UserRequirements = UserRequirements(
         {
             "dependency_update_tool": 8,
@@ -209,8 +208,7 @@ def test_single_fail():
         }
     )
     graded_sbom = grade_dependencies(sbom, user_requirements_fail)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "No"
 
 
@@ -232,8 +230,7 @@ def test_single_not_found():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "Test result not found"
 
 
@@ -256,8 +253,7 @@ def test_single_edge_case():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "No"
 
     user_requirements: UserRequirements = UserRequirements(
@@ -272,8 +268,7 @@ def test_single_edge_case():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "Yes"
 
     user_requirements: UserRequirements = UserRequirements(
@@ -289,8 +284,7 @@ def test_single_edge_case():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "Test result not found"
 
 def test_multiple():
@@ -311,8 +305,7 @@ def test_multiple():
     )
 
     graded_sbom = grade_dependencies(sbom, user_requirements)
-    dep_manager: DependencyManager = graded_sbom.dependency_manager
-    scored_dependencies = dep_manager.get_scored_dependencies()
+    scored_dependencies = graded_sbom.get_scored_dependencies()
     print(len(scored_dependencies))
     assert scored_dependencies[0].reach_requirement == "No"
     assert scored_dependencies[1].reach_requirement == "Yes"
