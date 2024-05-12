@@ -46,15 +46,16 @@ class Dependency:
         """
         # Loop over all attributes of the dependency
         for attr in self.__dict__:
+            if attr not in ("name", "version"):
+                continue
+
             # If the attribute is not the same in both dependencies
-            if attr not in (
-                    "dependency_score", "failure_reason", "reach_requirement"):
-                try:
-                    other_attr = getattr(other, attr)
-                except AttributeError:
-                    return False
-                if getattr(self, attr) != other_attr:
-                    return False
+            try:
+                other_attr = getattr(other, attr)
+            except AttributeError:
+                return False
+            if getattr(self, attr) != other_attr:
+                return False
         return True
 
     @property
