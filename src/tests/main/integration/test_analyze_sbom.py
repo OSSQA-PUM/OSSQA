@@ -121,8 +121,8 @@ class TestAnalyzeSBOM:
         sbom_proc = SbomProcessor(HOST)
         res_sbom = sbom_proc.analyze_sbom(sbom)
 
-        unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
-        scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
+        unscored_deps = res_sbom.get_unscored_dependencies()
+        scored_deps = res_sbom.get_scored_dependencies()
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
         after_test()
@@ -132,8 +132,8 @@ class TestAnalyzeSBOM:
         front_end_api = FrontEndAPI(HOST)
         res_sbom = front_end_api.analyze_sbom(sbom, user_reqs)
 
-        unscored_deps = res_sbom.dependency_manager.get_unscored_dependencies()
-        scored_deps = res_sbom.dependency_manager.get_scored_dependencies()
+        unscored_deps = res_sbom.get_unscored_dependencies()
+        scored_deps = res_sbom.get_scored_dependencies()
         assert len(unscored_deps) == 0
         assert len(scored_deps) != 0
         after_test()

@@ -31,7 +31,7 @@ class Check(db.Model):
     def to_dict(self) -> dict:
         return {
             "name": self.name,
-            "componentName": self.component_name,
+            "component_name": self.component_name,
             "score": self.score,
             "reason": self.reason,
             "details": self.details
