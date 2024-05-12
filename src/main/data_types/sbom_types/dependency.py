@@ -26,7 +26,7 @@ class Dependency:
     dependency_score: Scorecard = None
     failure_reason: Exception = None
     passed: bool = False
-    reach_requirement: bool = False
+    reach_requirement: str = None
     component_name: str = None
 
     def __init__(self, dependency: dict):

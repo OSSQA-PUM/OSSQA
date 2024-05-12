@@ -57,7 +57,12 @@ scorecard_1: Scorecard = Scorecard({
             }
         ]
     })
-dep_one = Dependency("component_1", "dep_1", "1.0.0", scorecard_1)
+dep_one = Dependency(
+        {
+            "component_name" : "component1",
+            "dependency_score" : scorecard_1
+        }
+    )
 
 
 scorecard_2: Scorecard = Scorecard({
@@ -84,7 +89,12 @@ scorecard_2: Scorecard = Scorecard({
         }
     ]
 })
-dep_two = Dependency("component_2", "dep_2", "1.0.0", scorecard_2)
+dep_two = Dependency(
+        {
+            "component_name" : "component2",
+            "dependency_score" : scorecard_2
+        }
+    )
 
 scorecard_3: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -104,7 +114,12 @@ scorecard_3: Scorecard = Scorecard({
         }
     ]
 })
-dep_three = Dependency("component_3", "dep_3", "1.0.0", scorecard_3)
+dep_three = Dependency(
+        {
+            "component_name" : "component3",
+            "dependency_score" : scorecard_3
+        }
+    )
 
 scorecard_4: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -148,7 +163,12 @@ scorecard_4: Scorecard = Scorecard({
         }
     ]
 })
-dep_four = Dependency("component_4", "dep_4", "1.0.0", scorecard_4)
+dep_four = Dependency(
+        {
+            "component_name" : "component4",
+            "dependency_score" : scorecard_4
+        }
+    )
 
 
 def test_single_pass():
