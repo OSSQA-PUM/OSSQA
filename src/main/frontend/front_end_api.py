@@ -9,7 +9,7 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import UserRequirements
 from main.data_types.event import Event
 from main.sbom_processor import SbomProcessor, SbomProcessorStatus
-from main.frontend.final_score_calculator import calculate_final_scores
+from main.frontend.dependency_grader import grade_dependencies
 
 
 class FrontEndAPI:
@@ -65,7 +65,7 @@ class FrontEndAPI:
         sbom_copy: Sbom = copy.deepcopy(sbom)
         sbom_copy = self.sbom_processor.analyze_sbom(sbom_copy)
 
-        scored_sbom: Sbom = calculate_final_scores(sbom_copy, user_requirements)
+        scored_sbom: Sbom = grade_dependencies(sbom_copy, user_requirements)
 
         return scored_sbom
 

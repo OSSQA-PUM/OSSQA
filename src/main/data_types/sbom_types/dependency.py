@@ -25,14 +25,14 @@ class Dependency:
 
     dependency_score: Scorecard = None
     failure_reason: Exception = None
-    passed: bool = False
+    reach_requirement: str = None
 
     def __init__(self, dependency: dict):
         for dependency_attr in dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
         self.failure_reason = None
-        self.passed = False
+        self.reach_requirement = None
 
     def __eq__(self, other):
         """
@@ -46,15 +46,32 @@ class Dependency:
         """
         # Loop over all attributes of the dependency
         for attr in self.__dict__:
+            if attr not in ("name", "version"):
+                continue
+
             # If the attribute is not the same in both dependencies
-            if attr not in ("dependency_score", "failure_reason", "passed"):
-                try:
-                    other_attr = getattr(other, attr)
-                except AttributeError:
-                    return False
-                if getattr(self, attr) != other_attr:
-                    return False
+            try:
+                other_attr = getattr(other, attr)
+            except AttributeError:
+                return False
+            if getattr(self, attr) != other_attr:
+                return False
         return True
+
+    @property
+    def component(self) -> dict:
+        """
+        Get the all the SBOM linked attributes of the dependency.
+
+        Returns:
+            dict: The attributes from the SBOM of the dependency.
+        """
+        res = {}
+        for attr in self.__dict__:
+            if attr not in (
+                    "dependency_score", "failure_reason", "reach_requirement"):
+                res.update({attr: getattr(self, attr)})
+        return res
 
     @property
     def component_name(self) -> str:

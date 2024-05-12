@@ -4,7 +4,7 @@
     "repo_name": "fake_sbom",
     "repo_version": "infdev",
     "scored_dependencies": [
-        {   
+        {
             "type": "library",
             "bom-ref": "bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
             "name": "bit-set",

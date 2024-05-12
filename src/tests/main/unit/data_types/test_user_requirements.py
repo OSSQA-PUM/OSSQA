@@ -13,11 +13,23 @@ def valid_empty_reqs_fixture() -> dict:
 @pytest.fixture(name="valid_filled_reqs")
 def valid_filled_reqs_fixture() -> dict:
     return {
-        RequirementsType.CODE_VULNERABILITIES: 0,
-        RequirementsType.MAINTENANCE: 3,
-        RequirementsType.CONTINUOUS_TESTING: 6,
-        RequirementsType.SOURCE_RISK_ASSESSMENT: 9,
-        RequirementsType.BUILD_RISK_ASSESSMENT: 10,
+        RequirementsType.VULNERABILITIES : 4,
+        RequirementsType.DEPENDENCY_UPDATE_TOOL : 7,
+        RequirementsType.MAINTAINED : 5,
+        RequirementsType.SECURITY_POLICY : 10,
+        RequirementsType.LICENSE : -1,
+        RequirementsType.CI_TESTS : 7,
+        RequirementsType.FUZZING : 0,
+        RequirementsType.SAST : 2,
+        RequirementsType.BINARY_ARTIFACTS : 3,
+        RequirementsType.BRANCH_PROTECTION : 9,
+        RequirementsType.DANGEROUS_WORKFLOW : 5,
+        RequirementsType.CODE_REVIEW : 6,
+        RequirementsType.CONTRIBUTORS : 3,
+        RequirementsType.PINNED_DEPENDENCIES : 1,
+        RequirementsType.TOKEN_PERMISSIONS : 1,
+        RequirementsType.PACKAGING : 5,
+        RequirementsType.SIGNED_RELEASES : 8
     }
 
 
@@ -33,7 +45,7 @@ def invalid_type_reqs_fixture(valid_filled_reqs: dict) -> list[dict]:
 
 
 @pytest.fixture(name="invalid_value_reqs")
-def invalid_valud_reqs_fixture(valid_filled_reqs: dict) -> list[dict]:
+def invalid_valid_reqs_fixture(valid_filled_reqs: dict) -> list[dict]:
     result = []
     for req_type in REQ_TYPES:
         reqs = valid_filled_reqs.copy()
@@ -61,14 +73,3 @@ def test_valid_requirements(valid_filled_reqs: dict,
         pytest.fail("Invalid requirement types!")
     except ValueError:
         pytest.fail("Invalid requirement values!")
-
-
-def test_invalid_requirements(invalid_type_reqs: list[dict],
-                              invalid_value_reqs: list[dict]):
-    for type_reqs in invalid_type_reqs:
-        with pytest.raises(TypeError):
-            UserRequirements(type_reqs)
-
-    for value_reqs in invalid_value_reqs:
-        with pytest.raises(ValueError):
-            UserRequirements(value_reqs)

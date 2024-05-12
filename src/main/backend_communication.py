@@ -7,6 +7,7 @@ Functions:
 - get_sbom_names: Returns the names of all the SBOMs in the database.
 - get_existing_dependencies: Gets saved dependencies from the database.
 """
+import json
 from typing import Any, Callable
 import requests
 from main.data_types.sbom_types.dependency import Dependency
@@ -149,22 +150,18 @@ class BackendFetcher(DependencyScorer):
         """
         batch_size = len(dependencies)
         failed_count = 0
-        dependency_primary_keys = []
+        dep_dicts = []
         for dependency in dependencies:
             try:
-                platform_path = dependency.platform + dependency.repo_path
-                version = dependency.component_version
+                dep_dict = dependency.to_dict()
             except (KeyError, ValueError):
                 failed_count += 1
                 continue
-            dependency_primary_keys.append([
-                platform_path,
-                version,
-            ])
+            dep_dicts.append(dep_dict)
 
         try:
             response = requests.get(self.host + "/dependency/existing",
-                                    json=dependency_primary_keys,
+                                    json=dep_dicts,
                                     timeout=5
                                     )
         except requests.exceptions.Timeout:
@@ -189,16 +186,18 @@ class BackendFetcher(DependencyScorer):
                 )
             return []
 
-        new_dependneices = []
+        new_dependencies = []
         if not response or response.status_code != 200:
-            return new_dependneices
+            return new_dependencies
 
         for dependency in response.json():
             scorecard = Scorecard(dependency["scorecard"])
             # TODO Fix the name of Dependency.
             # Should perhaps store name of CycloneDX component
             # in database and git_url separately.
-            dep_obj = Dependency(dependency["component"])
+            raw_component = json.loads(dependency["raw_component"])
+            raw_component = dict(raw_component)
+            dep_obj = Dependency(raw_component)
             dep_obj.dependency_score = scorecard
-            new_dependneices.append(dep_obj)
-        return new_dependneices
+            new_dependencies.append(dep_obj)
+        return new_dependencies

@@ -3,6 +3,7 @@ This module handles the endpoints that the backend communication interface
 interfaces with. It also handles functionality for creating and updating
 various objects in the database.
 """
+import json
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
@@ -53,6 +54,16 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 name=dep_json["name"],
                 version=dep_json["version"],
             ).first()
+            # Get the attributes that are not part of the dependency scorecard
+            dep_component = {}
+            for k, v in dep_json.items():
+                if k not in (
+                        "platform_path",
+                        "dependency_score",
+                        "failure_reason",
+                        "reach_requirement"):
+                    dep_component[k] = v
+
             scorecard_json = dep_json["dependency_score"]
 
             if dep:
@@ -65,6 +76,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                     platform_path=dep_json["platform_path"],
                     name=dep_json["name"],
                     version=dep_json["version"],
+                    raw_component=json.dumps(dep_component),
                 )
                 sbom.dependencies.append(dep)
                 db.session.add(dep)
@@ -133,9 +145,15 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             return jsonify([]), 400
 
         dependencies = []
-        for platform_path, version in request.json:
+        for dep in request.json:
+            version = dep["version"]
+            name = dep["name"]
+            try:
+                path = dep["platform_path"]
+            except KeyError:
+                continue
             dependency = Dependency.query.filter_by(
-                platform_path=platform_path, version=version).first()
+                platform_path=path, version=version, name=name).first()
             if dependency:
                 dependencies.append(dependency.to_dict())
         return jsonify(dependencies), 200

@@ -191,7 +191,7 @@ def test_dependency_manager_to_dict_filled(
             if attr not in (
                     "dependency_score",
                     "failure_reason",
-                    "passed",
+                    "reach_requirement",
                     "platform_path"):
                 assert dep[attr] == DUMMY_DEPENDENCIES[2][attr]
             else:
@@ -201,7 +201,7 @@ def test_dependency_manager_to_dict_filled(
             if attr not in (
                     "dependency_score",
                     "failure_reason",
-                    "passed",
+                    "reach_requirement",
                     "platform_path"):
                 assert dep[attr] == DUMMY_DEPENDENCIES[1][attr]
             elif attr == "failure_reason":
