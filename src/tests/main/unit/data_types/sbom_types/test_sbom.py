@@ -3,13 +3,13 @@ This module contains unit tests for the `Sbom` class in the
 `sbom` module of the `sbom_types` package.
 """
 import json
-import re
 import pytest
 from tests.main.unit.sboms.sboms import (PATHS as SBOM_PATHS,
                                          BAD_SBOMS,
                                          SBOM_COMPONENT_URLS,
-                                         DUMMY_SBOM)
+                                         DUMMY_DEPENDENCIES)
 from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.dependency import Dependency
 
 
 @pytest.fixture(params=SBOM_PATHS)
@@ -62,7 +62,7 @@ def test_sbom_initialize(sbom_from_json):
 
 def test_sbom_to_dict(sbom_from_json):
     """
-    Test that the to_dict method returns a dictionary representation of the 
+    Test that the to_dict method returns a dictionary representation of the
     SBOM.
     """
     sbom = Sbom(sbom_from_json)
@@ -84,37 +84,26 @@ def test_sbom_validation(sbom_bad):
         Sbom(sbom_bad)
 
 
-def test_parse_git_url(sbom_component_url):
+def test_sbom_dependency_manager(sbom_from_json):
     """
-    Test that the `_parse_git_url` method returns the correct URL.
+    Test that the dependency manager is correctly initialized.
     """
-    sbom = Sbom(DUMMY_SBOM)
-
-    if sbom_component_url.startswith("https://"):
-        parsed_url = sbom._parse_git_url(sbom_component_url)
-        assert sbom_component_url.lstrip("https:/") == parsed_url
-    else:
-        with pytest.raises(Exception):
-            sbom._parse_git_url(sbom_component_url)
+    sbom = Sbom(sbom_from_json)
+    assert sbom.dependency_manager is not None
+    assert len(sbom.get_failed_dependencies()) == 0
+    assert len(sbom.get_scored_dependencies()) == 0
+    assert len(sbom.get_unscored_dependencies()) == 13
 
 
-def test_get_component_url(sbom_component):
+def test_sbom_dependency_manager_update(sbom_from_json):
     """
-    Test that the `_get_component_url` method returns the correct URL.
+    Test that the dependency manager is correctly updated.
     """
-    sbom = Sbom(DUMMY_SBOM)
-    component_url = sbom._get_component_url(sbom_component)
-    assert component_url is not None
-    assert re.match(
-        r"https:\/\/github.com\/[^\/]+\/[^\/]+", component_url
-        ) is not None
-
-
-def test_get_component_url_bad():
-    """
-    Test that the `_get_component_url` method raises an exception when the
-    component is invalid.
-    """
-    sbom = Sbom(DUMMY_SBOM)
-    with pytest.raises(Exception):
-        sbom._get_component_url({"bad": "component"})
+    sbom = Sbom(sbom_from_json)
+    assert sbom.dependency_manager is not None
+    new_dep1 = Dependency(DUMMY_DEPENDENCIES[0])
+    new_dep2 = Dependency(DUMMY_DEPENDENCIES[1])
+    sbom.update_dependencies([new_dep1, new_dep2])
+    assert len(sbom.get_failed_dependencies()) == 0
+    assert len(sbom.get_scored_dependencies()) == 0
+    assert len(sbom.get_unscored_dependencies()) == 15

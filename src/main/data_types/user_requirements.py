@@ -37,7 +37,7 @@ class UserRequirements:
     def __init__(self, requirements: dict[str, int]):
         """
         Initializes the user requirements.
-        
+
         Args:
             requirements (dict): The user requirements.
         """

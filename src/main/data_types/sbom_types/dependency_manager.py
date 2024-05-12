@@ -11,8 +11,15 @@ class DependencyManager:
     """
     _dependencies: list[Dependency]
 
-    def __init__(self):
-        self._dependencies = []
+    def __init__(self, sbom_components: list[dict]):
+        """
+        Initialize the dependency manager.
+
+        Args:
+            sbom_components (list[dict]): The components of the SBOM.
+        """
+        self._dependencies = \
+            [Dependency(component) for component in sbom_components]
 
     def update(self, dependencies: list[Dependency]):
         """
@@ -24,9 +31,6 @@ class DependencyManager:
             dependencies (list[Dependency]): The dependencies to update.
         """
         for dependency in dependencies:
-            # We only want dependencies with a name and version
-            if not dependency.name or not dependency.version:
-                continue
             try:
                 index = self._dependencies.index(dependency)
                 if dependency.dependency_score or dependency.failure_reason:

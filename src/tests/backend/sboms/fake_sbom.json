@@ -4,9 +4,35 @@
     "repo_name": "fake_sbom",
     "repo_version": "infdev",
     "scored_dependencies": [
-        {
-            "name": "dep_1",
-            "version": "1.0",
+        {   
+            "type": "library",
+            "bom-ref": "bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+            "name": "bit-set",
+            "version": "v0.5.3",
+            "description": "A set of bits",
+            "scope": "required",
+            "licenses": [
+                {
+                "license": {
+                    "id": "MIT"
+                }
+                }
+            ],
+            "purl": "pkg:cargo/bit-set@0.5.3",
+            "externalReferences": [
+                {
+                "type": "documentation",
+                "url": "https://contain-rs.github.io/bit-set/bit_set"
+                },
+                {
+                "type": "website",
+                "url": "https://github.com/contain-rs/bit-set"
+                },
+                {
+                "type": "vcs",
+                "url": "https://github.com/contain-rs/bit-set"
+                }
+            ],
             "dependency_score": {
                 "date": "1984-05-21",
                 "score": 5.2,
@@ -20,7 +46,9 @@
                         ]
                     }
                 ]
-            }
+            },
+            "failure_reason" : "",
+            "platform_path" : "github.com/contain-rs/bit-set"
         }
     ],
     "unscored_dependencies": [],

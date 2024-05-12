@@ -7,10 +7,10 @@ Classes:
 """
 
 from re import match
-from urllib.parse import urlparse
+import requests
 from main.data_types.sbom_types.dependency_manager import DependencyManager
 from main.data_types.sbom_types.dependency import Dependency
-import requests
+from main.util import get_github_token
 
 
 class Sbom:
@@ -30,18 +30,18 @@ class Sbom:
     version: int
     repo_name: str
     repo_version: str
+    spec_version: str
 
     def __init__(self, sbom: dict):
         self._check_format_of_sbom(sbom)
-        self.dependency_manager: DependencyManager = DependencyManager()
-        self.dependency_manager.update(
-            self._parse_components(sbom["components"])
-            )
+        self.dependency_manager: DependencyManager \
+            = DependencyManager(sbom["components"])
 
         self.serial_number: str = sbom["serialNumber"]
         self.version: int = sbom["version"]
         self.repo_name: str = sbom["metadata"]["component"]["name"]
         self.repo_version: str = sbom["metadata"]["component"]["version"]
+        self.spec_version: str = sbom["specVersion"]
 
     def to_dict(self) -> dict:
         """
@@ -62,6 +62,54 @@ class Sbom:
             res[key] = value
 
         return res
+
+    def get_scored_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_scored_dependencies()
+
+    def get_unscored_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_unscored_dependencies()
+
+    def get_failed_dependencies(self) -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_failed_dependencies()
+
+    def get_dependencies_by_filter(self, dependency_filter: callable) \
+            -> list[Dependency]:
+        """
+        Gets the dependencies of the SBOM.
+
+        Returns:
+            list[Dependency]: The dependencies of the SBOM.
+        """
+        return self.dependency_manager.get_dependencies_by_filter(
+            dependency_filter
+            )
+
+    def update_dependencies(self, dependencies: list[Dependency]) -> None:
+        """
+        Updates the dependencies of the SBOM.
+
+        Args:
+            dependencies (list[Dependency]): The dependencies to update.
+        """
+        self.dependency_manager.update(dependencies)
 
     def _check_format_of_sbom(self, sbom_file: dict) -> None:
         """
@@ -115,117 +163,25 @@ class Sbom:
         if name == "":
             raise ValueError("Name could not be found, non valid SBOM")
 
-    def _parse_components(self, components: list[dict]) -> list[Dependency]:
+    def _try_git_api_connection(self, url: str) -> None:
         """
-        Parses a list of component dictionaries.
+        Tries to connect to the GitHub API.
 
         Args:
-            components (list[dict]): The list of component dictionaries.
+            url (str): The URL to connect to.
 
-        Returns:
-            list[Dependency]: A list of parsed Dependency objects.
+        Raises:
+            ConnectionError: If the connection could not be established.
         """
-        dependencies: list[Dependency] = []
-        for component in components:
-            dependency = self._parse_component(component)
-            dependencies.append(dependency)
-        return dependencies
-
-    def _parse_component(self, component: dict) -> Dependency:
-        """
-        Parses a component dictionary.
-
-        Args:
-            component (dict): The component dictionary.
-
-        Returns:
-            Dependency: The parsed Dependency object.
-        """
-        failure_reason = None
-        name = ""
-        version = ""
+        token = get_github_token()
+        headers = {'Authorization': f'Bearer {token}'} if token else {}
+        url = url.removeprefix("github.com")
+        url = f"https://api.github.com/repos{url}"
         try:
-            # TODO: The name of the component is not in the url.
-            #       According to the CycloneDX documentation,
-            #       each component has a name that can be accessed via
-            #       component["name"].
-            #       This should be fixed, preferably by storing the
-            #       URL in it's own variable in Dependency, so
-            #       that OSSQA adheres to the CycloneDX format,
-            #       which in turn makes the behavior of the program
-            #       more predictable.
-            name = self._parse_git_url(
-                self._get_component_url(component=component)
-                )
-            version = component["version"]
-        except (ConnectionError, KeyError, NameError, ValueError) as e:
-            failure_reason = e
-        dependency = Dependency(name=name, component_name=component["name"], version=version)
-        if failure_reason:
-            dependency.failure_reason = failure_reason
-        return dependency
-
-    def _parse_git_url(self, url: str) -> str:
-        """
-        Parses the git URL and returns the platform,
-        repository owner, and repository name.
-
-        Args:
-            url (str): The git URL.
-
-        Returns:
-            str: The dependency name
-
-        Raises:
-            ValueError: If the platform is not supported.
-        """
-        url_split = urlparse(url)
-        platform = url_split.netloc
-
-        if platform != "github.com":
-            raise ValueError("Platform not supported")
-
-        name = platform + url_split.path
-        return name
-
-    def _get_component_url(self, component: dict) -> str:
-        """
-        Retrieves the URL of a component from its external references.
-
-        Args:
-            component (dict): The component dictionary.
-
-        Returns:
-            str: The URL of the component.
-
-        Raises:
-            KeyError:
-            If no external references are found.
-
-            ConnectionError:
-            If there is a connection error while accessing the URL.
-
-            NameError:
-            If no VCS (Version Control System) external reference is found.
-        """
-        external_refs = component.get("externalReferences")
-        if not external_refs:
-            raise KeyError("No external references found")
-        for external_ref in external_refs:
-            if external_ref["type"] != "vcs":
-                continue
-
-            url = external_ref["url"]
-            try:
-                response = requests.get(url, timeout=5)
-            except (requests.ConnectTimeout, requests.ReadTimeout) as e:
-                raise ConnectionError(f"Connection to {url} timed out") from e
-            except requests.ConnectionError as e:
-                raise ConnectionError(f"Failed to connect to {url}") from e
-
+            response = requests.get(url, headers=headers, timeout=5)
             if response.status_code != 200:
-                raise ConnectionError(f"Failed to connect to {url}")
-
-            response_url = response.url
-            return response_url
-        raise NameError("No VCS external reference found")
+                print(f"Could not connect to {url} {response.text}")
+                raise ConnectionError(
+                    f"Could not connect to GitHub API for {url}")
+        except requests.exceptions.ConnectionError as e:
+            raise e

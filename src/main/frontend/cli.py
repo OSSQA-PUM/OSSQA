@@ -24,7 +24,8 @@ from tabulate import tabulate
 import main.constants as constants
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.sbom import Sbom
-from main.data_types.user_requirements import RequirementsType, UserRequirements
+from main.data_types.user_requirements import (RequirementsType,
+                                               UserRequirements)
 from main.frontend.front_end_api import FrontEndAPI
 from main.util import raise_github_token_refused
 
@@ -51,7 +52,7 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     return mean_score
 
 
-def calculate_mean_scores(dependencies:list[Dependency]) -> \
+def calculate_mean_scores(dependencies: list[Dependency]) -> \
                                                 list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
@@ -68,7 +69,7 @@ def calculate_mean_scores(dependencies:list[Dependency]) -> \
 
     for dependency in dependencies:
         mean_score = calculate_mean_score(dependency)
-        dep_result = [dependency.name, mean_score]
+        dep_result = [dependency.git_url, mean_score]
         mean_scores.append(dep_result)
     return mean_scores
 
@@ -186,7 +187,6 @@ def ossqa_cli():
               callback=validate_git_token,
               help=("GitHub Personal Access Token."
                     "  [default: GITHUB_AUTH_TOKEN env variable]"))
-
 @click.option("-wc", "--code-vulnerabilities", type=click.IntRange(0, 10),
               required=False, default=10,
               help="Weight for Code Vulnerabilities category.")
@@ -202,7 +202,6 @@ def ossqa_cli():
 @click.option("-wb", "--build-risk-assessment", type=click.IntRange(0, 10),
               required=False, default=10,
               help="Weight for Build Risk Assesment category.")
-
 @click.option("-b", "--backend", type=str, callback=validate_backend,
               default=constants.HOST, help="URL of the database server.")
 @click.option("-o", "--output", type=click.Choice(["table", "json"]),
@@ -236,10 +235,16 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
         failed_deps = [[dep.name, dep.failure_reason] for dep in failed_deps]
 
         print(
-            tabulate(mean_scores, headers=["Successful Dependencies", "Average Score"])
+            tabulate(
+                mean_scores,
+                headers=["Successful Dependencies", "Average Score"]
+                )
         )
         print(
-            tabulate(failed_deps, headers=["Failed Dependencies", "Failure Reason"])
+            tabulate(
+                failed_deps,
+                headers=["Failed Dependencies", "Failure Reason"]
+                )
         )
     elif output == "json":
         deps_dict = scored_sbom.dependency_manager.to_dict()
@@ -316,5 +321,3 @@ def lookup(name: str, backend: str, output: str, verbose: str):
     elif output == "json":
         sbom_dicts = [sbom.to_dict() for sbom in found_sboms]
         print(json.dumps(sbom_dicts))
-    else:
-        print("This code should be unreachable.")

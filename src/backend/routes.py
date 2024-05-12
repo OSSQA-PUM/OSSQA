@@ -49,6 +49,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
 
         for dep_json in sbom_json["scored_dependencies"]:
             dep: Dependency = Dependency.query.filter_by(
+                platform_path=dep_json["platform_path"],
                 name=dep_json["name"],
                 version=dep_json["version"],
             ).first()
@@ -61,6 +62,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                 db.session.delete(scorecard)
             else:
                 dep = Dependency(
+                    platform_path=dep_json["platform_path"],
                     name=dep_json["name"],
                     version=dep_json["version"],
                 )
@@ -86,7 +88,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         db.session.commit()
         return "", 201
 
-
     @app.route("/sbom", methods=["GET"])
     def get_sbom_names():
         """
@@ -99,7 +100,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         for sbom in SBOM.query.all():
             names.add(sbom.repo_name)
         return jsonify(list(names)), 200
-
 
     @app.route("/sbom/<path:repo_name>", methods=["GET"])
     def get_sboms_by_name(repo_name: str):
@@ -133,8 +133,9 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             return jsonify([]), 400
 
         dependencies = []
-        for name, version in request.json:
-            dependency = Dependency.query.filter_by(name=name, version=version).first()
+        for platform_path, version in request.json:
+            dependency = Dependency.query.filter_by(
+                platform_path=platform_path, version=version).first()
             if dependency:
                 dependencies.append(dependency.to_dict())
         return jsonify(dependencies), 200

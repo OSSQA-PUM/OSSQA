@@ -25,7 +25,8 @@ class BackendCommunication:
     on_status_changed: Event[StepResponse]
     backend_fetcher: DependencyScorer
 
-    def __init__(self, callback: Callable[[StepResponse], Any], host: str) -> None:
+    def __init__(self, callback: Callable[[StepResponse], Any], host: str) \
+            -> None:
         self.on_status_changed = Event[StepResponse]()
         self.on_status_changed.subscribe(callback)
         self.backend_fetcher = BackendFetcher(callback, host)
@@ -112,7 +113,8 @@ class BackendFetcher(DependencyScorer):
     """
     Represents a backend fetcher
     """
-    def __init__(self, callback: Callable[[StepResponse], Any], host: str) -> None:
+    def __init__(self, callback: Callable[[StepResponse], Any], host: str) \
+            -> None:
         super().__init__(callback)
         self.host = host.rstrip("/")
 
@@ -145,12 +147,19 @@ class BackendFetcher(DependencyScorer):
         Returns:
             list[Dependency]: The existing dependencies in the database
         """
+        batch_size = len(dependencies)
+        failed_count = 0
         dependency_primary_keys = []
         for dependency in dependencies:
+            try:
+                platform_path = dependency.platform + dependency.repo_path
+                version = dependency.component_version
+            except (KeyError, ValueError):
+                failed_count += 1
+                continue
             dependency_primary_keys.append([
-                dependency.name,
-                dependency.version,
-                dependency.component_name
+                platform_path,
+                version,
             ])
 
         try:
@@ -161,30 +170,35 @@ class BackendFetcher(DependencyScorer):
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
             self.on_step_complete.invoke(
-                StepResponse(0, 0, 0, 0, "The request timed out")
+                StepResponse(
+                    batch_size, 0, 0, failed_count, "The request timed out")
                 )
             return []
         except TypeError:
             # Tell the user that the response was not JSON
             self.on_step_complete.invoke(
-                StepResponse(0, 0, 0, 0, "The response was not JSON")
+                StepResponse(
+                    batch_size, 0, 0, failed_count,
+                    "The response was not JSON")
+                )
+            return []
+        except requests.exceptions.ConnectionError as e:
+            # Tell the user that the connection was refused
+            self.on_step_complete.invoke(
+                StepResponse(batch_size, 0, 0, failed_count, str(e))
                 )
             return []
 
-        result: list[Dependency] = []
+        new_dependneices = []
         if not response or response.status_code != 200:
-            return result
+            return new_dependneices
 
         for dependency in response.json():
-            name = dependency["name"]
-            component_name = dependency["component_name"]
-            version = dependency["version"]
             scorecard = Scorecard(dependency["scorecard"])
-
-            dep_obj = Dependency(name=name,
-                                 version=version,
-                                 component_name=component_name,
-                                 dependency_score=scorecard
-                                 )
-            result.append(dep_obj)
-        return result
+            # TODO Fix the name of Dependency.
+            # Should perhaps store name of CycloneDX component
+            # in database and git_url separately.
+            dep_obj = Dependency(dependency["component"])
+            dep_obj.dependency_score = scorecard
+            new_dependneices.append(dep_obj)
+        return new_dependneices
