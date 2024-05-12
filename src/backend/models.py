@@ -16,11 +16,10 @@ dependency_sbom = db.Table("dependency_sbom",
 
 class Check(db.Model):
     """
-    A model representing a OpenSSF Scorecard Chec.
+    A model representing a OpenSSF Scorecard Check.
     """
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(255), unique=False)
-    component_name = db.Column(db.String(255), unique=False)
     score = db.Column(db.Integer, unique=False)
     reason = db.Column(db.String(255), unique=False)
     details = db.Column(db.Text, unique=False)
@@ -31,7 +30,6 @@ class Check(db.Model):
     def to_dict(self) -> dict:
         return {
             "name": self.name,
-            "component_name": self.component_name,
             "score": self.score,
             "reason": self.reason,
             "details": self.details
@@ -66,7 +64,7 @@ class Dependency(db.Model):
     name = db.Column(db.String(255), unique=False)
     version = db.Column(db.String(255), unique=False)
     platform_path = db.Column(db.String(255), unique=False)
-    component_name = db.Column(db.String(255), unique=False)
+    raw_component = db.Column(db.String(4095), unique=False)
 
     # TODO: Should also store external references, at least of type "vcs".
 
@@ -84,10 +82,10 @@ class Dependency(db.Model):
         """
         return {
             "name": self.name,
-            "componentName": self.component_name,
             "version": self.version,
             "platformPath": self.platform_path,
             "scorecard": self.scorecard.to_dict(),
+            "raw_component": self.raw_component,
         }
 
 

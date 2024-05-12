@@ -78,10 +78,11 @@ def test_get_sboms_by_name(client: FlaskClient, sbom: dict):
 def test_get_existing_dependencies(client: FlaskClient, sbom: dict):
     dep_name_versions = []
     for dep in sbom["scored_dependencies"]:
-        dep_name_versions.append([dep["name"], dep["component_name"], dep["version"]])
+        dep_name_versions.append([dep["platform_path"], dep["name"], dep["version"]])
 
     resp = client.get("/dependency/existing", json=dep_name_versions)
     assert resp.status_code == 200
 
     for component in resp.json:
-        assert [component["name"], component["component_name"], component["version"]] in dep_name_versions
+        print(component)
+        assert [component["platformPath"], component["name"], component["version"]] in dep_name_versions

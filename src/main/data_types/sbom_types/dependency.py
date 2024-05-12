@@ -26,9 +26,9 @@ class Dependency:
     dependency_score: Scorecard = None
     failure_reason: Exception = None
     reach_requirement: str = None
-    component_name: str = None
 
     def __init__(self, dependency: dict):
+        self.raw_component = dependency
         for dependency_attr in dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
