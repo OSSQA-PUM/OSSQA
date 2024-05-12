@@ -140,15 +140,30 @@ class SSFAPIFetcher(DependencyScorer):
         # Check if the dependency has already been scored
         if self._check_if_scored(new_dependency):
             return new_dependency
+        
+        try:
+            repo_path = new_dependency.repo_path
+            component_version = new_dependency.component_version
+            component_name = new_dependency.component_name
+        except (KeyError, ValueError) as e:
+            error_message = f"Failed missing required field due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
 
         try:
-            sha1 = get_git_sha1(dependency.repo_path, dependency.version,
-                                dependency.component_name, "release")
-        except (ConnectionRefusedError, AssertionError, ValueError):
+            sha1 = get_git_sha1(repo_path,
+                                component_version,
+                                component_name, "release")
+        except (ConnectionRefusedError, AssertionError, ValueError, KeyError):
             try:
-                sha1 = get_git_sha1(dependency.repo_path, dependency.version,
-                                    dependency.component_name, "tag")
-            except (ConnectionRefusedError, AssertionError, ValueError) as e:
+                sha1 = get_git_sha1(repo_path,
+                                    component_version,
+                                    component_name, "tag")
+            except (
+                    ConnectionRefusedError,
+                    AssertionError,
+                    ValueError,
+                    KeyError) as e:
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
@@ -278,17 +293,28 @@ class ScorecardAnalyzer(DependencyScorer):
             return new_dependency
 
         try:
+            repo_path = new_dependency.repo_path
+            component_version = new_dependency.component_version
+            component_name = new_dependency.component_name
+        except (KeyError, ValueError) as e:
+            error_message = f"Failed missing required field due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+
+        try:
             version_git_sha1: str = get_git_sha1(
-                new_dependency.repo_path, new_dependency.version,
-                dependency.component_name, "release"
+                repo_path, component_version, component_name, "release"
             )
-        except (ConnectionRefusedError, AssertionError, ValueError):
+        except (ConnectionRefusedError, AssertionError, ValueError, KeyError):
             try:
                 version_git_sha1: str = get_git_sha1(
-                    new_dependency.repo_path, new_dependency.version,
-                    dependency.component_name, "tag"
+                    repo_path, component_version, component_name, "tag"
                 )
-            except (ConnectionRefusedError, AssertionError, ValueError) as e:
+            except (
+                    ConnectionRefusedError,
+                    AssertionError,
+                    ValueError,
+                    KeyError) as e:
                 error_message = f"Failed to get git sha1 due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 return new_dependency
