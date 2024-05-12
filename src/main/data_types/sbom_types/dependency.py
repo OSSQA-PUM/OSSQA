@@ -55,7 +55,7 @@ class Dependency:
                 if getattr(self, attr) != other_attr:
                     return False
         return True
-    
+
     @property
     def component_name(self) -> str:
         """
@@ -66,21 +66,6 @@ class Dependency:
 
         Raises:
             KeyError: If the component name is not found in the component.
-        """
-        if "name" not in dir(self):
-            raise KeyError("name not found in component")
-        return getattr(self, "name")
-
-    @property
-    def component_name(self) -> str:
-        """
-        Get the name of the dependency.
-
-        Returns:
-            str: The name of the dependency.
-
-        Raises:
-            KeyError: If the name is not found in the component.
         """
         if "name" not in dir(self):
             raise KeyError("name not found in component")

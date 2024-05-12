@@ -142,11 +142,11 @@ class SSFAPIFetcher(DependencyScorer):
             return new_dependency
 
         try:
-            sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
+            sha1 = get_git_sha1(dependency.repo_path, dependency.version,
                                 dependency.component_name, "release")
         except (ConnectionRefusedError, AssertionError, ValueError):
             try:
-                sha1 = get_git_sha1(dependency.repo_path, dependency.version, 
+                sha1 = get_git_sha1(dependency.repo_path, dependency.version,
                                     dependency.component_name, "tag")
             except (ConnectionRefusedError, AssertionError, ValueError) as e:
                 error_message = f"Failed to get git sha1 due to: {e}"
@@ -279,13 +279,13 @@ class ScorecardAnalyzer(DependencyScorer):
 
         try:
             version_git_sha1: str = get_git_sha1(
-                new_dependency.repo_path, new_dependency.version, 
+                new_dependency.repo_path, new_dependency.version,
                 dependency.component_name, "release"
             )
         except (ConnectionRefusedError, AssertionError, ValueError):
             try:
                 version_git_sha1: str = get_git_sha1(
-                    new_dependency.repo_path, new_dependency.version, 
+                    new_dependency.repo_path, new_dependency.version,
                     dependency.component_name, "tag"
                 )
             except (ConnectionRefusedError, AssertionError, ValueError) as e:
