@@ -26,6 +26,8 @@ class Dependency:
     dependency_score: Scorecard = None
     failure_reason: Exception = None
     passed: bool = False
+    reach_requirement: bool = False
+    component_name: str = None
 
     def __init__(self, dependency: dict):
         for dependency_attr in dependency:
@@ -33,6 +35,7 @@ class Dependency:
         self.dependency_score = None
         self.failure_reason = None
         self.passed = False
+        self.reach_requirement = False
 
     def __eq__(self, other):
         """

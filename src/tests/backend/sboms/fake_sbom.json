@@ -8,6 +8,7 @@
             "type": "library",
             "bom-ref": "bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
             "name": "bit-set",
+            "component_name": "comp1",
             "version": "v0.5.3",
             "description": "A set of bits",
             "scope": "required",

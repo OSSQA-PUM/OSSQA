@@ -73,36 +73,6 @@
     },
     {
       "type": "library",
-      "bom-ref": "bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
-      "name": "bit-set",
-      "version": "v0.5.3",
-      "description": "A set of bits",
-      "scope": "required",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "purl": "pkg:cargo/bit-set@0.5.3",
-      "externalReferences": [
-        {
-          "type": "documentation",
-          "url": "https://contain-rs.github.io/bit-set/bit_set"
-        },
-        {
-          "type": "website",
-          "url": "https://github.com/contain-rs/bit-set"
-        },
-        {
-          "type": "vcs",
-          "url": "https://github.com/contain-rs/bit-set"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "bom-ref": "async-stream 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "async-stream",
       "version": "0.3.5",
@@ -110,9 +80,7 @@
       "scope": "required",
       "licenses": [
         {
-          "license": {
-            "id": "MIT"
-          }
+          "expression": "MIT"
         }
       ],
       "purl": "pkg:cargo/async-stream@0.3.5",
@@ -120,6 +88,74 @@
         {
           "type": "vcs",
           "url": "https://github.com/tokio-rs/async-stream"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "async-stream-impl 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
+      "name": "async-stream-impl",
+      "version": "0.3.5",
+      "description": "proc macros for async-stream crate",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:cargo/async-stream-impl@0.3.5",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/tokio-rs/async-stream"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "axum 0.6.20 (registry+https://github.com/rust-lang/crates.io-index)",
+      "name": "axum",
+      "version": "0.6.20",
+      "description": "Web framework that focuses on ergonomics and modularity",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:cargo/axum@0.6.20",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/tokio-rs/axum"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/tokio-rs/axum"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "axum-core 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+      "name": "axum-core",
+      "version": "0.3.4",
+      "description": "Core types and traits for axum",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:cargo/axum-core@0.3.4",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/tokio-rs/axum"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/tokio-rs/axum"
         }
       ]
     },
@@ -302,6 +338,34 @@
         {
           "type": "vcs",
           "url": "https://github.com/servo/rust-url"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:golang/github.com/coreos/etcd@v3.3.10",
+      "type": "library",
+      "name": "github.com/coreos/etcd",
+      "version": "v3.3.10",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a1d778f324614e5305c1bc3b560cea519671ae74a7f543baf8f691436c8a04d6"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://spdx.org/licenses/Apache-2.0.html"
+          }
+        }
+      ],
+      "purl": "pkg:golang/github.com/coreos/etcd@v3.3.10",
+      "externalReferences": [
+        {
+          "url": "https://github.com/coreos/etcd",
+          "type": "vcs"
         }
       ]
     },

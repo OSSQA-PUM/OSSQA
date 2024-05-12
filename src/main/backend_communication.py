@@ -153,12 +153,14 @@ class BackendFetcher(DependencyScorer):
         for dependency in dependencies:
             try:
                 platform_path = dependency.platform + dependency.repo_path
+                component_name = dependency.component_name
                 version = dependency.component_version
             except (KeyError, ValueError):
                 failed_count += 1
                 continue
             dependency_primary_keys.append([
                 platform_path,
+                component_name,
                 version,
             ])
 
