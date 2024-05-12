@@ -147,9 +147,15 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             return jsonify([]), 400
 
         dependencies = []
-        for platform_path, name, version in request.json:
+        for dep in request.json:
+            version = dep["version"]
+            name = dep["name"]
+            try:
+                path = dep["platform_path"]
+            except KeyError:
+                continue
             dependency = Dependency.query.filter_by(
-                platform_path=platform_path, name=name, version=version).first()
+                platform_path=path, version=version, name=name).first()
             if dependency:
                 dependencies.append(dependency.to_dict())
         return jsonify(dependencies), 200

@@ -150,28 +150,18 @@ class BackendFetcher(DependencyScorer):
         """
         batch_size = len(dependencies)
         failed_count = 0
-        dependency_primary_keys = []
+        dep_dicts = []
         for dependency in dependencies:
             try:
-                platform_path = dependency.platform + dependency.repo_path
-                component_name = dependency.component_name
-                version = dependency.component_version
-                name = dependency.component_name
-                component = dependency.component
+                dep_dict = dependency.to_dict()
             except (KeyError, ValueError):
                 failed_count += 1
                 continue
-            dependency_primary_keys.append([
-                name,
-                platform_path,
-                component_name,
-                version,
-                component
-            ])
+            dep_dicts.append(dep_dict)
 
         try:
             response = requests.get(self.host + "/dependency/existing",
-                                    json=dependency_primary_keys,
+                                    json=dep_dicts,
                                     timeout=5
                                     )
         except requests.exceptions.Timeout:
