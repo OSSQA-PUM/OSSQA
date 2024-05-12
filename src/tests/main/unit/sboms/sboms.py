@@ -16,39 +16,12 @@ SBOM_COMPONENT_URLS = [
     "github.com/ProtonMail/",
     "a"
 ]
-
 DUMMY_DEPENDENCIES = [
     {
-      "raw_component":{
-        "type":"library-test",
-        "bom-ref":"ahash 0.8.6 (registry+https://github.com/rust-lang/crates.io-index)",
-        "name":"ahash",
-        "version":"0.8.6",
-        "description":"A non-cryptographic hash function using AES-NI for high performance",
-        "scope":"required",
-        "licenses":[
-          {
-            "license":{
-              "id":"MIT"
-            }
-          }
-        ],
-        "purl":"pkg:cargo/ahash@0.8.6",
-        "externalReferences":[
-          {
-            "type":"documentation",
-            "url":"https://docs.rs/ahash"
-          },
-          {
-            "type":"vcs",
-            "url":"https://github.com/tkaitchuck/ahash"
-          }
-        ]
-      },
       "type": "library-test",
-      "bom-ref": "ahash 0.8.6 (registry+https://github.com/rust-lang/crates.io-index)",
+      "bom-ref": "ahash 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "ahash",
-      "version": "0.8.6",
+      "version": "0.8.7",
       "description": "A non-cryptographic hash function using AES-NI for high performance",
       "scope": "required",
       "licenses": [
@@ -58,7 +31,7 @@ DUMMY_DEPENDENCIES = [
           }
         }
       ],
-      "purl": "pkg:cargo/ahash@0.8.6",
+      "purl": "pkg:cargo/ahash@0.8.7",
       "externalReferences": [
         {
           "type": "documentation",
@@ -71,40 +44,10 @@ DUMMY_DEPENDENCIES = [
       ]
     },
     {
-      "raw_component":{
-         "type":"library-test",
-         "bom-ref":"bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
-         "name":"bit-set",
-         "version":"v0.5.3",
-         "description":"A set of bits",
-         "scope":"required",
-         "licenses":[
-            {
-               "license":{
-                  "id":"MIT"
-               }
-            }
-         ],
-         "purl":"pkg:cargo/bit-set@0.5.3",
-         "externalReferences":[
-            {
-               "type":"documentation",
-               "url":"https://contain-rs.github.io/bit-set/bit_set"
-            },
-            {
-               "type":"website",
-               "url":"https://github.com/contain-rs/bit-set"
-            },
-            {
-               "type":"vcs",
-               "url":"https://github.com/contain-rs/bit-set"
-            }
-         ]
-      },
       "type": "library-test",
-      "bom-ref": "bit-set 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+      "bom-ref": "bit-set 0.5.33 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "bit-set",
-      "version": "v0.5.3",
+      "version": "v0.5.33",
       "description": "A set of bits",
       "scope": "required",
       "licenses": [
@@ -114,7 +57,7 @@ DUMMY_DEPENDENCIES = [
           }
         }
       ],
-      "purl": "pkg:cargo/bit-set@0.5.3",
+      "purl": "pkg:cargo/bit-set@0.5.33",
       "externalReferences": [
         {
           "type": "documentation",
@@ -131,28 +74,6 @@ DUMMY_DEPENDENCIES = [
       ]
     },
     {
-      "raw_component":{
-        "type":"library",
-        "bom-ref":"async-stream 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
-        "name":"async-stream",
-        "version": "0.3.5",
-        "description": "Asynchronous streams using async & await notation",
-        "scope": "required",
-        "licenses": [
-          {
-            "license": {
-              "id": "MIT"
-            }
-          }
-        ],
-        "purl": "pkg:cargo/async-stream@0.3.5",
-        "externalReferences": [
-          {
-            "type": "vcs",
-            "url": "https://github.com/tokio-rs/async-stream"
-          }
-        ]
-      },
       "type": "library",
       "bom-ref": "async-stream 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
       "name": "async-stream",
