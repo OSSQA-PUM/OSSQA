@@ -113,7 +113,6 @@ def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
         # Convert the reset time to a human-readable format
         reset_time = datetime.datetime.fromtimestamp(int(reset_time))
         reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"GitHub API rate limit exceeded. Rate limit resets at {reset_time}.")
         sleep(wait_time + 10)
         return get_git_sha1(git_url=git_url,
                             version=version,
