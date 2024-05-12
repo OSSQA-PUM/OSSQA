@@ -18,40 +18,19 @@ from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessor, SbomProcessorStatus
 
 from tests.main.integration.constants import HOST
-from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
-from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
-
-
-@pytest.fixture(name="sbom_path", scope="module")
-def sbom_path_fixture() -> Path:
-    return SBOM_PATHS[0]
+from tests.main.integration.sboms import create_scored_sbom
 
 
 @pytest.fixture(name="fake_scored_sbom", scope="module")
-def fake_scored_sbom_fixture(sbom_path: Path) -> Sbom:
+def fake_scored_sbom_fixture() -> Sbom:
     """
     This fixture reads and SBOM file and creates an Sbom object
     with fake scorecard data.
     """
-    with open(sbom_path, "r", encoding="utf-8") as sbom_file:
-        sbom = Sbom(json.load(sbom_file))
-
-    unscored_deps = sbom.dependency_manager.get_unscored_dependencies()
-    max_idx = min(len(unscored_deps), len(SCORECARD_PATHS))
-    scored_deps = []
-
-    for idx in range(max_idx):
-        with open(SCORECARD_PATHS[idx], "r", encoding="utf-8") as file:
-            scorecard = Scorecard(json.load(file))
-        dependency = unscored_deps[idx]
-        dependency.dependency_score = scorecard
-        scored_deps.append(dependency)
-
-    sbom.dependency_manager.update(scored_deps)
-    return sbom
+    return create_scored_sbom()
 
 
-@pytest.mark.order(-1) # Ensures the tests run after all unit tests
+@pytest.mark.order(-2) # Ensures the tests run after all unit tests
 class TestGetSbomNames:
     """
     These functions test the action of getting SBOM names from the

@@ -1,7 +1,6 @@
 """
 This module tests the functionality of analyzing an SBOM.
 """
-import json
 import os
 import sys
 from pathlib import Path
@@ -15,13 +14,12 @@ from main.frontend.cli import ossqa_cli
 from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessor
 from main.data_types.dependency_scorer import StepResponse
-from main.data_types.user_requirements import RequirementsType, UserRequirements
 from main.data_types.sbom_types.sbom import Sbom
-from main.data_types.sbom_types.scorecard import Scorecard
+from main.data_types.user_requirements import RequirementsType, UserRequirements
 
 from tests.main.integration.constants import HOST
-from tests.main.unit.sboms.sboms import PATHS as SBOM_PATHS
-from tests.main.unit.scorecards.scorecards import PATHS as SCORECARD_PATHS
+from tests.main.integration.sboms import SBOM_PATH, create_scored_sbom, \
+    create_unscored_sbom
 
 
 @pytest.fixture(name="git_token", scope="module")
@@ -38,40 +36,24 @@ def user_reqs_fixture() -> UserRequirements:
 
 @pytest.fixture(name="sbom_path", scope="module")
 def sbom_path_fixture() -> Path:
-    return SBOM_PATHS[0]
+    return SBOM_PATH
 
 
-@pytest.fixture(name="sbom", scope="module")
+@pytest.fixture(name="sbom", scope="function")
 def sbom_fixture(sbom_path: Path) -> Sbom:
     """
     This fixture reads an SBOM file and creates an Sbom object.
     """
-    with open(sbom_path, "r", encoding="utf-8") as sbom_file:
-        return Sbom(json.load(sbom_file))
+    return create_unscored_sbom()
 
 
-@pytest.fixture(name="fake_scored_sbom", scope="module")
+@pytest.fixture(name="fake_scored_sbom", scope="function")
 def fake_scored_sbom_fixture(sbom_path: Path) -> Sbom:
     """
     This fixture reads and SBOM file and creates an Sbom object
     with fake scorecard data.
     """
-    with open(sbom_path, "r", encoding="utf-8") as sbom_file:
-        sbom = Sbom(json.load(sbom_file))
-
-    unscored_deps = sbom.dependency_manager.get_unscored_dependencies()
-    max_idx = min(len(unscored_deps), len(SCORECARD_PATHS))
-    scored_deps = []
-
-    for idx in range(max_idx):
-        with open(SCORECARD_PATHS[idx], "r", encoding="utf-8") as file:
-            scorecard = Scorecard(json.load(file))
-        dependency = unscored_deps[idx]
-        dependency.dependency_score = scorecard
-        scored_deps.append(dependency)
-
-    sbom.dependency_manager.update(scored_deps)
-    return sbom
+    return create_scored_sbom()
 
 
 def before_test():
@@ -94,7 +76,7 @@ def after_test():
     assert len(resp.json()) != 0
 
 
-@pytest.mark.order(-2) # Ensures the tests run after all unit tests
+@pytest.mark.order(-3) # Ensures the tests run after all unit tests
 class TestAnalyzeSBOM:
     """
     These functions test the action of analyzing an SBOM in a
@@ -142,6 +124,7 @@ class TestAnalyzeSBOM:
         before_test()
 
         # Temporarily overwrite sys.argv, then run the CLI
+        # TODO: add user requirements to mock_args
         mock_args = [
             "prog",
             "analyze",
