@@ -242,29 +242,56 @@ class ScorecardAnalyzer(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
+        remaining_dependencies: list[Dependency] = dependencies
         with Pool() as pool:
-            for index, scored_dependency in enumerate(
-                    pool.imap(self._analyze_scorecard, dependencies)
-                    ):
+            try:
+                for index, scored_dependency in enumerate(
+                        pool.imap(self._analyze_scorecard, dependencies)
+                        ):
 
-                if scored_dependency.dependency_score:
-                    successful_items += 1
-                else:
-                    failed_items += 1
+                    if scored_dependency.dependency_score:
+                        successful_items += 1
+                    else:
+                        failed_items += 1
 
-                new_dependencies.append(scored_dependency)
+                    new_dependencies.append(scored_dependency)
+                    remaining_dependencies.remove(scored_dependency)
+                    self.on_step_complete.invoke(
+                        StepResponse(
+                            batch_size,
+                            index + 1,
+                            successful_items,
+                            failed_items
+                        )
+                    )
+            except TimeoutError as e:
                 self.on_step_complete.invoke(
                     StepResponse(
                         batch_size,
                         index + 1,
                         successful_items,
-                        failed_items
+                        failed_items,
+                        str(e)
                     )
                 )
+                token_data: dict = get_token_data()
+                time_to_wait:int = token_data.get("time_until_reset") + 10
+                self.on_step_complete.invoke(
+                    StepResponse(
+                        batch_size,
+                        index,
+                        successful_items,
+                        failed_items,
+                        f"Token limit reached. Waiting {time_to_wait / 60}" + \
+                        "minutes for reset."
+                    )
+                )
+                sleep(time_to_wait)
+                return new_dependencies + self.score(remaining_dependencies)
 
         return new_dependencies
 
-    def _analyze_scorecard(self, dependency: Dependency) -> Dependency:
+    def _analyze_scorecard(self, dependency: Dependency, timeout: int = 1) -> Dependency:
         """
         Analyzes the score for a dependency.
 
@@ -326,7 +353,7 @@ class ScorecardAnalyzer(DependencyScorer):
             try:
                 remaining_tries -= 1
                 scorecard: Scorecard = self._execute_scorecard(
-                    new_dependency.git_url, version_git_sha1
+                    new_dependency.git_url, version_git_sha1, timeout
                     )
 
                 new_dependency.dependency_score = scorecard
@@ -335,7 +362,13 @@ class ScorecardAnalyzer(DependencyScorer):
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
+                    TimeoutError,
                     json.JSONDecodeError, ValueError) as e:
+
+                if isinstance(e, TimeoutError) and \
+                get_token_data().get("remaining") == 0:
+                    raise TimeoutError(timeout) from e
+
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)  # Wait before retrying
@@ -394,13 +427,8 @@ class ScorecardAnalyzer(DependencyScorer):
         except (subprocess.CalledProcessError) as e:
             output = e.output.decode("utf-8")
         except subprocess.TimeoutExpired as e:
-            token_data: dict = get_token_data()
-            if token_data.get("remaining") > 0:
-                raise e
-            sleep(token_data.get("time_until_reset") + 10)
-            return self._execute_scorecard(git_url=git_url,
-                                           commit_sha1=commit_sha1,
-                                           timeout=timeout)
+            raise TimeoutError(e.timeout, 
+                               "Scorecard execution timed out") from e
 
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
