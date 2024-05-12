@@ -28,12 +28,11 @@ class Dependency:
     reach_requirement: str = None
 
     def __init__(self, dependency: dict):
-        self.raw_component = dependency
         for dependency_attr in dependency:
             setattr(self, dependency_attr, dependency[dependency_attr])
         self.dependency_score = None
         self.failure_reason = None
-        self.reach_requirement = False
+        self.reach_requirement = None
 
     def __eq__(self, other):
         """
@@ -56,6 +55,20 @@ class Dependency:
                 if getattr(self, attr) != other_attr:
                     return False
         return True
+
+    @property
+    def component(self) -> dict:
+        """
+        Get the all the SBOM linked attributes of the dependency.
+
+        Returns:
+            dict: The attributes from the SBOM of the dependency.
+        """
+        res = {}
+        for attr in self.__dict__:
+            if attr not in ("dependency_score", "failure_reason", "passed"):
+                res.update({attr: getattr(self, attr)})
+        return res
 
     @property
     def component_name(self) -> str:

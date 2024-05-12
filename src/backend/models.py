@@ -64,7 +64,7 @@ class Dependency(db.Model):
     name = db.Column(db.String(255), unique=False)
     version = db.Column(db.String(255), unique=False)
     platform_path = db.Column(db.String(255), unique=False)
-    raw_component = db.Column(db.String(4095), unique=False)
+    raw_component = db.Column(db.Text, unique=False)
 
     # TODO: Should also store external references, at least of type "vcs".
 
@@ -83,7 +83,8 @@ class Dependency(db.Model):
         return {
             "name": self.name,
             "version": self.version,
-            "platformPath": self.platform_path,
+            "platform_path": self.platform_path,
+            "component": self.component,
             "scorecard": self.scorecard.to_dict(),
             "raw_component": self.raw_component,
         }
