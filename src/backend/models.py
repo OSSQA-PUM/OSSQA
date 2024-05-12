@@ -84,7 +84,6 @@ class Dependency(db.Model):
             "name": self.name,
             "version": self.version,
             "platform_path": self.platform_path,
-            "component": self.component,
             "scorecard": self.scorecard.to_dict(),
             "raw_component": self.raw_component,
         }

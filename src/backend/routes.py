@@ -9,8 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 from backend.models import SBOM, Dependency, Scorecard, Check
 
-import json
-
 
 def register_endpoints(app: Flask, db: SQLAlchemy):
     """
@@ -63,7 +61,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                         "platform_path",
                         "dependency_score",
                         "failure_reason",
-                        "passed"):
+                        "reach_requirement"):
                     dep_component[k] = v
 
             scorecard_json = dep_json["dependency_score"]
@@ -78,7 +76,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                     platform_path=dep_json["platform_path"],
                     name=dep_json["name"],
                     version=dep_json["version"],
-                    raw_component=json.dumps(dep_json),
+                    raw_component=json.dumps(dep_component),
                 )
                 sbom.dependencies.append(dep)
                 db.session.add(dep)

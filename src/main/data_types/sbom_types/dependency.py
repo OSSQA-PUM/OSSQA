@@ -47,7 +47,8 @@ class Dependency:
         # Loop over all attributes of the dependency
         for attr in self.__dict__:
             # If the attribute is not the same in both dependencies
-            if attr not in ("dependency_score", "failure_reason", "passed"):
+            if attr not in (
+                    "dependency_score", "failure_reason", "reach_requirement"):
                 try:
                     other_attr = getattr(other, attr)
                 except AttributeError:
@@ -66,7 +67,8 @@ class Dependency:
         """
         res = {}
         for attr in self.__dict__:
-            if attr not in ("dependency_score", "failure_reason", "passed"):
+            if attr not in (
+                    "dependency_score", "failure_reason", "reach_requirement"):
                 res.update({attr: getattr(self, attr)})
         return res
 

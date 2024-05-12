@@ -192,7 +192,6 @@ class BackendFetcher(DependencyScorer):
 
         for dependency in response.json():
             scorecard = Scorecard(dependency["scorecard"])
-            #print(response.json())
             # TODO Fix the name of Dependency.
             # Should perhaps store name of CycloneDX component
             # in database and git_url separately.

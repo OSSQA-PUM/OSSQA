@@ -140,7 +140,7 @@ class SSFAPIFetcher(DependencyScorer):
         # Check if the dependency has already been scored
         if self._check_if_scored(new_dependency):
             return new_dependency
-        
+
         try:
             repo_path = new_dependency.repo_path
             component_version = new_dependency.component_version
