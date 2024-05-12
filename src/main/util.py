@@ -8,9 +8,51 @@ Functions:
 import re
 import os
 import datetime
-from time import time, sleep
+from time import time
 import requests
+from math import inf
 from packaging import version as version_parser
+
+class TokenLimitExceededError(Exception):
+    """
+    Exception raised when the GitHub API rate limit is exceeded.
+    """
+    reset_time: int
+
+    @property
+    def reset_datetime(self) -> str:
+        """
+        Returns:
+            str: The date and time at which the rate limit will be reset.
+        """
+        reset_datetime = datetime.datetime.fromtimestamp(int(self.reset_time))
+        reset_datetime = reset_datetime.strftime("%Y-%m-%d %H:%M:%S")
+        return reset_datetime
+
+    @property
+    def time_to_wait(self) -> float:
+        """
+        Returns:
+            float: The time in seconds remaining until the rate limit is reset.
+        """
+        return self.reset_time - time()
+
+    def __init__(self, reset_time: str):
+        self.reset_time = reset_time
+        super().__init__(f"GitHub API rate limit exceeded. Try again later. "
+                         f"Rate limit resets at {reset_time}.")
+
+
+class Sha1NotFoundError(Exception):
+    """
+    Exception raised when the SHA1 hash for a version of a dependency is not found.
+    """
+
+    message: str
+
+    def __init__(self, message: str = "SHA1 hash not found."):
+        super().__init__(message)
+
 
 def get_token_data() -> dict:
     """
@@ -32,61 +74,37 @@ def get_token_data() -> dict:
             "limit": int(user_data['X-RateLimit-Limit']),
             "used": int(user_data['x-ratelimit-used']),
             "remaining": int(user_data['X-RateLimit-Remaining']),
-            "time_until_reset": int(user_data["X-RateLimit-Reset"]) - time()
+            "reset_time": int(user_data["X-RateLimit-Reset"])
         }
 
     print(f"Failed to authenticate. Status code: {response.status_code}")
     return None
 
-def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
+def get_git_sha1(git_url: str, version: str) -> str:
     """
-    Gets the SHA1 hash for a version of a dependency.
+    Get the SHA1 hash for a version of a dependency.
 
     Args:
-        git_url (str): The Git URL of the dependency.
+        git_url (str): The URL of the GitHub repository.
         version (str): The version of the dependency.
-        name (str): The name of the dependency.
-        check (str): The type of check to perform. Either "release" or "tag".
 
     Returns:
-        str: The SHA1 hash of the version.
+        str: The SHA1 hash of the dependency version.
 
     Raises:
-        ValueError: If the version does not exist.
-        AssertionError: If the SHA1 hash is invalid.
-        ConnectionRefusedError: If the connection is refused.
+        ValueError: If the GitHub authentication token is not found in the 
+        environment.
+
+        ConnectionRefusedError: If the request to the GitHub API is 
+        unsuccessful.
+
+        TokenLimitExceededError: If the GitHub API rate limit is exceeded.
+
+        AssertionError: If the found SHA1 hash is not valid.
+
+        Sha1NotFoundError: If the SHA1 hash for the dependency version is not 
+        found.
     """
-    def is_greater_than(v1: str, v2: str) -> bool:
-        return version_parser.parse(v1) >= version_parser.parse(v2)
-
-    def find_matching_release(release_tags: list[str], version: str) \
-            -> str | None:
-        """
-        Finds the nearest release that is less than the given version.
-        """
-        # Remove "v" prefix and "-*" suffix from version
-        version = re.sub(r'^v', '', version)
-        version = re.sub(r'-.*$', '', version)
-
-        try:
-            # Sort the release tags in descending order
-            release_tags.sort(
-                key=lambda tag: version_parser.parse(tag),
-                reverse=True
-                )
-        except version_parser.InvalidVersion:
-            pass
-
-        for tag in release_tags:
-            # Remove "v" prefix and "-*" suffix from tag
-            stripped_tag = re.sub(r'^v', '', tag)
-            stripped_tag = re.sub(r'-.*$', '', stripped_tag)
-            try:
-                if is_greater_than(version, stripped_tag):
-                    return tag
-            except version_parser.InvalidVersion:
-                pass
-        return None
 
     # Get the GitHub authentication token
     token = os.environ.get('GITHUB_AUTH_TOKEN')
@@ -97,120 +115,81 @@ def get_git_sha1(git_url: str, version: str, name: str, check: str) -> str:
     headers = {'Authorization': f'token {token}'} if token else {}
 
     # Check that the release version exists
-    if check == "release":
-        url = f"https://api.github.com/repos/{git_url}/releases/tags/{version}"
-    elif check == "tag":
-        url = f"https://api.github.com/repos/{git_url}/tags/{version}"
+    url = f"https://api.github.com/repos/{git_url}/git/matching-refs/tags"
     response = requests.get(url, headers=headers, timeout=10)
 
-    # Check if the rate limit is exceeded
-    if response.status_code == 403 \
-            and "API rate limit exceeded" in response.json()["message"]:
-        reset_time = response.headers.get("X-RateLimit-Reset")
+    # Check if token is depleted
+    if response.status_code == 403:
+        raise TokenLimitExceededError(response.headers['X-RateLimit-Reset'])
 
-        wait_time: float = int(reset_time) - time()
-
-        # Convert the reset time to a human-readable format
-        reset_time = datetime.datetime.fromtimestamp(int(reset_time))
-        reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
-        sleep(wait_time + 10)
-        return get_git_sha1(git_url=git_url,
-                            version=version,
-                            name=name,
-                            check=check)
-
-    # Check if the response is successful
+    # Check if the request was successful
     if response.status_code != 200:
-        # Try to get all releases and find the matching nearest release
-        # that is less than the given version
-        if check == "release":
-            url = f"https://api.github.com/repos/{git_url}/releases"
-        elif check == "tag":
-            url = f"https://api.github.com/repos/{git_url}/tags"
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code != 200:
-            raise ValueError(f"Failed to get release tags for {git_url}")
-        if check == "release":
-            tag_names = [release["tag_name"] for release in response.json()]
-        elif check == "tag":
-            tag_names = [release["name"] for release in response.json()]
-        release_tag = find_matching_release(tag_names, version)
+        raise ConnectionRefusedError(
+            f"Failed to get tags. Status code: {response.status_code}"
+            )
 
-        # If no release found, try setting it to exact version
-        if not release_tag:
-            release_tag = version
-    else:
-        if check == "release":
-            release_tag = response.json()["tag_name"]
-        elif check == "tag":
-            release_tag = response.json()["name"]
+    # Filter out unwanted characters from the version
+    original_version = version
+    version.strip("-").strip("v").strip("@40")
 
-    try:
-        # Get the commit SHA1 hash for the release tag
-        url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{release_tag}"
-        reponse = requests.get(url, headers=headers, timeout=10)
-        sha1 = ""
-        if reponse.status_code == 200:
-            sha1 = reponse.json()["object"]["sha"]
+    # Get the SHA1 hash for the version
+    response_content: list[dict] = response.json()
+    if not response_content:
+        raise Sha1NotFoundError(
+            f"SHA1 hash not found for version {original_version}. "
+            "No tags found for repo.")
 
-        assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-    except AssertionError:
-        try:
-            # Get the commit SHA1 hash for the release tag
-            url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{name + "-" + release_tag}"
-            reponse = requests.get(url, headers=headers, timeout=10)
-            sha1 = ""
-            if reponse.status_code == 200:
-                sha1 = reponse.json()["object"]["sha"]
+    # Sort the tags by version number
+    for tag in response_content:
+        tag_name: str = tag["ref"]
+        tag_name: str = (tag_name.strip("refs/tags/").strip("-")
+                         .strip("v").strip("@40"))
+        tag["ref"] = tag_name
+        tag_digits = "".join([c for c in tag_name if c.isdigit()])
 
-            assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-        except AssertionError:
-            try:
-                # Get the commit SHA1 hash for the release tag
-                url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
-                       f"{name + "-v" + release_tag}")
-                reponse = requests.get(url, headers=headers, timeout=10)
-                sha1 = ""
-                if reponse.status_code == 200:
-                    sha1 = reponse.json()["object"]["sha"]
+        if not tag_digits:
+            tag_digits = inf
+        else:
+            tag_digits = int(tag_digits)
 
-                assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-            except AssertionError:
-                try:
-                    # Get the commit SHA1 hash for the release tag
-                    url = f"https://api.github.com/repos/{git_url}/git/ref/tags/{"v" + release_tag}"
-                    reponse = requests.get(url, headers=headers, timeout=10)
-                    sha1 = ""
-                    if reponse.status_code == 200:
-                        sha1 = reponse.json()["object"]["sha"]
+        tag["tag_digits"] = tag_digits
 
-                    assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-                except AssertionError:
-                    try:
-                        # Get the commit SHA1 hash for the release tag
-                        url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
-                               f"{name + "@40" + release_tag}")
-                        reponse = requests.get(url, headers=headers, timeout=10)
-                        sha1 = ""
-                        if reponse.status_code == 200:
-                            sha1 = reponse.json()["object"]["sha"]
+    response_content = sorted(response_content, 
+                              key=lambda x: x["tag_digits"], reverse=True)
 
-                        assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-                    except AssertionError:
-                        try:
-                            # Get the commit SHA1 hash for the release tag
-                            url = (f"https://api.github.com/repos/{git_url}/git/ref/tags/"
-                                   f"{name + "@40v" + release_tag}")
-                            reponse = requests.get(url, headers=headers, timeout=10)
-                            sha1 = ""
-                            if reponse.status_code == 200:
-                                sha1 = reponse.json()["object"]["sha"]
+    # Get the SHA1 hash for the version
+    version_digits = "".join([c for c in version if c.isdigit()])
+    if version_digits:
+        version_digits = int(version_digits)
 
-                            assert is_valid_sha1(sha1), f"given commit sha1: {sha1} is not valid"
-                        except AssertionError as e:
-                            raise AssertionError((f"Failed to get commit SHA1 hash for "
-                                                  f"{release_tag}")) from e
-    return sha1
+    result_sha1 = ""
+
+    for tag in response_content:
+        tag_name: str = tag["ref"]
+        tag_sha: str = tag["object"]["sha"]
+
+        # Check if the tag name contains the version
+        if version in tag_name:
+            result_sha1 = tag_sha
+            break
+
+        if not version_digits:
+            continue
+
+        tag_digits = tag["tag_digits"]
+
+        # Check if the tag version is less than or equal to the required
+        # version
+        if tag_digits <= version_digits:
+            result_sha1 = tag_sha
+            break
+
+    if result_sha1:
+        assert is_valid_sha1(result_sha1)
+        return result_sha1
+
+    raise Sha1NotFoundError(
+        f"SHA1 hash not found for version {original_version}.")
 
 def is_valid_sha1(sha1_str: str) -> bool:
     """
@@ -240,19 +219,3 @@ def get_github_token() -> str:
             "GitHub authentication token not found in environment"
             )
     return token
-
-
-def raise_github_token_refused(response: requests.Response) -> None:
-    """
-    Raises an error if the GitHub API rate limit is exceeded.
-    """
-    reset_time = response.headers.get("X-RateLimit-Reset")
-
-    # Convert the reset time to a human-readable format
-    reset_time = datetime.datetime.fromtimestamp(int(reset_time))
-    reset_time = reset_time.strftime("%Y-%m-%d %H:%M:%S")
-
-    raise ConnectionRefusedError(
-        (f"GitHub API rate limit exceeded. Try again later. "
-            f"Rate limit resets at {reset_time}.")
-            )

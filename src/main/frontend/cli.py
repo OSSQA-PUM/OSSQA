@@ -27,7 +27,6 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import (RequirementsType,
                                                UserRequirements)
 from main.frontend.front_end_api import FrontEndAPI
-from main.util import raise_github_token_refused
 
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
