@@ -9,13 +9,7 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.scorecard import Scorecard
 
 DIR_PATH = Path(__file__).parent
-SBOM_PATH = DIR_PATH / "example-SBOM.json"
-# TODO: planned on using a downscaled version of ddmanager SBOM,
-#       but using that one fails,
-#       because "platform_path" can be empty in certain dependencies,
-#       which causes "POST /sbom" to fail,
-#       because it tries to get that field in the dependency json
-#       without safety
+SBOM_PATH = DIR_PATH / "downscaled-ddmanager-controller.cdx.json"
 
 SCORECARD = Scorecard({
     "date": "2024-04-15",
@@ -198,16 +192,20 @@ SCORECARD = Scorecard({
     ]
 })
 
+
 def create_unscored_sbom() -> Sbom:
     with open(SBOM_PATH, "r", encoding="utf-8") as file:
         return Sbom(json.load(file))
+
 
 def create_scored_sbom() -> Sbom:
     with open(SBOM_PATH, "r", encoding="utf-8") as file:
         sbom = Sbom(json.load(file))
     dependencies = []
     for dep in sbom.get_unscored_dependencies():
-        dep.dependency_score = SCORECARD
+        dep_dict = dep.to_dict()
+        if "platform_path" in dep_dict.keys():
+            dep.dependency_score = SCORECARD
     sbom.update_dependencies(dependencies)
     return sbom
 
