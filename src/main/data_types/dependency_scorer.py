@@ -125,14 +125,14 @@ class SSFAPIFetcher(DependencyScorer):
                         )
                     )
         except TokenLimitExceededError as e:
-            time_to_wait:int = e.time_to_wait + 10
+            time_to_wait: int = e.time_to_wait + 10
             self.on_step_complete.invoke(
                 StepResponse(
                     batch_size,
                     index,
                     successful_items,
                     failed_items,
-                    f"Token limit reached. Until {e.reset_datetime}" + \
+                    f"Token limit reached. Until {e.reset_datetime}" +
                     "for token reset."
                 )
             )
@@ -260,15 +260,6 @@ class ScorecardAnalyzer(DependencyScorer):
         new_dependencies = []
         remaining_dependencies: list[Dependency] = dependencies
 
-        start_step: StepResponse = StepResponse(
-                        batch_size,
-                        0,
-                        successful_items,
-                        failed_items,
-                        "Starting to score dependencies."
-                    )
-        self.on_step_complete.invoke(start_step)
-
         with Pool() as pool:
             try:
                 for index, scored_dependency in enumerate(
@@ -291,14 +282,14 @@ class ScorecardAnalyzer(DependencyScorer):
                         )
                     )
             except TokenLimitExceededError as e:
-                time_to_wait:int = e.time_to_wait + 10
+                time_to_wait: int = e.time_to_wait + 10
                 self.on_step_complete.invoke(
                     StepResponse(
                         batch_size,
                         index,
                         successful_items,
                         failed_items,
-                        f"Token limit reached. Until {e.reset_datetime}" + \
+                        f"Token limit reached. Until {e.reset_datetime}" +
                         "for token reset."
                     )
                 )
@@ -308,7 +299,7 @@ class ScorecardAnalyzer(DependencyScorer):
         return new_dependencies
 
     def _analyze_scorecard(self, dependency: Dependency, timeout: float = 120)\
-                                                                -> Dependency:
+            -> Dependency:
         """
         Analyzes the score for a dependency.
 
@@ -344,7 +335,6 @@ class ScorecardAnalyzer(DependencyScorer):
             error_message = f"Failed missing required field due to: {e}"
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
-
 
         try:
             version_git_sha1: str = get_git_sha1(
