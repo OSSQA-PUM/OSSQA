@@ -10,16 +10,19 @@ from typing import Any, Callable
 from dataclasses import dataclass
 import subprocess
 from multiprocessing import Pool
+from time import sleep
 import re
 import json
 import copy
 import os
-from time import sleep
 import requests
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.event import Event
-from main.util import get_git_sha1
+from main.util import (get_git_sha1,
+                       get_token_data,
+                       Sha1NotFoundError,
+                       TokenLimitExceededError)
 
 
 @dataclass
@@ -100,24 +103,41 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        with Pool() as pool:
-            for index, dependency in enumerate(
-                    pool.imap(self._request_ssf_api, dependencies)
-                    ):
-                if dependency.dependency_score:
-                    successful_items += 1
-                else:
-                    failed_items += 1
+        remaining_dependencies: list[Dependency] = dependencies
+        try:
+            with Pool() as pool:
+                for index, dependency in enumerate(
+                        pool.imap(self._request_ssf_api, dependencies)
+                        ):
+                    if dependency.dependency_score:
+                        successful_items += 1
+                    else:
+                        failed_items += 1
 
-                new_dependencies.append(dependency)
-                self.on_step_complete.invoke(
-                    StepResponse(
-                        batch_size,
-                        index + 1,
-                        successful_items,
-                        failed_items
+                    remaining_dependencies.remove(dependency)
+                    new_dependencies.append(dependency)
+                    self.on_step_complete.invoke(
+                        StepResponse(
+                            batch_size,
+                            index + 1,
+                            successful_items,
+                            failed_items
+                        )
                     )
+        except TokenLimitExceededError as e:
+            time_to_wait:int = e.time_to_wait + 10
+            self.on_step_complete.invoke(
+                StepResponse(
+                    batch_size,
+                    index,
+                    successful_items,
+                    failed_items,
+                    f"Token limit reached. Until {e.reset_datetime}" + \
+                    "for token reset."
                 )
+            )
+            sleep(time_to_wait)
+            return new_dependencies + self.score(remaining_dependencies)
 
         return new_dependencies
 
@@ -144,7 +164,6 @@ class SSFAPIFetcher(DependencyScorer):
         try:
             repo_path = new_dependency.repo_path
             component_version = new_dependency.component_version
-            component_name = new_dependency.component_name
         except (KeyError, ValueError) as e:
             error_message = f"Failed missing required field due to: {e}"
             new_dependency.failure_reason = type(e)(error_message)
@@ -152,21 +171,18 @@ class SSFAPIFetcher(DependencyScorer):
 
         try:
             sha1 = get_git_sha1(repo_path,
-                                component_version,
-                                component_name, "release")
-        except (ConnectionRefusedError, AssertionError, ValueError, KeyError):
-            try:
-                sha1 = get_git_sha1(repo_path,
-                                    component_version,
-                                    component_name, "tag")
-            except (
-                    ConnectionRefusedError,
-                    AssertionError,
-                    ValueError,
-                    KeyError) as e:
-                error_message = f"Failed to get git sha1 due to: {e}"
-                new_dependency.failure_reason = type(e)(error_message)
-                return new_dependency
+                                component_version)
+        except (
+                ConnectionRefusedError,
+                AssertionError,
+                ValueError,
+                KeyError,
+                Sha1NotFoundError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+        except TokenLimitExceededError as e:
+            raise e from e
 
         try:
             score = self._lookup_ssf_api(
@@ -242,29 +258,57 @@ class ScorecardAnalyzer(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
+        remaining_dependencies: list[Dependency] = dependencies
+
+        start_step: StepResponse = StepResponse(
+                        batch_size,
+                        0,
+                        successful_items,
+                        failed_items,
+                        "Starting to score dependencies."
+                    )
+        self.on_step_complete.invoke(start_step)
+
         with Pool() as pool:
-            for index, scored_dependency in enumerate(
-                    pool.imap(self._analyze_scorecard, dependencies)
-                    ):
+            try:
+                for index, scored_dependency in enumerate(
+                        pool.imap(self._analyze_scorecard, dependencies)
+                        ):
 
-                if scored_dependency.dependency_score:
-                    successful_items += 1
-                else:
-                    failed_items += 1
+                    if scored_dependency.dependency_score:
+                        successful_items += 1
+                    else:
+                        failed_items += 1
 
-                new_dependencies.append(scored_dependency)
+                    new_dependencies.append(scored_dependency)
+                    remaining_dependencies.remove(scored_dependency)
+                    self.on_step_complete.invoke(
+                        StepResponse(
+                            batch_size,
+                            index + 1,
+                            successful_items,
+                            failed_items
+                        )
+                    )
+            except TokenLimitExceededError as e:
+                time_to_wait:int = e.time_to_wait + 10
                 self.on_step_complete.invoke(
                     StepResponse(
                         batch_size,
-                        index + 1,
+                        index,
                         successful_items,
-                        failed_items
+                        failed_items,
+                        f"Token limit reached. Until {e.reset_datetime}" + \
+                        "for token reset."
                     )
                 )
+                sleep(time_to_wait)
+                return new_dependencies + self.score(remaining_dependencies)
 
         return new_dependencies
 
-    def _analyze_scorecard(self, dependency: Dependency) -> Dependency:
+    def _analyze_scorecard(self, dependency: Dependency, timeout: float = 120)\
+                                                                -> Dependency:
         """
         Analyzes the score for a dependency.
 
@@ -282,6 +326,7 @@ class ScorecardAnalyzer(DependencyScorer):
             subprocess.CalledProcessError: If the scorecard binary could not be
                                            executed.
             json.JSONDecodeError: If the scorecard output could not be parsed.
+            TimeoutError: If the scorecard execution timed out.
         """
         assert isinstance(dependency, Dependency), \
             f"dependency: {dependency} is not a Dependency object"
@@ -295,29 +340,27 @@ class ScorecardAnalyzer(DependencyScorer):
         try:
             repo_path = new_dependency.repo_path
             component_version = new_dependency.component_version
-            component_name = new_dependency.component_name
         except (KeyError, ValueError) as e:
             error_message = f"Failed missing required field due to: {e}"
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
 
+
         try:
             version_git_sha1: str = get_git_sha1(
-                repo_path, component_version, component_name, "release"
+                repo_path, component_version
             )
-        except (ConnectionRefusedError, AssertionError, ValueError, KeyError):
-            try:
-                version_git_sha1: str = get_git_sha1(
-                    repo_path, component_version, component_name, "tag"
-                )
-            except (
-                    ConnectionRefusedError,
-                    AssertionError,
-                    ValueError,
-                    KeyError) as e:
-                error_message = f"Failed to get git sha1 due to: {e}"
-                new_dependency.failure_reason = type(e)(error_message)
-                return new_dependency
+        except (
+                ConnectionRefusedError,
+                AssertionError,
+                ValueError,
+                KeyError,
+                Sha1NotFoundError) as e:
+            error_message = f"Failed to get git sha1 due to: {e}"
+            new_dependency.failure_reason = type(e)(error_message)
+            return new_dependency
+        except TokenLimitExceededError as e:
+            raise e from e
 
         remaining_tries: int = 3
         retry_interval: int = 3
@@ -326,7 +369,7 @@ class ScorecardAnalyzer(DependencyScorer):
             try:
                 remaining_tries -= 1
                 scorecard: Scorecard = self._execute_scorecard(
-                    new_dependency.git_url, version_git_sha1
+                    new_dependency.git_url, version_git_sha1, timeout
                     )
 
                 new_dependency.dependency_score = scorecard
@@ -335,11 +378,14 @@ class ScorecardAnalyzer(DependencyScorer):
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
+                    TimeoutError,
                     json.JSONDecodeError, ValueError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)  # Wait before retrying
                 continue
+            except TokenLimitExceededError as e:
+                raise e from e
 
         # Successful execution of scorecard
         if new_dependency.dependency_score:
@@ -349,7 +395,7 @@ class ScorecardAnalyzer(DependencyScorer):
     def _execute_scorecard(self,
                            git_url: str,
                            commit_sha1: str,
-                           timeout: int = 120) -> Scorecard:
+                           timeout: float = 120) -> Scorecard:
         """
         Executes the OpenSSF Scorecard binary
         on a specific version of a dependency.
@@ -357,7 +403,7 @@ class ScorecardAnalyzer(DependencyScorer):
         Args:
             git_url (str): The Git URL of the dependency.
             version (str): The version of the dependency.
-            timeout (int): The timeout in seconds for the scorecard binary.
+            timeout (float): The timeout in seconds for the scorecard binary.
 
         Returns:
             Scorecard: The scorecard of the dependency.
@@ -367,6 +413,9 @@ class ScorecardAnalyzer(DependencyScorer):
             AssertionError: If the commit sha1 is not a string.
             ValueError: If the scorecard output could not be parsed.
             json.JSONDecodeError: If the scorecard output could not be parsed.
+            subprocess.CalledProcessError: If the scorecard binary could not be
+                                             executed.
+            TimeoutError: If the scorecard execution timed out.
         """
         # Validate input
         assert isinstance(git_url, str), f"git_url: {git_url} is not a string"
@@ -382,7 +431,7 @@ class ScorecardAnalyzer(DependencyScorer):
             if os.name == "nt":
                 output: str = subprocess.check_output(
                     f'scorecard-windows.exe {flags}',
-                    shell=True,
+                    shell=False,
                     timeout=timeout
                 ).decode("utf-8")
             else:
@@ -391,8 +440,15 @@ class ScorecardAnalyzer(DependencyScorer):
                     shell=True,
                     timeout=timeout
                 ).decode("utf-8")
-        except subprocess.CalledProcessError as e:
+        except (subprocess.CalledProcessError) as e:
             output = e.output.decode("utf-8")
+        except subprocess.TimeoutExpired as e:
+            token_data: dict = get_token_data()
+            if token_data.get("remaining") == 0:
+                raise TokenLimitExceededError(
+                    token_data.get("reset_time")) from e
+            raise TimeoutError(e.timeout,
+                               "Scorecard execution timed out") from e
 
         # Remove unnecessary data
         # Find start of JSON used for creating a Scorecard by finding the first
