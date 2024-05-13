@@ -83,7 +83,9 @@ def get_current_status():
 @app.route("/get_previous_sbom/<path:repo_name>", methods=['GET'])
 def get_previous_sboms(repo_name: str):
     print(f"Looking up previous SBOMs for {repo_name}")
-    return frontend_api.lookup_previous_sboms(repo_name)
+    sboms = frontend_api.lookup_previous_sboms(repo_name)
+    sbom_dicts = [sbom.to_dict() for sbom in sboms]
+    return json.dumps(sbom_dicts)
 
 
 def run():
