@@ -15,8 +15,15 @@ OSSQA is a project for determining the quality of a software projekt using a Sof
 
 ### Executing program
 
-* How to run the program
-* ...
+1. Build the Docker image
+```
+docker compose build ossqa-cli
+```
+
+2. Run a container of the image
+```
+docker compose run ossqa-cli [COMMAND] [ARGUMENTS…]
+```
 
 ## Contribute
 
