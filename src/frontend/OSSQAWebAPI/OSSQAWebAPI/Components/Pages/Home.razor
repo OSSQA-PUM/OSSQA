@@ -1,0 +1,104 @@
+﻿@page "/"
+
+@using System.Diagnostics
+@rendermode InteractiveServer
+@using System.Text
+@using static SbomAnalysis.Check
+@using static SbomAnalysis.Dependency
+@using static SbomAnalysis.Status
+<PageTitle>OSSQA</PageTitle>
+<MatThemeProvider Theme="@theme">
+@*This class stores all information that will otherwise get wiped when refreshing components *@
+
+    @*shows correct tabs if analysis is complete*@
+@if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
+{
+    <MatTabGroup>
+        <MatTab Label="Home">
+            <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
+        </MatTab>
+        <MatTab Label="Code Vulnerabilities">
+            <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
+        </MatTab>
+        <MatTab Label="Maintenance">
+            <ViewResults SbomResult="SbomResult" Tests='[ "License", "Security-Policy"]' />
+        </MatTab>
+        <MatTab Label="Continuous Testing">
+            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests"]' />
+        </MatTab>
+        <MatTab Label="Source Risk Assessment">
+            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Code-Review", "Dangerous-Workflow"]' />
+        </MatTab>
+        <MatTab Label="Build Risk Assessment">
+            <ViewResults SbomResult="SbomResult" Tests='[ "Pinned-Dependencies", "Token-Permissions"]' />
+                </MatTab>
+    </MatTabGroup>
+}
+    @* if the user has not chosen sbom or requirements *@
+else if(!ready)
+{
+    <MatTabGroup @bind-ActiveIndex="@activeTab">
+        <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
+            <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
+        </MatTab>
+            <MatTab Label="Specify Requirements" @onclick="()=>activeTab = 1">
+            <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
+        </MatTab>
+    </MatTabGroup>
+}
+    @* start analysis if done *@
+else
+{
+        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />
+}
+
+</MatThemeProvider>
+
+
+@code {
+    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
+    StringBuilder ChosenSbom = new StringBuilder();
+    private SemaphoreSlim Analyzing = new(1, 1);
+    private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
+    private List<SbomAnalysis.Dependency> FailedDependencies = new();
+    private Action StateHasChangedCallback =>()=>
+    {
+        UpdateTab();
+        InvokeAsync(StateHasChanged);
+    };
+    public int activeTab = 0;
+    private Dictionary<string, string> PostData = new();
+    private string SBOM = "";
+    bool ready = false;
+
+    private void UpdateTab()
+    {
+        if (!PostData.ContainsKey("sbom"))
+        {
+            activeTab = 0;
+
+        }
+        else if (!PostData.ContainsKey("user_reqs"))
+        {
+            activeTab = 1;
+        }
+        else
+        {
+            ready = true;
+        }
+    }
+
+    MatTheme theme = new MatTheme()
+        {
+            Primary = "#88bcec",
+            Secondary = MatThemeColors.BlueGrey._500.Value,
+            //Surface = "#88bcec",
+            //OnPrimary = MatThemeColors.BlueGrey._500.Value
+        };
+
+    void ChangeTab(MouseEventArgs e)
+    {
+        activeTab = activeTab == 0 ? activeTab = 1 : 0;
+    }
+
+}

@@ -1,0 +1,59 @@
+﻿@using System.Text.Json
+@using System.Text;
+
+@* this component handles user SBOM input and reads the sbom file as a string *@
+
+<ViewLogo />
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@ChosenSbom.ToString()></MatFileUpload>
+    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="LoadSBOM">Continue</MatButton>
+</div>
+
+@code {
+    private IMatFileUploadEntry? file;
+    private bool loadedFile = false;
+    private string status = "";
+    [Parameter]
+    public Dictionary<string, string> PostData { get; set; }
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    [Parameter]
+    public StringBuilder ChosenSbom { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if(ChosenSbom.Length == 0)
+        {
+            ChosenSbom.Append("Drag SBOM here or browse");
+        }
+
+    }
+
+    private async Task LoadSBOM()
+    {
+
+        using var memoryStream = new MemoryStream();
+        if (file == null)
+        {
+            status = "No file selected";
+            return;
+        }
+        await file.WriteToStreamAsync(memoryStream);
+
+        PostData["sbom"] = Encoding.UTF8.GetString(memoryStream.ToArray());
+        loadedFile = true;
+        StateHasChangedCallback.Invoke();
+    }
+
+    private void GetInput(IMatFileUploadEntry[] files)
+    {
+        foreach (var f in files)
+        {
+            file = f;
+        }
+        ChosenSbom.Clear();
+        ChosenSbom.Append(file?.Name ?? "Drag SBOM here or browse");
+        LoadSBOM();
+    }
+}

@@ -1,0 +1,6 @@
+pytest
+coverage
+fun-coverage
+pytest-order
+pytest-asyncio
+pytest-dotenv
