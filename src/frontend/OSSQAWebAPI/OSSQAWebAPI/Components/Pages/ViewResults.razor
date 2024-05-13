@@ -26,7 +26,15 @@
                             var url = $"https://{check.dependency.name}";
                                 
                             <MatListItem>
-                                    <h5 style="margin-right:1em;">Score: @check.score/10 </h5>
+                                    @if (passFail(check) == "PASS")
+                                    {
+                                        <h5 style="margin-right:1em; color:green;"> PASS </h5>
+                                    }
+                                    else
+                                    {
+                                        <h5 style="margin-right:1em; color:red;"> FAIL </h5>
+                                    }
+                                    
                             </MatListItem>
                             <MatListItem>
                                     Component URL: <a style="margin-left:1em;" href="@url">@check.dependency.name</a>
@@ -52,5 +60,16 @@
     public Dictionary<string, List<SbomAnalysis.Check>> SbomResult { get; set; }
     [Parameter]
     public string[] Tests { get; set; }
+    [Parameter]
+    public SortedDictionary<String, int> Requirements { get; set; }
+
+    private string passFail(SbomAnalysis.Check check)
+    {
+        if( check.score >= Requirements[check.name.Replace("-"," ")])
+        {
+            return "PASS";
+        }
+        return "FAIL";
+    }
 
 }

@@ -17,19 +17,19 @@
             </MatTab>
 
             <MatTab Label="Code Vulnerabilities">
-                <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
+                <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' Requirements="Requirements" />
             </MatTab>
             <MatTab Label="Maintenance">
-                <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' />
+                <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' Requirements="Requirements" />
             </MatTab>
             <MatTab Label="Continuous Testing">
-                <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' />
+                <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' Requirements="Requirements" />
             </MatTab>
             <MatTab Label="Source Risk Assessment">
-                <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' />
+                <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' Requirements="Requirements" />
             </MatTab>
             <MatTab Label="Build Risk Assessment">
-                <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' />
+                <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' Requirements="Requirements" />
             </MatTab>
             @if(FailedComponents.Count > 0)
             {
@@ -77,14 +77,38 @@ else
     private Dictionary<string, List<Check>> SbomResult = new();
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
-    private List<int> Requirements = new() { 0, 0, 0, 0, 0 };
     private List<Dependency> FailedComponents = new();
     public int activeTab = 0;
     private Dictionary<string, string> PostData = new();
     private string SBOM = "";
     bool ready = false;
     bool viewOld = false;
-    
+    private SortedDictionary<String, int> Requirements = new();
+
+    protected override void OnInitialized()
+    {
+        Requirements.Add("Vulnerabilities", 0);
+        Requirements.Add("Dependency Update Tool", 0);
+        Requirements.Add("Maintained", 0);
+        Requirements.Add("Security Policy", 0);
+        Requirements.Add("License", 0);
+        Requirements.Add("CII Best Practices", 0);
+        Requirements.Add("CI Tests", 0);
+        Requirements.Add("Fuzzing", 0);
+        Requirements.Add("SAST", 0);
+        Requirements.Add("Binary Artifacts", 0);
+        Requirements.Add("Branch Protection", 0);
+        Requirements.Add("Dangerous Workflow", 0);
+        Requirements.Add("Code Review", 0);
+        Requirements.Add("Contributors", 0);
+        Requirements.Add("Pinned Dependencies", 0);
+        Requirements.Add("Token Permissions", 0);
+        Requirements.Add("Packaging", 0);
+        Requirements.Add("Signed Releases", 0);
+
+
+
+    }
     private Action StateHasChangedCallback =>()=>
     {
         UpdateTab();
@@ -113,8 +137,6 @@ else
         {
             Primary = "#88bcec",
             Secondary = MatThemeColors.BlueGrey._500.Value,
-            //Surface = "#88bcec",
-            //OnPrimary = MatThemeColors.BlueGrey._500.Value
         };
 
     void ChangeTab(MouseEventArgs e)
