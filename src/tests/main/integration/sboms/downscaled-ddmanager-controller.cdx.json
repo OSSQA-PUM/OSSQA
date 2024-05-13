@@ -1,0 +1,1469 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:98393ccd-87be-4830-95b1-f8c2661dd6fa",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2023-12-06T10:20:03Z",
+    "tools": [
+      {
+        "vendor": "anchore",
+        "name": "syft",
+        "version": "0.93.0"
+      }
+    ],
+    "component": {
+      "bom-ref": "aea63943bc9ae0b3",
+      "type": "container",
+      "name": "target/ddmanager-controller-v1.0.1-rc1-production.tar",
+      "version": "sha256:001717f9b3948e265e8b9fad92362437904b13cf894765769ab90f080eb7c924"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:npm/%40babel/generator@7.23.0?package-id=23dbcd5333ba128f",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/generator",
+      "version": "7.23.0",
+      "description": "Turns an AST into code.",
+      "purl": "pkg:npm/%40babel/generator@7.23.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-generator",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/helper-builder-binary-assignment-operator-visitor@7.22.15?package-id=e4305dc63d7d5746",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/helper-builder-binary-assignment-operator-visitor",
+      "version": "7.22.15",
+      "description": "Helper function to build binary assignment operator visitors",
+      "purl": "pkg:npm/%40babel/helper-builder-binary-assignment-operator-visitor@7.22.15",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-helper-builder-binary-assignment-operator-visitor",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/helper-remap-async-to-generator@7.22.20?package-id=8e231bbe18bf102b",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/helper-remap-async-to-generator",
+      "version": "7.22.20",
+      "description": "Helper function to remap async functions to generators",
+      "purl": "pkg:npm/%40babel/helper-remap-async-to-generator@7.22.20",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-helper-remap-async-to-generator",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/helper-replace-supers@7.22.20?package-id=ae2db2d3883c13d4",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/helper-replace-supers",
+      "version": "7.22.20",
+      "description": "Helper function to replace supers",
+      "purl": "pkg:npm/%40babel/helper-replace-supers@7.22.20",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-helper-replace-supers",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/helper-validator-option@7.22.15?package-id=0d77d05a3d653e01",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/helper-validator-option",
+      "version": "7.22.15",
+      "description": "Validate plugin/preset options",
+      "purl": "pkg:npm/%40babel/helper-validator-option@7.22.15",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-syntax-object-rest-spread@7.8.3?package-id=c4e2a4b16f24a527",
+      "type": "library",
+      "name": "@babel/plugin-syntax-object-rest-spread",
+      "version": "7.8.3",
+      "description": "Allow parsing of object rest/spread",
+      "purl": "pkg:npm/%40babel/plugin-syntax-object-rest-spread@7.8.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-object-rest-spread",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-computed-properties@7.22.5?package-id=544db09fd63745ff",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-computed-properties",
+      "version": "7.22.5",
+      "description": "Compile ES2015 computed properties to ES5",
+      "purl": "pkg:npm/%40babel/plugin-transform-computed-properties@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-computed-properties",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-dotall-regex@7.22.5?package-id=fbd110ada1f0259c",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-dotall-regex",
+      "version": "7.22.5",
+      "description": "Compile regular expressions using the `s` (`dotAll`) flag to ES5.",
+      "purl": "pkg:npm/%40babel/plugin-transform-dotall-regex@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-dotall-regex",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-modules-commonjs@7.23.0?package-id=a52b9872d9482477",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-modules-commonjs",
+      "version": "7.23.0",
+      "description": "This plugin transforms ES2015 modules to CommonJS",
+      "purl": "pkg:npm/%40babel/plugin-transform-modules-commonjs@7.23.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-modules-commonjs",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-new-target@7.22.5?package-id=09cf59bb371a9dc8",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-new-target",
+      "version": "7.22.5",
+      "description": "Transforms new.target meta property",
+      "purl": "pkg:npm/%40babel/plugin-transform-new-target@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-new-target",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-object-super@7.22.5?package-id=399b9119dc521f93",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-object-super",
+      "version": "7.22.5",
+      "description": "Compile ES2015 object super to ES5",
+      "purl": "pkg:npm/%40babel/plugin-transform-object-super@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-object-super",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-optional-chaining@7.23.0?package-id=12c63505a7114db4",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-optional-chaining",
+      "version": "7.23.0",
+      "description": "Transform optional chaining operators into a series of nil checks",
+      "purl": "pkg:npm/%40babel/plugin-transform-optional-chaining@7.23.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-optional-chaining",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-parameters@7.22.15?package-id=3f5894b00f77a551",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-parameters",
+      "version": "7.22.15",
+      "description": "Compile ES2015 default and rest parameters to ES5",
+      "purl": "pkg:npm/%40babel/plugin-transform-parameters@7.22.15",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-parameters",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-spread@7.22.5?package-id=f31d27e238432caf",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-spread",
+      "version": "7.22.5",
+      "description": "Compile ES2015 spread to ES5",
+      "purl": "pkg:npm/%40babel/plugin-transform-spread@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-spread",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/plugin-transform-sticky-regex@7.22.5?package-id=60f99be55ccd684f",
+      "type": "library",
+      "author": "The Babel Team (https://babel.dev/team)",
+      "name": "@babel/plugin-transform-sticky-regex",
+      "version": "7.22.5",
+      "description": "Compile ES2015 sticky regex to an ES5 RegExp constructor",
+      "purl": "pkg:npm/%40babel/plugin-transform-sticky-regex@7.22.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/babel/babel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://babel.dev/docs/en/next/babel-plugin-transform-sticky-regex",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40babel/regjsgen@0.8.0?package-id=8a28f3f4bc1be1b6",
+      "type": "library",
+      "author": "Benjamin Tan (https://ofcr.se/)",
+      "name": "@babel/regjsgen",
+      "version": "0.8.0",
+      "description": "Generate regular expressions from regjsparser\u2019s AST.",
+      "purl": "pkg:npm/%40babel/regjsgen@0.8.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/bnjmnt4n/regjsgen.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/bnjmnt4n/regjsgen",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40discoveryjs/json-ext@0.5.7?package-id=9623d42c49818c48",
+      "type": "library",
+      "author": "Roman Dvornov <rdvornov@gmail.com> (https://github.com/lahmatiy)",
+      "name": "@discoveryjs/json-ext",
+      "version": "0.5.7",
+      "description": "A set of utilities that extend the use of JSON",
+      "purl": "pkg:npm/%40discoveryjs/json-ext@0.5.7"
+    },
+    {
+      "bom-ref": "pkg:npm/%40isaacs/cliui@8.0.2?package-id=32cc3194610d7b68",
+      "type": "library",
+      "author": "Ben Coe <ben@npmjs.com>",
+      "name": "@isaacs/cliui",
+      "version": "8.0.2",
+      "description": "easily create complex multi-column command-line-interfaces",
+      "purl": "pkg:npm/%40isaacs/cliui@8.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40jest/schemas@29.6.3?package-id=240bb839a4948d0a",
+      "type": "library",
+      "name": "@jest/schemas",
+      "version": "29.6.3",
+      "purl": "pkg:npm/%40jest/schemas@29.6.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/jestjs/jest.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/set-array@1.1.2?package-id=120c99c4ee50e4c5",
+      "type": "library",
+      "author": "Justin Ridgewell <justin@ridgewell.name>",
+      "name": "@jridgewell/set-array",
+      "version": "1.1.2",
+      "description": "Like a Set, but provides the index of the `key` in the backing array",
+      "purl": "pkg:npm/%40jridgewell/set-array@1.1.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/jridgewell/set-array",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/sourcemap-codec@1.4.15?package-id=d85b880205364634",
+      "type": "library",
+      "author": "Rich Harris",
+      "name": "@jridgewell/sourcemap-codec",
+      "version": "1.4.15",
+      "description": "Encode/decode sourcemap mappings",
+      "purl": "pkg:npm/%40jridgewell/sourcemap-codec@1.4.15",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/jridgewell/sourcemap-codec.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40protobufjs/base64@1.1.2?package-id=68a095e372bff137",
+      "type": "library",
+      "author": "Daniel Wirtz <dcode+protobufjs@dcode.io>",
+      "name": "@protobufjs/base64",
+      "version": "1.1.2",
+      "description": "A minimal base64 implementation for number arrays.",
+      "purl": "pkg:npm/%40protobufjs/base64@1.1.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dcodeIO/protobuf.js.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40protobufjs/codegen@2.0.4?package-id=2eccab68f6c43e4e",
+      "type": "library",
+      "author": "Daniel Wirtz <dcode+protobufjs@dcode.io>",
+      "name": "@protobufjs/codegen",
+      "version": "2.0.4",
+      "description": "A minimalistic code generation utility.",
+      "purl": "pkg:npm/%40protobufjs/codegen@2.0.4",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dcodeIO/protobuf.js.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40protobufjs/path@1.1.2?package-id=e58f0590fd7137ab",
+      "type": "library",
+      "author": "Daniel Wirtz <dcode+protobufjs@dcode.io>",
+      "name": "@protobufjs/path",
+      "version": "1.1.2",
+      "description": "A minimal path module to resolve Unix, Windows and URL paths alike.",
+      "purl": "pkg:npm/%40protobufjs/path@1.1.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/dcodeIO/protobuf.js.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40rjsf/core@5.13.2?package-id=b23e9ec7e48ceab0",
+      "type": "library",
+      "author": "Nicolas Perriault <nperriault@mozilla.com>",
+      "name": "@rjsf/core",
+      "version": "5.13.2",
+      "description": "A simple React component capable of building HTML forms out of a JSON schema.",
+      "purl": "pkg:npm/%40rjsf/core@5.13.2",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/rjsf-team/react-jsonschema-form.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/rjsf-team/react-jsonschema-form",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40tufjs/canonical-json@1.0.0?package-id=8a5bf1553d62c552",
+      "type": "library",
+      "author": "bdehamer@github.com",
+      "name": "@tufjs/canonical-json",
+      "version": "1.0.0",
+      "description": "OLPC JSON canonicalization",
+      "purl": "pkg:npm/%40tufjs/canonical-json@1.0.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/theupdateframework/tuf-js.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/theupdateframework/tuf-js/packages/canonical-json#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/eslint-scope@3.7.5?package-id=06f7498dfdbf0bb6",
+      "type": "library",
+      "name": "@types/eslint-scope",
+      "version": "3.7.5",
+      "description": "TypeScript definitions for eslint-scope",
+      "purl": "pkg:npm/%40types/eslint-scope@3.7.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/eslint-scope",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/pg@8.10.5?package-id=c0b81b3540faa311",
+      "type": "library",
+      "name": "@types/pg",
+      "version": "8.10.5",
+      "description": "TypeScript definitions for pg",
+      "purl": "pkg:npm/%40types/pg@8.10.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pg",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40webassemblyjs/helper-buffer@1.11.6?package-id=152d4d80089339e0",
+      "type": "library",
+      "author": "Sven Sauleau",
+      "name": "@webassemblyjs/helper-buffer",
+      "version": "1.11.6",
+      "description": "Buffer manipulation utility",
+      "purl": "pkg:npm/%40webassemblyjs/helper-buffer@1.11.6",
+      "externalReferences": [
+        {
+          "url": "https://github.com/xtuc/webassemblyjs.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40webassemblyjs/helper-wasm-bytecode@1.11.6?package-id=437372148915b142",
+      "type": "library",
+      "author": "Sven Sauleau",
+      "name": "@webassemblyjs/helper-wasm-bytecode",
+      "version": "1.11.6",
+      "description": "WASM's Bytecode constants",
+      "purl": "pkg:npm/%40webassemblyjs/helper-wasm-bytecode@1.11.6",
+      "externalReferences": [
+        {
+          "url": "https://github.com/xtuc/webassemblyjs.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/%40webpack-cli/configtest@2.1.1?package-id=f7bd77421b09415e",
+      "type": "library",
+      "name": "@webpack-cli/configtest",
+      "version": "2.1.1",
+      "description": "Validate a webpack configuration.",
+      "purl": "pkg:npm/%40webpack-cli/configtest@2.1.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/webpack/webpack-cli.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/webpack/webpack-cli/tree/master/packages/configtest",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/ansi-styles@4.3.0?package-id=8c750a0e2669c701",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "ansi-styles",
+      "version": "4.3.0",
+      "description": "ANSI escape codes for styling strings in the terminal",
+      "purl": "pkg:npm/ansi-styles@4.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/ansi-styles@4.3.0?package-id=249ad3cb255912c9",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "ansi-styles",
+      "version": "4.3.0",
+      "description": "ANSI escape codes for styling strings in the terminal",
+      "purl": "pkg:npm/ansi-styles@4.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/big.js@5.2.2?package-id=a29ae4ba257d52b6",
+      "type": "library",
+      "author": "Michael Mclaughlin <M8ch88l@gmail.com>",
+      "name": "big.js",
+      "version": "5.2.2",
+      "description": "A small, fast, easy-to-use library for arbitrary-precision decimal arithmetic",
+      "purl": "pkg:npm/big.js@5.2.2",
+      "externalReferences": [
+        {
+          "url": "https://github.com/MikeMcl/big.js.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/bytes@3.1.2?package-id=74918597247c2d4f",
+      "type": "library",
+      "author": "TJ Holowaychuk <tj@vision-media.ca> (http://tjholowaychuk.com)",
+      "name": "bytes",
+      "version": "3.1.2",
+      "description": "Utility to parse a string bytes to bytes and vice-versa",
+      "purl": "pkg:npm/bytes@3.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/cli-columns@4.0.0?package-id=255a8b93f65830bc",
+      "type": "library",
+      "author": "Shannon Moeller <me@shannonmoeller> (http://shannonmoeller.com)",
+      "name": "cli-columns",
+      "version": "4.0.0",
+      "description": "Columnated lists for the CLI.",
+      "purl": "pkg:npm/cli-columns@4.0.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/shannonmoeller/cli-columns#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/cli-table3@0.6.3?package-id=6e16e24452e8dfd2",
+      "type": "library",
+      "author": "James Talmage",
+      "name": "cli-table3",
+      "version": "0.6.3",
+      "description": "Pretty unicode tables for the command line. Based on the original cli-table.",
+      "purl": "pkg:npm/cli-table3@0.6.3",
+      "externalReferences": [
+        {
+          "url": "https://github.com/cli-table/cli-table3.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/cli-table/cli-table3",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/color-convert@2.0.1?package-id=bb1b13ebd2e00860",
+      "type": "library",
+      "author": "Heather Arthur <fayearthur@gmail.com>",
+      "name": "color-convert",
+      "version": "2.0.1",
+      "description": "Plain color conversion functions",
+      "purl": "pkg:npm/color-convert@2.0.1"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/dash@0.5.11+git20200708+dd9ef66-5?arch=amd64&distro=debian-11&package-id=8fbbfa5d1ef18185",
+      "type": "library",
+      "publisher": "Andrej Shadura <andrewsh@debian.org>",
+      "name": "dash",
+      "version": "0.5.11+git20200708+dd9ef66-5",
+      "purl": "pkg:deb/debian/dash@0.5.11+git20200708+dd9ef66-5?arch=amd64&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/debianutils@4.11.2?arch=amd64&distro=debian-11&package-id=97230e52d627b890",
+      "type": "library",
+      "publisher": "Clint Adams <clint@debian.org>",
+      "name": "debianutils",
+      "version": "4.11.2",
+      "purl": "pkg:deb/debian/debianutils@4.11.2?arch=amd64&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:npm/debug@2.6.9?package-id=6963b71e14d718d7",
+      "type": "library",
+      "author": "TJ Holowaychuk <tj@vision-media.ca>",
+      "name": "debug",
+      "version": "2.6.9",
+      "description": "small debugging utility",
+      "purl": "pkg:npm/debug@2.6.9",
+      "externalReferences": [
+        {
+          "url": "git://github.com/visionmedia/debug.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/debug@2.6.9?package-id=049042e5df1c2222",
+      "type": "library",
+      "author": "TJ Holowaychuk <tj@vision-media.ca>",
+      "name": "debug",
+      "version": "2.6.9",
+      "description": "small debugging utility",
+      "purl": "pkg:npm/debug@2.6.9",
+      "externalReferences": [
+        {
+          "url": "git://github.com/visionmedia/debug.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/delegates@1.0.0?package-id=0e1f32c670fc389d",
+      "type": "library",
+      "name": "delegates",
+      "version": "1.0.0",
+      "description": "delegate methods and accessors to another property",
+      "purl": "pkg:npm/delegates@1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/diff@5.1.0?package-id=50afb4006199e178",
+      "type": "library",
+      "name": "diff",
+      "version": "5.1.0",
+      "description": "A javascript text diff implementation.",
+      "purl": "pkg:npm/diff@5.1.0",
+      "externalReferences": [
+        {
+          "url": "git://github.com/kpdecker/jsdiff.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/emojis-list@3.0.0?package-id=8534ad875ae2f59c",
+      "type": "library",
+      "author": "Kiko Beats <josefrancisco.verdu@gmail.com> (https://github.com/Kikobeats)",
+      "name": "emojis-list",
+      "version": "3.0.0",
+      "description": "Complete list of standard emojis.",
+      "purl": "pkg:npm/emojis-list@3.0.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/kikobeats/emojis-list.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://nidecoc.io/Kikobeats/emojis-list",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/express@4.18.2?package-id=793a27a58dd8cd12",
+      "type": "library",
+      "author": "TJ Holowaychuk <tj@vision-media.ca>",
+      "name": "express",
+      "version": "4.18.2",
+      "description": "Fast, unopinionated, minimalist web framework",
+      "purl": "pkg:npm/express@4.18.2",
+      "externalReferences": [
+        {
+          "url": "http://expressjs.com/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/fast-deep-equal@3.1.3?package-id=d5db505c3f725773",
+      "type": "library",
+      "author": "Evgeny Poberezkin",
+      "name": "fast-deep-equal",
+      "version": "3.1.3",
+      "description": "Fast deep equal",
+      "purl": "pkg:npm/fast-deep-equal@3.1.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/epoberezkin/fast-deep-equal.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/epoberezkin/fast-deep-equal#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/finalhandler@1.2.0?package-id=8db67c4c2a553d40",
+      "type": "library",
+      "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
+      "name": "finalhandler",
+      "version": "1.2.0",
+      "description": "Node.js final http responder",
+      "purl": "pkg:npm/finalhandler@1.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/find-up@4.1.0?package-id=ccd2ede8b78382d0",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "find-up",
+      "version": "4.1.0",
+      "description": "Find a file or directory by walking up parent directories",
+      "purl": "pkg:npm/find-up@4.1.0"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/findutils@4.8.0-1?arch=amd64&distro=debian-11&package-id=59f9ee4984bb1663",
+      "type": "library",
+      "publisher": "Andreas Metzler <ametzler@debian.org>",
+      "name": "findutils",
+      "version": "4.8.0-1",
+      "purl": "pkg:deb/debian/findutils@4.8.0-1?arch=amd64&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:npm/form-data@4.0.0?package-id=57c88a2733689fd3",
+      "type": "library",
+      "author": "Felix Geisend\u00f6rfer <felix@debuggable.com> (http://debuggable.com/)",
+      "name": "form-data",
+      "version": "4.0.0",
+      "description": "A library to create readable \"multipart/form-data\" streams. Can be used to submit forms and file uploads to other web applications.",
+      "purl": "pkg:npm/form-data@4.0.0",
+      "externalReferences": [
+        {
+          "url": "git://github.com/form-data/form-data.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/fs-readdir-recursive@1.1.0?package-id=94ce9d165198de66",
+      "type": "library",
+      "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
+      "name": "fs-readdir-recursive",
+      "version": "1.1.0",
+      "description": "Recursively read a directory",
+      "purl": "pkg:npm/fs-readdir-recursive@1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/html-minifier-terser@6.1.0?package-id=42ed81fb9037bdde",
+      "type": "library",
+      "author": "Daniel Ruf",
+      "name": "html-minifier-terser",
+      "version": "6.1.0",
+      "description": "Highly configurable, well-tested, JavaScript-based HTML minifier.",
+      "purl": "pkg:npm/html-minifier-terser@6.1.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/terser/html-minifier-terser.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://terser.org/html-minifier-terser/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/imurmurhash@0.1.4?package-id=982d079e67a420b4",
+      "type": "library",
+      "author": "Jens Taylor <jensyt@gmail.com> (https://github.com/homebrewing)",
+      "name": "imurmurhash",
+      "version": "0.1.4",
+      "description": "An incremental implementation of MurmurHash3",
+      "purl": "pkg:npm/imurmurhash@0.1.4",
+      "externalReferences": [
+        {
+          "url": "https://github.com/jensyt/imurmurhash-js",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/jensyt/imurmurhash-js",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/inherits@2.0.4?package-id=22cb6527dfef2e14",
+      "type": "library",
+      "name": "inherits",
+      "version": "2.0.4",
+      "description": "Browser-friendly inheritance fully compatible with standard node.js inherits()",
+      "purl": "pkg:npm/inherits@2.0.4",
+      "externalReferences": [
+        {
+          "url": "git://github.com/isaacs/inherits",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:deb/debian/libgcrypt20@1.8.7-6?arch=amd64&distro=debian-11&package-id=c69c4517911c8dfd",
+      "type": "library",
+      "publisher": "Debian GnuTLS Maintainers <pkg-gnutls-maint@lists.alioth.debian.org>",
+      "name": "libgcrypt20",
+      "version": "1.8.7-6",
+      "purl": "pkg:deb/debian/libgcrypt20@1.8.7-6?arch=amd64&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:npm/libnpmfund@4.0.19?package-id=fe0b3cbda0b62e9c",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "libnpmfund",
+      "version": "4.0.19",
+      "description": "Programmatic API for npm fund",
+      "purl": "pkg:npm/libnpmfund@4.0.19",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/cli.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:deb/debian/libpcre2-8-0@10.36-2+deb11u1?arch=amd64&upstream=pcre2&distro=debian-11&package-id=5d07d7ec308f6bb2",
+      "type": "library",
+      "publisher": "Matthew Vernon <matthew@debian.org>",
+      "name": "libpcre2-8-0",
+      "version": "10.36-2+deb11u1",
+      "purl": "pkg:deb/debian/libpcre2-8-0@10.36-2+deb11u1?arch=amd64&upstream=pcre2&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/libstdc++6@10.2.1-6?arch=amd64&upstream=gcc-10&distro=debian-11&package-id=4a2fb804fdb95bab",
+      "type": "library",
+      "publisher": "Debian GCC Maintainers <debian-gcc@lists.debian.org>",
+      "name": "libstdc++6",
+      "version": "10.2.1-6",
+      "purl": "pkg:deb/debian/libstdc++6@10.2.1-6?arch=amd64&upstream=gcc-10&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:deb/debian/libxxhash0@0.8.0-2?arch=amd64&upstream=xxhash&distro=debian-11&package-id=a868c2ca05be3ba7",
+      "type": "library",
+      "publisher": "Norbert Preining <norbert@preining.info>",
+      "name": "libxxhash0",
+      "version": "0.8.0-2",
+      "purl": "pkg:deb/debian/libxxhash0@0.8.0-2?arch=amd64&upstream=xxhash&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:npm/locate-path@7.2.0?package-id=b4a031fd5cd305bc",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
+      "name": "locate-path",
+      "version": "7.2.0",
+      "description": "Get the first path that exists on disk of multiple paths",
+      "purl": "pkg:npm/locate-path@7.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/lodash.camelcase@4.3.0?package-id=7707bf5224ebe7fe",
+      "type": "library",
+      "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
+      "name": "lodash.camelcase",
+      "version": "4.3.0",
+      "description": "The lodash method `_.camelCase` exported as a module.",
+      "purl": "pkg:npm/lodash.camelcase@4.3.0",
+      "externalReferences": [
+        {
+          "url": "https://lodash.com/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/lodash.debounce@4.0.8?package-id=db6185cec0459697",
+      "type": "library",
+      "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
+      "name": "lodash.debounce",
+      "version": "4.0.8",
+      "description": "The lodash method `_.debounce` exported as a module.",
+      "purl": "pkg:npm/lodash.debounce@4.0.8",
+      "externalReferences": [
+        {
+          "url": "https://lodash.com/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/lru-cache@9.1.1?package-id=9713d0c9eb7af5c1",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me>",
+      "name": "lru-cache",
+      "version": "9.1.1",
+      "description": "A cache object that deletes the least-recently-used items.",
+      "purl": "pkg:npm/lru-cache@9.1.1",
+      "externalReferences": [
+        {
+          "url": "git://github.com/isaacs/node-lru-cache.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/minipass@3.3.6?package-id=fbb0f440d48cecd2",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+      "name": "minipass",
+      "version": "3.3.6",
+      "description": "minimal implementation of a PassThrough stream",
+      "purl": "pkg:npm/minipass@3.3.6",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/isaacs/minipass.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/minipass@3.3.6?package-id=34efd89359d81136",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+      "name": "minipass",
+      "version": "3.3.6",
+      "description": "minimal implementation of a PassThrough stream",
+      "purl": "pkg:npm/minipass@3.3.6",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/isaacs/minipass.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/mute-stream@1.0.0?package-id=499927377881bd22",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "mute-stream",
+      "version": "1.0.0",
+      "description": "Bytes go in, but they don't come out (when muted).",
+      "purl": "pkg:npm/mute-stream@1.0.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/mute-stream.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/nopt@6.0.0?package-id=d97483769e1f282e",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "nopt",
+      "version": "6.0.0",
+      "description": "Option parsing for Node, supporting types, shorthands, etc. Used by npm.",
+      "purl": "pkg:npm/nopt@6.0.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/nopt.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/nopt@7.2.0?package-id=8d36f94487e5394f",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "nopt",
+      "version": "7.2.0",
+      "description": "Option parsing for Node, supporting types, shorthands, etc. Used by npm.",
+      "purl": "pkg:npm/nopt@7.2.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/nopt.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/npm-install-checks@6.1.1?package-id=317feb3de64d6f63",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "npm-install-checks",
+      "version": "6.1.1",
+      "description": "Check the engines and platform fields in package.json",
+      "purl": "pkg:npm/npm-install-checks@6.1.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/npm-install-checks.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/npm-registry-fetch@14.0.5?package-id=8e64adf451bb5a2b",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "npm-registry-fetch",
+      "version": "14.0.5",
+      "description": "Fetch-based http client for use with npm registry APIs",
+      "purl": "pkg:npm/npm-registry-fetch@14.0.5",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/npm-registry-fetch.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/pascal-case@3.1.2?package-id=827afc5e62045e34",
+      "type": "library",
+      "author": "Blake Embrey <hello@blakeembrey.com> (http://blakeembrey.me)",
+      "name": "pascal-case",
+      "version": "3.1.2",
+      "description": "Transform into a string of capitalized words without separators",
+      "purl": "pkg:npm/pascal-case@3.1.2",
+      "externalReferences": [
+        {
+          "url": "git://github.com/blakeembrey/change-case.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/blakeembrey/change-case/tree/master/packages/pascal-case#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:deb/debian/passwd@1:4.8.1-1?arch=amd64&upstream=shadow&distro=debian-11&package-id=c31ea6da71073f40",
+      "type": "library",
+      "publisher": "Shadow package maintainers <pkg-shadow-devel@lists.alioth.debian.org>",
+      "name": "passwd",
+      "version": "1:4.8.1-1",
+      "purl": "pkg:deb/debian/passwd@1:4.8.1-1?arch=amd64&upstream=shadow&distro=debian-11"
+    },
+    {
+      "bom-ref": "pkg:npm/pg@8.11.3?package-id=1843f82215a8957c",
+      "type": "library",
+      "author": "Brian Carlson <brian.m.carlson@gmail.com>",
+      "name": "pg",
+      "version": "8.11.3",
+      "description": "PostgreSQL client - pure javascript & libpq with the same API",
+      "purl": "pkg:npm/pg@8.11.3",
+      "externalReferences": [
+        {
+          "url": "git://github.com/brianc/node-postgres.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/brianc/node-postgres",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/pkg-dir@4.2.0?package-id=724a2a697add070a",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "pkg-dir",
+      "version": "4.2.0",
+      "description": "Find the root directory of a Node.js project or npm package",
+      "purl": "pkg:npm/pkg-dir@4.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-value-parser@4.2.0?package-id=875540dc725417f7",
+      "type": "library",
+      "author": "Bogdan Chadkin <trysound@yandex.ru>",
+      "name": "postcss-value-parser",
+      "version": "4.2.0",
+      "description": "Transforms css values and at-rule params into the tree",
+      "purl": "pkg:npm/postcss-value-parser@4.2.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/TrySound/postcss-value-parser.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/TrySound/postcss-value-parser",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/promise-all-reject-late@1.0.1?package-id=cbdada40f118a801",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me> (https://izs.me)",
+      "name": "promise-all-reject-late",
+      "version": "1.0.1",
+      "description": "Like Promise.all, but save rejections until all promises are resolved",
+      "purl": "pkg:npm/promise-all-reject-late@1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/promzard@1.0.0?package-id=4734754d5c3f5ab8",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "promzard",
+      "version": "1.0.0",
+      "description": "prompting wizardly",
+      "purl": "pkg:npm/promzard@1.0.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/promzard.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/proxy-addr@2.0.7?package-id=55568d2ad23b33cd",
+      "type": "library",
+      "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
+      "name": "proxy-addr",
+      "version": "2.0.7",
+      "description": "Determine address of proxied request",
+      "purl": "pkg:npm/proxy-addr@2.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/qrcode-terminal@0.12.0?package-id=cde083283f3abcd3",
+      "type": "library",
+      "name": "qrcode-terminal",
+      "version": "0.12.0",
+      "description": "QRCodes, in the terminal",
+      "purl": "pkg:npm/qrcode-terminal@0.12.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/gtanner/qrcode-terminal",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/gtanner/qrcode-terminal",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/qs@6.11.0?package-id=9de5c6bb93d62b10",
+      "type": "library",
+      "name": "qs",
+      "version": "6.11.0",
+      "description": "A querystring parser that supports nesting and arrays, with a depth limit",
+      "purl": "pkg:npm/qs@6.11.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/ljharb/qs.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/ljharb/qs",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/react-dom@18.2.0?package-id=6b3e66b2d9c54656",
+      "type": "library",
+      "name": "react-dom",
+      "version": "18.2.0",
+      "description": "React package for working with the DOM.",
+      "purl": "pkg:npm/react-dom@18.2.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/facebook/react.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://reactjs.org/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/react-is@16.13.1?package-id=c281b19a6bdda250",
+      "type": "library",
+      "name": "react-is",
+      "version": "16.13.1",
+      "description": "Brand checking of React Elements.",
+      "purl": "pkg:npm/react-is@16.13.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/facebook/react.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://reactjs.org/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/read@2.1.0?package-id=39a8f474ffcf22da",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "read",
+      "version": "2.1.0",
+      "description": "read(1) for node programs",
+      "purl": "pkg:npm/read@2.1.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/read.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/resolve-from@5.0.0?package-id=9933d3a268002d12",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "resolve-from",
+      "version": "5.0.0",
+      "description": "Resolve the path of a module like `require.resolve()` but from a given path",
+      "purl": "pkg:npm/resolve-from@5.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/scheduler@0.23.0?package-id=81b05dd9340856a9",
+      "type": "library",
+      "name": "scheduler",
+      "version": "0.23.0",
+      "description": "Cooperative scheduler for the browser environment.",
+      "purl": "pkg:npm/scheduler@0.23.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/facebook/react.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://reactjs.org/",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/send@0.18.0?package-id=e5e48a8eda0abb3b",
+      "type": "library",
+      "author": "TJ Holowaychuk <tj@vision-media.ca>",
+      "name": "send",
+      "version": "0.18.0",
+      "description": "Better streaming static file server with Range and conditional-GET support",
+      "purl": "pkg:npm/send@0.18.0"
+    },
+    {
+      "bom-ref": "pkg:npm/side-channel@1.0.4?package-id=ab9be1d01d1fcc6f",
+      "type": "library",
+      "author": "Jordan Harband <ljharb@gmail.com>",
+      "name": "side-channel",
+      "version": "1.0.4",
+      "description": "Store information about any JS value in a side channel. Uses WeakMap if available.",
+      "purl": "pkg:npm/side-channel@1.0.4",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/ljharb/side-channel.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/ljharb/side-channel#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/ssri@10.0.4?package-id=e69d1c227d4d6249",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "ssri",
+      "version": "10.0.4",
+      "description": "Standard Subresource Integrity library -- parses, serializes, generates, and verifies integrity metadata according to the SRI spec.",
+      "purl": "pkg:npm/ssri@10.0.4",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/ssri.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/supports-color@7.2.0?package-id=850156bcb5f880cf",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "supports-color",
+      "version": "7.2.0",
+      "description": "Detect whether a terminal supports color",
+      "purl": "pkg:npm/supports-color@7.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/supports-color@7.2.0?package-id=edb0f07cda2acf25",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)",
+      "name": "supports-color",
+      "version": "7.2.0",
+      "description": "Detect whether a terminal supports color",
+      "purl": "pkg:npm/supports-color@7.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/supports-color@8.1.1?package-id=ee0ba67d5aa7cff5",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
+      "name": "supports-color",
+      "version": "8.1.1",
+      "description": "Detect whether a terminal supports color",
+      "purl": "pkg:npm/supports-color@8.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/unicode-canonical-property-names-ecmascript@2.0.0?package-id=c586c2ebe9b2c9b8",
+      "type": "library",
+      "author": "Mathias Bynens (https://mathiasbynens.be/)",
+      "name": "unicode-canonical-property-names-ecmascript",
+      "version": "2.0.0",
+      "description": "The set of canonical Unicode property names supported in ECMAScript RegExp property escapes.",
+      "purl": "pkg:npm/unicode-canonical-property-names-ecmascript@2.0.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/mathiasbynens/unicode-canonical-property-names-ecmascript.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/mathiasbynens/unicode-canonical-property-names-ecmascript",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/whatwg-url@5.0.0?package-id=8576190ce09ded29",
+      "type": "library",
+      "author": "Sebastian Mayr <github@smayr.name>",
+      "name": "whatwg-url",
+      "version": "5.0.0",
+      "description": "An implementation of the WHATWG URL Standard's URL API and parsing machinery",
+      "purl": "pkg:npm/whatwg-url@5.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/which@2.0.2?package-id=a219622f8a1c4b12",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)",
+      "name": "which",
+      "version": "2.0.2",
+      "description": "Like which(1) unix command. Find the first instance of an executable in the PATH.",
+      "purl": "pkg:npm/which@2.0.2",
+      "externalReferences": [
+        {
+          "url": "git://github.com/isaacs/node-which.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/which@2.0.2?package-id=3b1ca3541e4dce66",
+      "type": "library",
+      "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)",
+      "name": "which",
+      "version": "2.0.2",
+      "description": "Like which(1) unix command. Find the first instance of an executable in the PATH.",
+      "purl": "pkg:npm/which@2.0.2",
+      "externalReferences": [
+        {
+          "url": "git://github.com/isaacs/node-which.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/winston@3.11.0?package-id=bb8c804c0f4137f1",
+      "type": "library",
+      "author": "Charlie Robbins <charlie.robbins@gmail.com>",
+      "name": "winston",
+      "version": "3.11.0",
+      "description": "A logger for just about everything.",
+      "purl": "pkg:npm/winston@3.11.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/winstonjs/winston.git",
+          "type": "distribution"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/winston-transport@4.5.0?package-id=86c7a3d72d80bc26",
+      "type": "library",
+      "author": "Charlie Robbins <charlie.robbins@gmail.com>",
+      "name": "winston-transport",
+      "version": "4.5.0",
+      "description": "Base stream implementations for winston@3 and up.",
+      "purl": "pkg:npm/winston-transport@4.5.0",
+      "externalReferences": [
+        {
+          "url": "https://github.com/winstonjs/winston-transport#readme",
+          "type": "website"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/wrap-ansi@7.0.0?package-id=1c5f0e5dbe2eeb31",
+      "type": "library",
+      "author": "Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)",
+      "name": "wrap-ansi",
+      "version": "7.0.0",
+      "description": "Wordwrap a string with ANSI escape codes",
+      "purl": "pkg:npm/wrap-ansi@7.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/write-file-atomic@5.0.1?package-id=649cb9262a9f196d",
+      "type": "library",
+      "author": "GitHub Inc.",
+      "name": "write-file-atomic",
+      "version": "5.0.1",
+      "description": "Write files in an atomic fashion w/configurable ownership",
+      "purl": "pkg:npm/write-file-atomic@5.0.1",
+      "externalReferences": [
+        {
+          "url": "https://github.com/npm/write-file-atomic.git",
+          "type": "distribution"
+        },
+        {
+          "url": "https://github.com/npm/write-file-atomic",
+          "type": "website"
+        }
+      ]
+    }
+  ]
+}
