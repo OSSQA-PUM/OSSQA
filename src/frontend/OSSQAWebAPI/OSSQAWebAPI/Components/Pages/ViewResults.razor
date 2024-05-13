@@ -11,7 +11,7 @@
         {
             <div style=" min-width:0.3vw;">
                 <h3 class="d-flex justify-content-center" style="margin-bottom:1em;">@test</h3>
-                
+
                 @if (SbomResult.ContainsKey(test))
                 {
                     List<SbomAnalysis.Check> values = SbomResult[test];
@@ -24,7 +24,7 @@
                         if(check.dependency.name != null)
                         {
                             var url = $"https://{check.dependency.name}";
-                                
+
                             <MatListItem>
                                     @if (passFail(check) == "PASS")
                                     {
@@ -34,7 +34,7 @@
                                     {
                                         <h5 style="margin-right:1em; color:red;"> FAIL </h5>
                                     }
-                                    
+
                             </MatListItem>
                             <MatListItem>
                                     Component URL: <a style="margin-left:1em;" href="@url">@check.dependency.name</a>
@@ -43,7 +43,7 @@
                                 Reason: @check.reason
                             </MatListItem>
                             <MatListDivider></MatListDivider>
-                           
+
                         }
                     }
                     </MatList>
