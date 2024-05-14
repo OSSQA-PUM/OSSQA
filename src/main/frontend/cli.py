@@ -43,9 +43,9 @@ def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
         float: The mean score of the dependency.
     """
     mean_score = 0
-    for dep_score in dependency.dependency_score.checks:
+    for dep_score in dependency.scorecard.checks:
         mean_score += dep_score.score
-    mean_score /= len(dependency.dependency_score.checks)
+    mean_score /= len(dependency.scorecard.checks)
     mean_score = round(mean_score, decimals)
 
     return mean_score

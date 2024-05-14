@@ -59,12 +59,12 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             for k, v in dep_json.items():
                 if k not in (
                         "platform_path",
-                        "dependency_score",
+                        "scorecard",
                         "failure_reason",
                         "reach_requirement"):
                     dep_component[k] = v
 
-            scorecard_json = dep_json["dependency_score"]
+            scorecard_json = dep_json["scorecard"]
 
             if dep:
                 scorecard: Scorecard = dep.scorecard
@@ -76,7 +76,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                     platform_path=dep_json["platform_path"],
                     name=dep_json["name"],
                     version=dep_json["version"],
-                    raw_component=json.dumps(dep_component),
+                    component=json.dumps(dep_component),
                 )
                 sbom.dependencies.append(dep)
                 db.session.add(dep)

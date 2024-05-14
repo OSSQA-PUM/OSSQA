@@ -102,7 +102,7 @@ class SbomProcessor:
         """
         current_unscored_dependencies = \
             sbom.dependency_manager.get_dependencies_by_filter(
-                lambda dependency: not dependency.dependency_score
+                lambda dependency: not dependency.scorecard
             )
         self._set_event_start_state(
             state,

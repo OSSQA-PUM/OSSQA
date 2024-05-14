@@ -30,7 +30,7 @@ def _grade_dependency(dependency: Dependency, user_requirements: UserRequirement
     Returns:
         str: The grade of the dependency.
     """
-    dependency_scores: dict = dependency.dependency_score.to_dict()
+    dependency_scores: dict = dependency.scorecard.to_dict()
     checks: dict = {}
 
     for check in dependency_scores["checks"]:

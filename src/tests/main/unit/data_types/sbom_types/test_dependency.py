@@ -39,7 +39,7 @@ def dependency_scorecard(request):
     with open(request.param, "r", encoding="utf-8") as file:
         scorecard = json.load(file)
     dep = Dependency(DUMMY_DEPENDENCIES[0])
-    dep.dependency_score = Scorecard(scorecard)
+    dep.scorecard = Scorecard(scorecard)
     return dep
 
 
@@ -109,7 +109,7 @@ def test_dependency_basic_to_dict(dependency_basic):
     dictionary representation of the object.
     """
     dep_dict = dependency_basic.to_dict()
-    assert "dependency_score" in dep_dict
+    assert "scorecard" in dep_dict
     assert "failure_reason" in dep_dict
     for key in DUMMY_DEPENDENCIES[0]:
         assert key in dep_dict
@@ -122,49 +122,49 @@ def test_dependency_scorecard_to_dict(dependency_scorecard):
     returns the correct dictionary representation of the object.
     """
     dep_dict = dependency_scorecard.to_dict()
-    assert "dependency_score" in dep_dict
+    assert "scorecard" in dep_dict
     assert "failure_reason" in dep_dict
     for key in DUMMY_DEPENDENCIES[0]:
         assert key in dep_dict
         assert dep_dict[key] == DUMMY_DEPENDENCIES[0][key]
 
     # Check correct format of scorecard
-    assert isinstance(dep_dict["dependency_score"], dict)
-    assert "date" in dep_dict["dependency_score"]
-    assert "score" in dep_dict["dependency_score"]
-    assert "checks" in dep_dict["dependency_score"]
-    assert isinstance(dep_dict["dependency_score"]["date"], str)
-    assert isinstance(dep_dict["dependency_score"]["score"], float)
-    assert isinstance(dep_dict["dependency_score"]["checks"], list)
+    assert isinstance(dep_dict["scorecard"], dict)
+    assert "date" in dep_dict["scorecard"]
+    assert "score" in dep_dict["scorecard"]
+    assert "checks" in dep_dict["scorecard"]
+    assert isinstance(dep_dict["scorecard"]["date"], str)
+    assert isinstance(dep_dict["scorecard"]["score"], float)
+    assert isinstance(dep_dict["scorecard"]["checks"], list)
     assert all(
         isinstance(check, dict)
-        for check in dep_dict["dependency_score"]["checks"]
+        for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
-        "name" in check for check in dep_dict["dependency_score"]["checks"]
+        "name" in check for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
-        "score" in check for check in dep_dict["dependency_score"]["checks"]
+        "score" in check for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
-        "reason" in check for check in dep_dict["dependency_score"]["checks"]
+        "reason" in check for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
-        "details" in check for check in dep_dict["dependency_score"]["checks"]
+        "details" in check for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
         isinstance(check["name"], str)
-        for check in dep_dict["dependency_score"]["checks"]
+        for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
         isinstance(check["score"], int)
-        for check in dep_dict["dependency_score"]["checks"]
+        for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
         isinstance(check["reason"], str)
-        for check in dep_dict["dependency_score"]["checks"]
+        for check in dep_dict["scorecard"]["checks"]
         )
     assert all(
         isinstance(check["details"], list | None)
-        for check in dep_dict["dependency_score"]["checks"]
+        for check in dep_dict["scorecard"]["checks"]
         )

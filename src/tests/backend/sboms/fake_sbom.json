@@ -33,7 +33,7 @@
                 "url": "https://github.com/contain-rs/bit-set"
                 }
             ],
-            "dependency_score": {
+            "scorecard": {
                 "date": "1984-05-21",
                 "score": 5.2,
                 "checks": [

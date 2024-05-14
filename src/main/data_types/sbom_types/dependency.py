@@ -18,21 +18,24 @@ class Dependency:
         name (str): The name of the dependency, corresponds to the URL in
                     CycloneDX format.
         version (str): The version of the dependency.
-        dependency_score (Scorecard): The scorecard related to the dependency.
+        scorecard (Scorecard): The scorecard related to the dependency.
         failure_reason (Exception): The reason for any failure
                                     related to the dependency.
     """
 
-    dependency_score: Scorecard = None
+    scorecard: Scorecard = None
     failure_reason: Exception = None
     reach_requirement: str = None
 
     def __init__(self, dependency: dict):
-        for dependency_attr in dependency:
-            setattr(self, dependency_attr, dependency[dependency_attr])
-        self.dependency_score = None
+        self.scorecard = None
         self.failure_reason = None
         self.reach_requirement = None
+        for dependency_attr in dependency.keys():
+            if dependency_attr == "scorecard":
+                self.scorecard = Scorecard(dependency[dependency_attr])
+            else:
+                setattr(self, dependency_attr, dependency[dependency_attr])
 
     def __eq__(self, other):
         """
@@ -69,7 +72,7 @@ class Dependency:
         res = {}
         for attr in self.__dict__:
             if attr not in (
-                    "dependency_score", "failure_reason", "reach_requirement"):
+                    "scorecard", "failure_reason", "reach_requirement"):
                 res.update({attr: getattr(self, attr)})
         return res
 
@@ -199,13 +202,13 @@ class Dependency:
         """
         dependency_dict = {}
         for attr in self.__dict__:
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in ("scorecard", "failure_reason"):
                 dependency_dict.update({attr: getattr(self, attr)})
-            if attr == "dependency_score":
+            if attr == "scorecard":
                 dependency_dict.update(
-                        {"dependency_score":
-                         self.dependency_score.to_dict()
-                         if self.dependency_score else None
+                        {"scorecard":
+                         self.scorecard.to_dict()
+                         if self.scorecard else None
                          }
                 )
             if attr == "failure_reason":

@@ -1,6 +1,7 @@
 """
 This module handles the configuration of each model that is in the database.
 """
+import json
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -64,7 +65,7 @@ class Dependency(db.Model):
     name = db.Column(db.String(255), unique=False)
     version = db.Column(db.String(255), unique=False)
     platform_path = db.Column(db.String(255), unique=False)
-    raw_component = db.Column(db.Text, unique=False)
+    component = db.Column(db.Text, unique=False)
 
     # TODO: Should also store external references, at least of type "vcs".
 
@@ -80,13 +81,11 @@ class Dependency(db.Model):
         Returns
             dict: The dict representing the dependency.
         """
-        return {
-            "name": self.name,
-            "version": self.version,
-            "platform_path": self.platform_path,
-            "scorecard": self.scorecard.to_dict(),
-            "raw_component": self.raw_component,
-        }
+        res = {}
+        for key, value in json.loads(self.component).items():
+            res[key] = value
+        res["scorecard"] = self.scorecard.to_dict()
+        return res
 
 
 class SBOM(db.Model):
