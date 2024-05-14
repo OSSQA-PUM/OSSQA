@@ -4,6 +4,7 @@
 @using System.Diagnostics
 @rendermode InteractiveServer
 @using System.Text
+@using OSSQAWebAPI.Components.PageComponents
 @using static SbomAnalysis
 
 
@@ -16,28 +17,8 @@
                 <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
             </MatTab>
 
-            <MatTab Label="Code Vulnerabilities">
-                <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' Requirements="Requirements" />
-            </MatTab>
-            <MatTab Label="Maintenance">
-                <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' Requirements="Requirements" />
-            </MatTab>
-            <MatTab Label="Continuous Testing">
-                <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' Requirements="Requirements" />
-            </MatTab>
-            <MatTab Label="Source Risk Assessment">
-                <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' Requirements="Requirements" />
-            </MatTab>
-            <MatTab Label="Build Risk Assessment">
-                <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' Requirements="Requirements" />
-            </MatTab>
-            @if(FailedComponents.Count > 0)
-            {
-                <MatTab Label="Failed Components">
-                    <ShowFailedComponents FailedComponents="FailedComponents" />
-                </MatTab>
-            }
-        </MatTabGroup>
+        <ResultTabs SbomResult="SbomResult" StateHasChangedCallback="StateHasChangedCallback" Requirements="Requirements" FailedComponents="FailedComponents" Analyzing="Analyzing" />
+    </MatTabGroup>
 }
     @* if the user has not chosen sbom or requirements *@
 else if(!ready)
@@ -50,14 +31,17 @@ else if(!ready)
     {
         <MatTabGroup @bind-ActiveIndex="@activeTab">
             <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                <ViewLogo/>
                 <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
+                </div>
             </MatTab>
             <MatTab Label="Specify Requirements" @onclick="()=>activeTab = 1">
                 <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
             </MatTab>
         </MatTabGroup>
         <div class="d-flex flex-column justify-content-center align-items-center">
-            <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
+            <MatButton Style="font-size:1em; width:20vw;margin-top:25em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
         </div>
     }
 }
@@ -87,24 +71,24 @@ else
 
     protected override void OnInitialized()
     {
-        Requirements.Add("Vulnerabilities", 0);
-        Requirements.Add("Dependency Update Tool", 0);
-        Requirements.Add("Maintained", 0);
-        Requirements.Add("Security Policy", 0);
-        Requirements.Add("License", 0);
-        Requirements.Add("CII Best Practices", 0);
-        Requirements.Add("CI Tests", 0);
-        Requirements.Add("Fuzzing", 0);
-        Requirements.Add("SAST", 0);
-        Requirements.Add("Binary Artifacts", 0);
-        Requirements.Add("Branch Protection", 0);
-        Requirements.Add("Dangerous Workflow", 0);
-        Requirements.Add("Code Review", 0);
-        Requirements.Add("Contributors", 0);
-        Requirements.Add("Pinned Dependencies", 0);
-        Requirements.Add("Token Permissions", 0);
-        Requirements.Add("Packaging", 0);
-        Requirements.Add("Signed Releases", 0);
+        Requirements.Add("Vulnerabilities", -1);
+        Requirements.Add("Dependency Update Tool", -1);
+        Requirements.Add("Maintained", -1);
+        Requirements.Add("Security Policy", -1);
+        Requirements.Add("License", -1);
+        Requirements.Add("CII Best Practices", -1);
+        Requirements.Add("CI Tests", -1);
+        Requirements.Add("Fuzzing", -1);
+        Requirements.Add("SAST", -1);
+        Requirements.Add("Binary Artifacts", -1);
+        Requirements.Add("Branch Protection", -1);
+        Requirements.Add("Dangerous Workflow", -1);
+        Requirements.Add("Code Review", -1);
+        Requirements.Add("Contributors", -1);
+        Requirements.Add("Pinned Dependencies", -1);
+        Requirements.Add("Token Permissions", -1);
+        Requirements.Add("Packaging", -1);
+        Requirements.Add("Signed Releases", -1);
 
 
 
