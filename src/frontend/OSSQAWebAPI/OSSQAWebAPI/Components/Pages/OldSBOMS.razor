@@ -1,36 +1,49 @@
 ﻿@inject NavigationManager _navigationManager
 @using System.Text.Json
 @using System.Text;
+@using OSSQAWebAPI.Components.PageComponents
 @inject HttpClient Http
 @inject HttpClient httpClient
+@using static SbomAnalysis.Sbom
+
+<MatButton Style="font-size:1em; width:20vw;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
 
 
-<div class="d-flex flex-column justify-content-center align-items-center">
-    <h4 style="margin-bottom:3em; margin-top:3em;">Look up Previously Analyzed SBOMs in the Database</h4>
-    <div class ="d-flex justify-content-center align-items-center">
-        <MatTextField Label="Input SBOM repo" PlaceHolder="github.com/user/example" Value="@name" Style="margin-right:2em; max-height:5em; width:30vw;"></MatTextField>
-        <h4>OR</h4>
-        <MatFileUpload Style="margin-left:2em; max-height:5em; width:30vw;" OnChange="GetInput" Label=@ChosenSbom.ToString()></MatFileUpload>
-    </div>
 
-    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" OnClick='()=> GetPrevious()'>Get previous</MatButton>
-    <p> @name</p>
-    <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:10em;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
-</div>
-
-
-@if(Analyzing.CurrentCount == 1)
+@if (viewOld == true)
 {
-    <p>previous sboms</p>
-    <div class="d-flex flex-wrap justify-content-evenly">
-        @foreach (var sbom in sboms)
+    <MatTabGroup Style="margin-bottom:2em;">
+        <ResultTabs SbomResult="SbomResult" StateHasChangedCallback="StateHasChangedCallback" Requirements="null" FailedComponents="null" />
+    </MatTabGroup>
+}
+else if(Analyzing.CurrentCount == 1 && sboms is not null && sboms.Count > 0)
+{
+    <div class="d-flex flex-column justify-content-evenly justify-content-center align-items-center">
+        <h4>Select SBOM to view</h4>
+        <MatRadioGroup @bind-Value="@OldSbom" TValue="SbomAnalysis.Sbom">
+        @foreach(var sbom in sboms)
         {
-            <div style=" min-width:0.3vw; margin-bottom:3em;">
-                <h3>@sbom.metadata.component.name</h3>
-            </div>
+            <MatRadioButton Value="@sbom" TValue="SbomAnalysis.Sbom">@sbom.repo_name</MatRadioButton>
+            
         }
+        </MatRadioGroup>
+        <MatButton @onclick="()=> LoadOldSbom()">View</MatButton>
     </div>
 }
+
+else
+{
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <h4 style="margin-bottom:3em;"> Look up Previously Analyzed SBOMs in the Database</h4>
+        <div class="d-flex flex-column ustify-content-center align-items-center">
+            <MatTextField Label="Input SBOM repo" PlaceHolder="github.com/user/example" Value="@ChosenSbom.ToString()" Style="max-height:5em; width:20vw;"></MatTextField>
+            <h4 style="margin-top:2em;margin-bottom:2em;">OR</h4>
+            <InputSBOM PostData="PostData" StateHasChangedCallback="ChooseSbomCallback" ChosenSbom="ChosenSbom" />
+            <p> @ChosenSbom</p>
+        </div>
+    </div>
+}
+<p>@resultOld</p>
 @code {
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
@@ -38,63 +51,61 @@
     public Dictionary<string, string> PostData { get; set; }
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
-    private string name = "";
-    private IMatFileUploadEntry? file;
-    private bool loadedFile = false;
     public StringBuilder ChosenSbom = new StringBuilder();
-    private List<Sbom> sboms = new();
-    protected override void OnParametersSet()
+    private List<SbomAnalysis.Sbom> sboms = new();
+    private SbomAnalysis.Sbom OldSbom;
+    private bool viewOld = false;
+    private List<bool> Selected = new();
+    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
+    private SortedDictionary<string, int> Requirements = new();
+    private string resultOld = "";
+
+    private Action UpdateSelected => () =>
     {
-        PostData.Clear();
-        if (ChosenSbom.Length == 0)
-        {
-            ChosenSbom.Append("Drag SBOM here or browse");
-        }
+        InvokeAsync(StateHasChanged);
+        StateHasChanged();
+    };
+
+    protected override void OnInitialized()
+    {
+        Requirements.Add("Vulnerabilities", -1);
+        Requirements.Add("Dependency Update Tool", -1);
+        Requirements.Add("Maintained", -1);
+        Requirements.Add("Security Policy", -1);
+        Requirements.Add("License", -1);
+        Requirements.Add("CII Best Practices", -1);
+        Requirements.Add("CI Tests", -1);
+        Requirements.Add("Fuzzing", -1);
+        Requirements.Add("SAST", -1);
+        Requirements.Add("Binary Artifacts", -1);
+        Requirements.Add("Branch Protection", -1);
+        Requirements.Add("Dangerous Workflow", -1);
+        Requirements.Add("Code Review", -1);
+        Requirements.Add("Contributors", -1);
+        Requirements.Add("Pinned Dependencies", -1);
+        Requirements.Add("Token Permissions", -1);
+        Requirements.Add("Packaging", -1);
+        Requirements.Add("Signed Releases", -1);
+
+
 
     }
-    private async Task LoadSBOM()
+
+    private Action ChooseSbomCallback => () =>
     {
-
-        using var memoryStream = new MemoryStream();
-        if (file == null)
-        {
-            return;
-        }
-        await file.WriteToStreamAsync(memoryStream);
-
-        string sbomString = Encoding.UTF8.GetString(memoryStream.ToArray());
+        string name = ChosenSbom.ToString();
         try
         {
-            Sbom sbom = JsonSerializer.Deserialize<Sbom>(sbomString);
+            Sbom sbom = JsonSerializer.Deserialize<Sbom>(PostData["sbom"]);
+
             name = sbom.metadata.component.name;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
-            throw(e);
+            throw (e);
         }
-        loadedFile = true;
-        StateHasChangedCallback.Invoke();
-    }
-
-    private void GetInput(IMatFileUploadEntry[] files)
-    {
-        foreach (var f in files)
-        {
-            file = f;
-        }
-        ChosenSbom.Clear();
-        ChosenSbom.Append(file?.Name ?? "Drag SBOM here or browse");
-        _ = LoadSBOM();
-    }
-
-    private void GetPrevious()
-    {
-        if (name.Length == 0)
-        {
-            return;
-        }
-        var analyzeTask = Http.GetAsync("http://host.docker.internal:98/get_previous_sbom/"+ name);
+        var analyzeTask = Http.GetAsync("http://host.docker.internal:98/get_previous_sbom/" + name);
 
         Analyzing.Wait();
         _ = analyzeTask.ContinueWith(async t =>
@@ -104,20 +115,36 @@
             if (result.IsSuccessStatusCode)
             {
                 var previousSboms = await result.Content.ReadAsStringAsync();
+                resultOld = previousSboms;
                 try
                 {
-                    sboms = JsonSerializer.Deserialize<List<Sbom>>(previousSboms);
-
+                    sboms = JsonSerializer.Deserialize<List<SbomAnalysis.Sbom>>(previousSboms);
+                    
+                    SbomAnalysis.Sbom test = new SbomAnalysis.Sbom("test",0,"test","test",null,null,null);
+                    sboms.Add(test); 
                 }
                 catch (Exception e)
                 {
                     throw (e);
                 }
+                Selected = new List<bool>();
+                for (int i = 0; i < sboms.Count; i++)
+                {
+                    Selected.Add(false);
+                }
                 StateHasChangedCallback.Invoke();
                 _ = InvokeAsync(StateHasChanged);
             }
         });
+    };
+    
+    private void LoadOldSbom()
+    {
+        
+        SbomAnalysis.AddToDict(OldSbom, SbomResult);
+        viewOld = true;
     }
+
 
     public class Sbom
     {

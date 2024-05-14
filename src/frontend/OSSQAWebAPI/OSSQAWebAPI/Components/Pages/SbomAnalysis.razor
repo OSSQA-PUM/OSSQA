@@ -57,7 +57,6 @@ else
     string status = "";
     private string fullSBOM = "full sbom";
     private Status statusObj;
-    Sbom sbom;
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
@@ -68,6 +67,7 @@ else
     public Action StateHasChangedCallback { get; set; }
     [Parameter]
     public List<SbomAnalysis.Dependency> FailedComponents { get; set; }
+
     protected override void OnInitialized()
     {
         Analyze();
@@ -88,8 +88,8 @@ else
 
                 try
                 {
-                    sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
-                    AddToDict(sbom);
+                    Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
+                    AddToDict(sbom, SbomResult);
                     AddFailed(sbom);
 
                 }
@@ -104,7 +104,7 @@ else
         _ = PollStatus(Analyzing);
     }
 
-    private void AddToDict(Sbom sbom)
+    public static void AddToDict(Sbom sbom, Dictionary<string, List<Check>> SbomResult)
     {
         foreach (Dependency dependency in sbom.scored_dependencies)
         {

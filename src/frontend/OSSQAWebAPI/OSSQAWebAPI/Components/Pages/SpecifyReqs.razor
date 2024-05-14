@@ -1,4 +1,6 @@
 ﻿@using System.Text.Json
+@using OSSQAWebAPI.Components.PageComponents
+@using PageComponents
 
 @* this component handles user requirement inputs*@
 
@@ -10,6 +12,7 @@
     <MatDivider></MatDivider>
     @foreach (var req in Requirements)
     {
+
         <PassingGradeSlider Requirements="Requirements" Req="req" ></PassingGradeSlider>
 
     }
