@@ -64,7 +64,8 @@ def test_get_sboms_by_name(client: FlaskClient, sbom: dict):
         assert resp_sbom["serialNumber"] == sbom["serialNumber"]
         assert resp_sbom["version"] == sbom["version"]
         assert resp_sbom["metadata"]["component"]["name"] == sbom["repo_name"]
-        assert resp_sbom["metadata"]["component"]["version"] == sbom["repo_version"]
+        assert resp_sbom["metadata"]["component"]["version"] == \
+            sbom["repo_version"]
         for component in resp_sbom["components"]:
             found_component = False
             for dependency in sbom["scored_dependencies"]:

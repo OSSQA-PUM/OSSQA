@@ -20,7 +20,6 @@ DEPENDENCY_NAME = "github.com/repo/path"
 COMPONENT_NAME = "path"
 
 
-
 @pytest.fixture
 def dependency_basic():
     """

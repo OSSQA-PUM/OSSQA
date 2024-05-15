@@ -15,7 +15,8 @@ from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessor
 from main.data_types.dependency_scorer import StepResponse
 from main.data_types.sbom_types.sbom import Sbom
-from main.data_types.user_requirements import RequirementsType, UserRequirements
+from main.data_types.user_requirements import (RequirementsType,
+                                               UserRequirements)
 
 from tests.main.integration.constants import HOST
 from tests.main.integration.sboms import SBOM_PATH, create_scored_sbom, \
@@ -30,7 +31,7 @@ def git_token_fixture() -> str:
 @pytest.fixture(name="user_reqs", scope="module")
 def user_reqs_fixture() -> UserRequirements:
     req_types = [t.value for t in RequirementsType]
-    reqs_dict = {req_type:10 for req_type in req_types}
+    reqs_dict = {req_type: 10 for req_type in req_types}
     return UserRequirements(reqs_dict)
 
 
@@ -76,7 +77,7 @@ def after_test():
     assert len(resp.json()) != 0
 
 
-@pytest.mark.order(-3) # Ensures the tests run after all unit tests
+@pytest.mark.order(-3)  # Ensures the tests run after all unit tests
 class TestAnalyzeSBOM:
     """
     These functions test the action of analyzing an SBOM in a
@@ -92,6 +93,7 @@ class TestAnalyzeSBOM:
 
     def test_backend_comm(self, fake_scored_sbom: Sbom):
         before_test()
+
         def callback(response: StepResponse):
             assert response.message != "The request timed out"
         backend_comm = BackendCommunication(callback, HOST)

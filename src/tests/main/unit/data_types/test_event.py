@@ -20,7 +20,7 @@ def test_event_subscribe_int():
 
     def callback_function(value: int):
         assert value == test_value
-        
+
     event.subscribe(callback_function)
     assert callback_function in event._callbacks
     assert event.invoke(test_value) is None
@@ -117,14 +117,14 @@ def test_event_invoke_with_data_type():
     """
     Test the invoke method of the Event class with a custom data type.
     """
-    
+
     class TestDataType:
         """Dummy TestDataType class."""
         def __init__(self, value: int) -> None:
             self.value = value
     event = Event()
     test_value = TestDataType(42)
-    
+
     def callback_function(value: TestDataType):
         assert value.value == test_value.value
 
