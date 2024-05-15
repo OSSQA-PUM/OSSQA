@@ -84,10 +84,6 @@ def get_token_data() -> dict:
     if response.status_code == 200:
         user_data = response.headers
 
-        #print("response", response.content)
-        #print("response header", response.headers)
-        #print(f"Reset time", user_data["X-RateLimit-Reset"])
-
         return {
             "limit": int(user_data['X-RateLimit-Limit']),
             "used": int(user_data['x-ratelimit-used']),
