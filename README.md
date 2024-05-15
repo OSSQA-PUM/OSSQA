@@ -9,9 +9,10 @@ OSSQA is a project for determining the quality of a software projekt using a Sof
 
 ### Installing
 
-* Step 1
-* Step 2
-* ...
+To install OSSQA, clone this repository
+```
+git clone https://github.com/OSSQA-PUM/OSSQA.git
+```
 
 ### Executing program
 
@@ -118,6 +119,7 @@ This command prints out details of all SBOMs in the database that have a specifi
 | --help   | Show the help page for the lookup command        |
 
 ## Contribute
+This project is open source, contributions are appreciated. 
 
 ## Help
 
