@@ -17,7 +17,6 @@ git clone https://github.com/OSSQA-PUM/OSSQA.git
 ### Inserting SBOMs
 To analyze your SBOMs, the SBOM in CycloneDX-format needs to be added to the `/sboms` directory.
 
-
 ### Executing program
 
 1. Build the Docker image.
@@ -51,7 +50,7 @@ This command analyzes an SBOM and scores its components. The components are scor
 ### Options
 | Option      | Description |
 | ----------- | ----------- |
-| -g \| --git-token      | A GitHub Personal Access Token. Defaults to the GITHUB_AUTH_TOKEN environment variable in the docker image.       |
+| -g \| --git-token      | Set GitHub Personal Access Token. Defaults to the GITHUB_AUTH_TOKEN environment variable in the docker image.       |
 | -vu \| --vulnerabilities   | Requirement for vulnerabilities from -1 to 10.        |
 | -dut \| –dependency-update-tool   | Requirement for dependency update tool from -1 to 10.        |
 | -m \| --maintained   | Requirement for maintained from -1 to 10.        |
