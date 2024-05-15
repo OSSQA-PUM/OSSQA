@@ -17,7 +17,7 @@ git clone https://github.com/OSSQA-PUM/OSSQA.git
 ### Inserting SBOMs
 To analyze your SBOMs, the SBOM in CycloneDX-format needs to be added to the `/sboms` directory.
 
-### Inserting GutHub Access Token
+### Inserting GitHub Access Token
 Insert your GitHUb Access Tokej the `.env` file.
 ```
 GITHUB_AUTH_TOKEN = [TOKEN…]
