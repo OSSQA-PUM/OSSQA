@@ -9,9 +9,11 @@ import re
 import os
 import datetime
 from time import time
-import requests
 from math import inf
-from packaging import version as version_parser
+
+
+import requests
+
 
 class TokenLimitExceededError(Exception):
     """
@@ -45,7 +47,8 @@ class TokenLimitExceededError(Exception):
 
 class Sha1NotFoundError(Exception):
     """
-    Exception raised when the SHA1 hash for a version of a dependency is not found.
+    Exception raised when the SHA1 hash for
+    a version of a dependency is not found.
     """
 
     message: str
@@ -57,7 +60,7 @@ class Sha1NotFoundError(Exception):
 def get_token_data() -> dict:
     """
     Returns:
-        dict: A dictionary containing the user's GitHub API token data 
+        dict: A dictionary containing the user's GitHub API token data
     """
     token = os.environ.get('GITHUB_AUTH_TOKEN')
     url = 'https://api.github.com/rate_limit'
@@ -80,6 +83,7 @@ def get_token_data() -> dict:
     print(f"Failed to authenticate. Status code: {response.status_code}")
     return None
 
+
 def get_git_sha1(git_url: str, version: str) -> str:
     """
     Get the SHA1 hash for a version of a dependency.
@@ -92,17 +96,17 @@ def get_git_sha1(git_url: str, version: str) -> str:
         str: The SHA1 hash of the dependency version.
 
     Raises:
-        ValueError: If the GitHub authentication token is not found in the 
+        ValueError: If the GitHub authentication token is not found in the
         environment.
 
-        ConnectionRefusedError: If the request to the GitHub API is 
+        ConnectionRefusedError: If the request to the GitHub API is
         unsuccessful.
 
         TokenLimitExceededError: If the GitHub API rate limit is exceeded.
 
         AssertionError: If the found SHA1 hash is not valid.
 
-        Sha1NotFoundError: If the SHA1 hash for the dependency version is not 
+        Sha1NotFoundError: If the SHA1 hash for the dependency version is not
         found.
     """
 
@@ -154,7 +158,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
         tag["tag_digits"] = tag_digits
 
-    response_content = sorted(response_content, 
+    response_content = sorted(response_content,
                               key=lambda x: x["tag_digits"], reverse=True)
 
     # Get the SHA1 hash for the version
@@ -190,6 +194,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
     raise Sha1NotFoundError(
         f"SHA1 hash not found for version {original_version}.")
+
 
 def is_valid_sha1(sha1_str: str) -> bool:
     """

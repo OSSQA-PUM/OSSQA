@@ -28,7 +28,7 @@ def fake_scored_sbom_fixture() -> Sbom:
     return create_scored_sbom()
 
 
-@pytest.mark.order(-1) # Ensures the tests run after all unit tests
+@pytest.mark.order(-1)  # Ensures the tests run after all unit tests
 class TestGetNamedSboms:
     """
     These functions test the action of getting SBOMs with specific names
@@ -52,6 +52,7 @@ class TestGetNamedSboms:
 
     def test_backend_comm(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+
         def callback(response: StepResponse):
             assert response.message != "The request timed out"
             assert response.message != "An error occurred in the database"
@@ -63,6 +64,7 @@ class TestGetNamedSboms:
 
     def test_sbom_processor(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+
         def callback(status: SbomProcessorStatus):
             if response := status.step_response:
                 assert response.message != "The request timed out"
@@ -74,9 +76,9 @@ class TestGetNamedSboms:
         assert len(sboms) != 0
         assert sboms[0].repo_name == name
 
-
     def test_front_end_api(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
+
         def callback(status: SbomProcessorStatus):
             if response := status.step_response:
                 assert response.message != "The request timed out"
@@ -87,7 +89,6 @@ class TestGetNamedSboms:
         assert isinstance(sboms, list)
         assert len(sboms) != 0
         assert sboms[0].repo_name == name
-
 
     def test_cli(self, fake_scored_sbom: Sbom):
         name = fake_scored_sbom.repo_name
