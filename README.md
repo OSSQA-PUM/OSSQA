@@ -25,7 +25,18 @@ docker compose build ossqa-cli
 docker compose run ossqa-cli [COMMAND] [ARGUMENTS…]
 ```
 
-## Analyze Commands
+## Analyze Command
+This command analyzes an SBOM and scores its components. The components are scored with OpenSSF Scorecard which runs many tests of five different categories. Scorecard requires a GitHub Personal Access Token which can be created according to [these instructions](https://github.com/ossf/scorecard?tab=readme-ov-file#authentication)
+
+* Usage:
+  ```
+  docker compose run ossqa-cli analyze PATH [OPTIONS…]
+  ```
+* Example:
+  ```
+  docker compose run ossqa-cli analyze /sboms/example-SBOM.json -sp 6
+  ```
+
 
 ### Prepositionals
 | Prepositional      | Description |
@@ -58,6 +69,10 @@ docker compose run ossqa-cli [COMMAND] [ARGUMENTS…]
 | -o \| --output   | Format of the output. Can be table, simplified or JSON. Defaults to table.        |
 | -v \| --verbose   | Print the output verbosely.        |
 | --help   | Show the help page for the analyze command.        |
+
+
+## SBOM Command
+
 
 ## Contribute
 
