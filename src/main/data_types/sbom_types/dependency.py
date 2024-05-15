@@ -237,13 +237,15 @@ class Dependency:
             dict: The dictionary representation of the dependency.
         """
         res = {}
-        res["dependency_score"] = self.scorecard.to_dict() if self.scorecard else None
-        res["failure_reason"] = str(self.failure_reason) if self.failure_reason else ""
+        res["dependency_score"] = self.scorecard.to_dict() \
+            if self.scorecard else None
+        res["failure_reason"] = str(self.failure_reason) \
+            if self.failure_reason else ""
         res["reach_requirement"] = self.reach_requirement
         try:
             platform = self.platform
             repo_path = self.repo_path
-            res["name"] = platform + repo_path
+            res["name"] = f"{platform}/{repo_path}"
         except (KeyError, ValueError):
             res["name"] = ""
         res["version"] = self.component_version
