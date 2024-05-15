@@ -68,7 +68,7 @@ def analyze():
     frontend_api.subscribe_to_state_change(update_current_status)
     result_sbom: Sbom = frontend_api.analyze_sbom(sbom, user_reqs)
 
-    result_json = result_sbom.to_dict()
+    result_json = result_sbom.to_dict_web()
     return json.dumps(result_json)
 
 

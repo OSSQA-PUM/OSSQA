@@ -10,36 +10,33 @@
         @foreach (var test in Tests)
         {
             <div style=" min-width:0.3vw;">
-            @if (SbomResult.ContainsKey(test))
-            {
-                <h3 class="d-flex justify-content-center" style="margin-bottom:1em;">@test</h3>
-                List<SbomAnalysis.Check> values = SbomResult[test];
-                values.Sort((x, y) => x.score.CompareTo(y.score));
-                int count = 0;
-                <MatList>
-                @foreach (var check in values)
+                @if (SbomResult.ContainsKey(test))
                 {
-                    count++;
-                    if(check.dependency.name != null)
+                    
+                    <h3 class="d-flex justify-content-center" style="margin-bottom:1em;">@test</h3>
+                    List<SbomAnalysis.Check> values = SbomResult[test];
+                    values.Sort((x, y) => x.score.CompareTo(y.score));
+                    int count = 0;
+                    <MatList>
+                    @foreach (var check in values)
                     {
-                        var url = $"https://{check.dependency.name}";
-                        <MatListItem>
-                            @if (passFail(check) == "PASS")
-                            {
-                                <h5 style="margin-right:1em; color:green;"> PASS </h5>
-                            }
-                            else
-                            {
-                                <h5 style="margin-right:1em; color:red;"> FAIL </h5>
-                            }
-                        </MatListItem>
-                        <MatListItem>
-                                Component URL: <a style="margin-left:1em;" href="@url">@check.dependency.name</a>
-                        </MatListItem>
-                        <MatListItem>
-                            Reason: @check.reason
-                        </MatListItem>
-                        <MatListDivider></MatListDivider>
+                        count++;
+                        if(check.dependency.name != null)
+                        {
+                            var url = $"https://{check.dependency.name}";
+
+                            <MatListItem>
+                                    <h5 style="margin-right:1em; color:green;"> @check.dependency.reach_requirement </h5>
+
+                            </MatListItem>
+                            <MatListItem>
+                                    Component URL: <a style="margin-left:1em;" href="@url">@check.dependency.name</a>
+                            </MatListItem>
+                            <MatListItem>
+                                Reason: @check.reason
+                            </MatListItem>
+                            <MatListDivider></MatListDivider>
+
                         }
                     }
                 </MatList>
