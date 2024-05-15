@@ -1,0 +1,40 @@
+﻿@namespace OSSQAWebAPI.Components.PageComponents
+@using OSSQAWebAPI.Components.Pages
+
+<div>
+    <MatCheckbox @bind-Value="@value" Label="@Sbom.serialNumber"></MatCheckbox>
+</div>
+
+@code {
+    [Parameter]
+    public Action UpdateSelected { get; set; }
+    [Parameter]
+    public SbomAnalysis.Sbom Sbom { get; set; }
+
+    [Parameter]
+    public List<bool> Selected { get; set; }
+
+    private bool _value = false;
+    public bool value
+    {
+        get => _value;
+        set
+        {
+            _value = value;
+            if (value == true)
+            {
+                for (var i = 0; i < Selected.Count; i++)
+                {
+
+                    Selected[i] = false;
+                }
+            }
+            Selected[Index] = _value;
+            
+            this.StateHasChanged();
+            UpdateSelected.Invoke();
+        }
+    }
+    [Parameter]
+    public int Index { get; set; }
+}

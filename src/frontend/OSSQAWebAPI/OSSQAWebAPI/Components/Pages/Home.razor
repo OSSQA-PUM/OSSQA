@@ -1,75 +1,103 @@
-﻿@page "/"
+﻿@*This class stores all information that will otherwise get wiped when refreshing components *@
+@page "/"
 
 @using System.Diagnostics
 @rendermode InteractiveServer
 @using System.Text
-@using static SbomAnalysis.Check
-@using static SbomAnalysis.Dependency
-@using static SbomAnalysis.Status
-<PageTitle>OSSQA</PageTitle>
-<MatThemeProvider Theme="@theme">
-@*This class stores all information that will otherwise get wiped when refreshing components *@
+@using OSSQAWebAPI.Components.PageComponents
+@using static SbomAnalysis
 
+
+<MatThemeProvider Theme="@theme">
     @*shows correct tabs if analysis is complete*@
 @if (Analyzing.CurrentCount == 1 && SbomResult.Count > 0)
 {
-    <MatTabGroup>
-        <MatTab Label="Home">
-            <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
-        </MatTab>
-        <MatTab Label="Code Vulnerabilities">
-            <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' />
-        </MatTab>
-        <MatTab Label="Maintenance">
-            <ViewResults SbomResult="SbomResult" Tests='[ "License", "Security-Policy"]' />
-        </MatTab>
-        <MatTab Label="Continuous Testing">
-            <ViewResults SbomResult="SbomResult" Tests='["CI-Tests"]' />
-        </MatTab>
-        <MatTab Label="Source Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Code-Review", "Dangerous-Workflow"]' />
-        </MatTab>
-        <MatTab Label="Build Risk Assessment">
-            <ViewResults SbomResult="SbomResult" Tests='[ "Pinned-Dependencies", "Token-Permissions"]' />
-                </MatTab>
+    <MatTabGroup Style="margin-bottom:2em;">
+            <MatTab Label="Home">
+                <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
+            </MatTab>
+        <ResultTabs SbomResult="SbomResult" StateHasChangedCallback="StateHasChangedCallback" Requirements="Requirements" FailedComponents="FailedComponents" />
     </MatTabGroup>
 }
     @* if the user has not chosen sbom or requirements *@
 else if(!ready)
 {
-    <MatTabGroup @bind-ActiveIndex="@activeTab">
-        <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
-            <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
-        </MatTab>
+    if (viewOld)
+    {
+        <OldSBOMS StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" Analyzing="Analyzing" />
+    }
+    else
+    {
+        <MatTabGroup @bind-ActiveIndex="@activeTab">
+            <MatTab Label="Choose SBOM" @onclick="()=>activeTab = 0">
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                <ViewLogo/>
+                <InputSBOM PostData="PostData" StateHasChangedCallback="StateHasChangedCallback" ChosenSbom="ChosenSbom" />
+                </div>
+            </MatTab>
             <MatTab Label="Specify Requirements" @onclick="()=>activeTab = 1">
-            <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
-        </MatTab>
-    </MatTabGroup>
+                <SpecifyReqs PostData="PostData" StateHasChangedCallback="StateHasChangedCallback " Requirements="Requirements" />
+            </MatTab>
+        </MatTabGroup>
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <MatButton Style="font-size:1em; width:20vw;margin-top:10em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
+        </div>
+    }
 }
+
     @* start analysis if done *@
 else
 {
-        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedDependencies="FailedDependencies" />
+        <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" FailedComponents="FailedComponents" />
 }
 
 </MatThemeProvider>
 
 
+
+
 @code {
-    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
+    private List<SbomAnalysis.Sbom> SbomResult = new();
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
-    private List<int> Requirements = new() { -1, -1, -1, -1, -1 };
-    private List<SbomAnalysis.Dependency> FailedDependencies = new();
+    private List<Dependency> FailedComponents = new();
+    public int activeTab = 0;
+    private Dictionary<string, string> PostData = new();
+    private string SBOM = "";
+    bool ready = false;
+    bool viewOld = false;
+    private SortedDictionary<String, int> Requirements = new();
+
+    protected override void OnInitialized()
+    {
+        Requirements.Add("Vulnerabilities", -1);
+        Requirements.Add("Dependency Update Tool", -1);
+        Requirements.Add("Maintained", -1);
+        Requirements.Add("Security Policy", -1);
+        Requirements.Add("License", -1);
+        Requirements.Add("CII Best Practices", -1);
+        Requirements.Add("CI Tests", -1);
+        Requirements.Add("Fuzzing", -1);
+        Requirements.Add("SAST", -1);
+        Requirements.Add("Binary Artifacts", -1);
+        Requirements.Add("Branch Protection", -1);
+        Requirements.Add("Dangerous Workflow", -1);
+        Requirements.Add("Code Review", -1);
+        Requirements.Add("Contributors", -1);
+        Requirements.Add("Pinned Dependencies", -1);
+        Requirements.Add("Token Permissions", -1);
+        Requirements.Add("Packaging", -1);
+        Requirements.Add("Signed Releases", -1);
+
+
+
+    }
     private Action StateHasChangedCallback =>()=>
     {
         UpdateTab();
         InvokeAsync(StateHasChanged);
     };
-    public int activeTab = 0;
-    private Dictionary<string, string> PostData = new();
-    private string SBOM = "";
-    bool ready = false;
+
 
     private void UpdateTab()
     {
@@ -92,8 +120,6 @@ else
         {
             Primary = "#88bcec",
             Secondary = MatThemeColors.BlueGrey._500.Value,
-            //Surface = "#88bcec",
-            //OnPrimary = MatThemeColors.BlueGrey._500.Value
         };
 
     void ChangeTab(MouseEventArgs e)

@@ -51,7 +51,6 @@ def _grade_dependency(dependency: Dependency, user_requirements: UserRequirement
         if check_score < req_score:
             return "No"
 
-
     # Check if result not found
     if not found_all_checks:
         return "Test result not found"

@@ -8,16 +8,13 @@
 
 @* this component sends requests to the backend and retrives the analyzed sbom*@
 
-<ViewLogo />
-
 
 @if (statusObj is not null)
 {
     @* if the status has a step_response, display it *@
     if (statusObj.step_response is not null)
     {
-        <div class="d-flex flex-column align-items-center justify-content-center">
-            <h3>@statusObj.current_state</h3>
+        <div class="d-flex flex-column align-items-center justify-content-center " style="height:50vh;">
             <h3>@statusObj.step_response.message</h3>
             <h5>Batch Size: @statusObj.step_response.batch_size</h5>
             <h5>Completed Items: @statusObj.step_response.completed_items</h5>
@@ -45,44 +42,27 @@
 else
 {
     <div class="d-flex flex-column align-items-center justify-content-center">
-        <MatButton OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
+        <MatButton Raised="true" OnClick='()=> _navigationManager.NavigateTo("/", true)'> Analyze another SBOM</MatButton>
     </div>
 }
 @* show failed dependencies and reason, not working at the moment*@
-<div class="d-flex flex-column align-items-center justify-content-center">
-    <div class="d-flex flex-column">
-        @if (FailedDependencies is not null && FailedDependencies.Count > 0)
-        {
-            <h5>Failed Items</h5>
-            @foreach (var failedDependency in FailedDependencies)
-            {
-                string url = "https://" + failedDependency.name;
-                <p>Repo: <a href="@url"> @failedDependency.name</a></p>
-                <p>Reason: @failedDependency.failure_reason</p>
-
-            }
-        }
-    </div>
-</div>
 
 
 @code {
-    private float score = 0;
     Dictionary<string, string> statusInfo = new();
     string status = "";
-    private string fullSBOM = "";
     private Status statusObj;
-    Sbom sbom;
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
-    public Dictionary<string, List<Check>> SbomResult { get; set; }
+    public List<Sbom> SbomResult { get; set; }
     [Parameter]
     public Dictionary<string, string> PostData { get; set; }
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
     [Parameter]
-    public List<SbomAnalysis.Dependency> FailedDependencies { get; set; }
+    public List<SbomAnalysis.Dependency> FailedComponents { get; set; }
+
     protected override void OnInitialized()
     {
         Analyze();
@@ -98,15 +78,12 @@ else
             HttpResponseMessage result = await t;
             if (result.IsSuccessStatusCode)
             {
-                SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
-                fullSBOM = SBOMString;
-
                 try
                 {
-                    sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
-                    AddToDict(sbom);
-                    AddFailed(sbom);
+                    SbomResult.Add(JsonSerializer.Deserialize<Sbom>(SBOMString));
+
+                    AddFailed(SbomResult[0]);
 
                 }
                 catch (Exception e)
@@ -120,35 +97,11 @@ else
         _ = PollStatus(Analyzing);
     }
 
-    private void AddToDict(Sbom sbom)
-    {
-        foreach (Dependency dependency in sbom.scored_dependencies)
-        {
-            if (dependency.dependency_score.checks is null)
-            {
-                continue;
-            }
-            foreach (Check check in dependency.dependency_score.checks)
-            {
-                check.dependency = dependency;
-                if (SbomResult.ContainsKey(check.name))
-                {
-                    SbomResult[check.name].Add(check);
-                }
-                else
-                {
-                    SbomResult.Add(check.name, new List<Check> { check });
-                }
-            }
-        }
-        int count = SbomResult.Count;
-    }
-
     private void AddFailed(Sbom sbom)
     {
         foreach (Dependency dependency in sbom.failed_dependencies)
         {
-            FailedDependencies.Add(dependency);
+            FailedComponents.Add(dependency);
         }
     }
 
@@ -205,13 +158,14 @@ else
         public string version { get; set; }
         public DependencyScore dependency_score { get; set; }
         public string failure_reason { get; set; }
-
-        public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason)
+        public string reach_requirement { get; set; }
+        public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason, string reach_requirement)
         {
             this.name = name;
             this.version = version;
             this.dependency_score = dependency_score;
             this.failure_reason = failure_reason;
+            this.reach_requirement = reach_requirement;
         }
     }
 

@@ -1,40 +1,33 @@
 @* This component generates result for each category tab*@
 
-<div class="d-flex">
-    <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these results mean?</a>
-</div>
 
-@if (SbomResult != null && SbomResult.Count>0)
+@if (SbomResult != null)
 {
-    <div class="d-flex flex-wrap justify-content-evenly">
-        @foreach (var test in Tests)
-        {
-            <div style=" min-width:0.3vw; margin-bottom:3em;">
-                <h3>@test</h3>
-                @if (SbomResult.ContainsKey(test))
-                {
-                    List<SbomAnalysis.Check> values = SbomResult[test];
-                    values.Sort((x, y) => x.score.CompareTo(y.score));
-                    foreach (var check in values)
-                    {
-                        if(check.dependency.name != null)
-                        {
-                            var url = $"https://{check.dependency.name}";
-                            <p>Score: @check.score/10 URL: <a href="@url">@check.dependency.name</a> </p>
-                        }
-                    }
-                }
-            </div>
-        }
-    </div>
+    <div class="d-flex align-items-center justify-content-center">
+    <MatTable Items="@SbomResult[0].scored_dependencies" class="mat-elevation-z5">
 
+        <MatTableHeader>
+            <th>Component</th>
+            <th>Score</th>
+            <th>Reach requirement</th>
+        </MatTableHeader>
+        <MatTableRow>
+            <td>@context.name</td>
+            <td>@context.dependency_score.score</td>
+            <td>@context.reach_requirement</td>
+        </MatTableRow>
+    </MatTable>
+    </div>
 }
+
 
 
 @code {
     [Parameter]
-    public Dictionary<string, List<SbomAnalysis.Check>> SbomResult { get; set; }
+    public List<SbomAnalysis.Sbom> SbomResult { get; set; }
     [Parameter]
     public string[] Tests { get; set; }
+    [Parameter]
+    public SortedDictionary<String, int> Requirements { get; set; }
 
 }

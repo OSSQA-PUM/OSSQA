@@ -1,0 +1,39 @@
+﻿@namespace OSSQAWebAPI.Components.PageComponents
+
+<h5>@Req.Key</h5>
+<div class="d-flex justify-content-center">
+    <MatTextField @bind-Value="@Score" Style="max-width:4em; margin-right:2em;" Label="Score" OnFocusOut="()=>SetRequirement()"></MatTextField>
+    <MatSlider @bind-Value="@Score" Discrete="true" Pin="true" TValue="int" ValueMin="-1" ValueMax="10" Style="width:30vw;"></MatSlider>
+</div>
+@code {
+    [Parameter]
+    public SortedDictionary<string, int> Requirements { get; set; }
+    [Parameter]
+    public KeyValuePair<string, int> Req { get; set; }
+    private int _score = -1;
+    public int Score
+    {
+        get => _score;
+        set
+        {
+            _score = value;
+            Requirements[Req.Key] = _score;
+            this.StateHasChanged();
+        }
+    }
+
+
+    private void SetRequirement()
+    {
+        
+        if (Requirements[Req.Key] > 10)
+        {
+            Requirements[Req.Key] = 10;
+        }
+        if (Requirements[Req.Key] < -1)
+        {
+            Requirements[Req.Key] = -1;
+        }
+
+    }
+}
