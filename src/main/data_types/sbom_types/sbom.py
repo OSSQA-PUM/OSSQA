@@ -123,6 +123,9 @@ class Sbom:
         """
         Gets the dependencies of the SBOM with a filter.
 
+        Args:
+            dependency_filter (Callable): The filter to apply.
+
         Returns:
             list[Dependency]: The filtered dependencies of the SBOM.
         """
