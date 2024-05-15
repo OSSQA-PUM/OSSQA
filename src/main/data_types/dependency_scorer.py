@@ -242,9 +242,6 @@ class SSFAPIFetcher(DependencyScorer):
                     f"{git_url}/?commit={sha1}"),
                 timeout=10
                 )
-            # TODO: Currently not checking version or commit
-            # Should add a message to the dependency
-            # that the version used was not the version entered.
             if score.status_code != 200:
                 score = requests.get(
                     (f"https://api.securityscorecards.dev"
