@@ -1,5 +1,5 @@
 """
-This module defines the Event class, which allows subscribing to and invoking 
+This module defines the Event class, which allows subscribing to and invoking
 callback functions.
 
 Example usage:

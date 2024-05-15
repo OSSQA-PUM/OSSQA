@@ -39,8 +39,8 @@ class UserRequirements:
             vulnerabilities (int): The vulnerabilities of the project.
         maintenance (int): The maintenance of the project.
         includes:
-            dependency_update_tool (int): The dependency update tool of the 
-            project.
+            dependency_update_tool (int): The dependency update tool of the
+                                          project.
             maintained (int): The maintenance of the project.
             security_policy (int): The security policy of the project.
             license (int): The license of the project.
