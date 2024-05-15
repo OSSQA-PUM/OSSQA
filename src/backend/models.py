@@ -1,5 +1,6 @@
 """
-This module handles the configuration of each model that is in the database.
+This module handles the configuration of each database model and their
+relations.
 """
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -29,6 +30,13 @@ class Check(db.Model):
                              nullable=False)
 
     def to_dict(self) -> dict:
+        """
+        Creates a dictionary representing the check, that can be used in
+        responses.
+
+        Returns
+            dict: A dictionary representation of the check.
+        """
         return {
             "name": self.name,
             "score": self.score,
@@ -50,6 +58,13 @@ class Scorecard(db.Model):
                               nullable=False)
 
     def to_dict(self) -> dict:
+        """
+        Creates a dictionary representing the scorecard, that can be used in
+        responses.
+
+        Returns
+            dict: A dictionary representation of the scorecard.
+        """
         return {
             "date": self.date,
             "score": self.aggregate_score,
@@ -74,10 +89,11 @@ class Dependency(db.Model):
 
     def to_dict(self) -> dict:
         """
-        Represent the dependency as a dict resembling its original json format.
+        Creates a dictionary representing the dependency, that can be used in
+        responses.
 
         Returns
-            dict: The dict representing the dependency.
+            dict: A dictionary representation of the dependency.
         """
         res = {}
         for key, value in json.loads(self.component).items():
@@ -101,10 +117,11 @@ class SBOM(db.Model):
 
     def to_dict(self) -> dict:
         """
-        Represent the SBOM as a dict resembling its original json format.
+        Creates a dictionary representing the SBOM, that can be used in
+        responses.
 
         Returns
-            dict: The dict representing the SBOM.
+            dict: A dictionary representation of the SBOM.
         """
         return {
             "bomFormat": "CycloneDX",
