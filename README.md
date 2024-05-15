@@ -37,7 +37,6 @@ This command analyzes an SBOM and scores its components. The components are scor
   docker compose run ossqa-cli analyze /sboms/example-SBOM.json -sp 6
   ```
 
-
 ### Prepositionals
 | Prepositional      | Description |
 | ----------- | ----------- |
@@ -70,8 +69,25 @@ This command analyzes an SBOM and scores its components. The components are scor
 | -v \| --verbose   | Print the output verbosely.        |
 | --help   | Show the help page for the analyze command.        |
 
+## SBOMs Command
+This command prints out the names of all SBOMs in the database.
 
-## SBOM Command
+* Usage:
+  ```
+  docker compose run ossqa-cli sboms [OPTIONS…]
+  ```
+* Example:
+  ```
+  docker compose run ossqa-cli sboms -o json
+  ```
+
+### Options
+| Option      | Description |
+| ----------- | ----------- |
+| -b \| --backend   | URL of the backend server. Defaults to internal docker backend.        |
+| -o \| --output   | Format of the output. Can be table or json. Defaults to table.        |
+| -v \| --verbose   | Print the output verbosely.        |
+| --help   | Show the help page for the SBOMs command        |
 
 
 ## Contribute
