@@ -1,5 +1,10 @@
 """
-Represents a dependency manager that manages dependencies for a project.
+This module contains the DependencyManager class, which manages the
+dependencies (components) of an SBOM.
+
+Classes:
+- DependencyManager: Represents a dependency manager that manages dependencies
+    for a project.
 """
 from typing import Callable
 from main.data_types.sbom_types.dependency import Dependency
@@ -86,25 +91,22 @@ class DependencyManager:
     def get_dependencies_by_filter(self, dependency_filter: Callable) \
             -> list[Dependency]:
         """
-        Get the dependencies by filter.
+        Get the dependencies with a filter.
 
         Args:
             dependency_filter (Callable): The filter to apply.
 
         Returns:
-            list[Dependency]: The dependencies that satisfy the filter.
+            list[Dependency]: The filtered dependencies.
         """
         return list(filter(dependency_filter, self._dependencies))
 
     def to_dict(self) -> dict:
         """
-        Convert the object to a dictionary.
+        Create a dictionary representing the dependency manager.
 
         Returns:
-            dict: A dictionary containing
-                scored_dependencies: list[dict],
-                unscored_dependencies: list[dict],
-                failed_dependencies: list[dict].
+            dict: The dependency manager as a dictionary.
         """
         return {
             'scored_dependencies':
@@ -117,16 +119,14 @@ class DependencyManager:
                 [dependency.to_dict() for dependency
                     in self.get_failed_dependencies()]
         }
-    
+
     def to_dict_web(self) -> dict:
         """
-        Convert the object to a dictionary.
+        Create a dictionary representing the dependency manager to use in the
+        web interface.
 
         Returns:
-            dict: A dictionary containing
-                scored_dependencies: list[dict],
-                unscored_dependencies: list[dict],
-                failed_dependencies: list[dict].
+            dict: The dependency manager as a dictionary.
         """
         return {
             'scored_dependencies':

@@ -55,6 +55,9 @@ class SbomProcessor:
     def __init__(self, backend_host: str):
         """
         Initializes an SBOM processor.
+
+        Args:
+            backend_host (str): The host of the backend.
         """
         self.on_status_update = Event[SbomProcessorStatus]()
         self.sbom_processor_status = SbomProcessorStatus(
@@ -78,10 +81,11 @@ class SbomProcessor:
                                state: SbomProcessorStates,
                                step_response: StepResponse = None) -> None:
         """
-        Sets the event state.
+        Sets the event start state.
 
         Args:
             state (SbomProcessorStates): The state to set.
+            step_response (StepResponse): The response from the step.
         """
         if step_response:
             self.sbom_processor_status.step_response = step_response
@@ -99,6 +103,7 @@ class SbomProcessor:
         Args:
             sbom (Sbom): The SBOM to analyze.
             dependency_scorer (DependencyScorer): The dependency scorer to run.
+            state (SbomProcessorStates): The state to set.
         """
         current_unscored_dependencies = \
             sbom.dependency_manager.get_dependencies_by_filter(
@@ -116,10 +121,15 @@ class SbomProcessor:
 
     def analyze_sbom(self, sbom: Sbom) -> Sbom:
         """
-        Analyzes an SBOM and scores its dependencies.
+        Analyzes the given SBOM (Software Bill of Materials) by running
+        various dependency scorers and updating the scores in the database.
 
-        Args:
-            sbom (Sbom): The SBOM to analyze.
+        Parameters:
+        sbom (Sbom): The SBOM to be analyzed.
+
+        Returns:
+        Sbom: The analyzed SBOM with updated scores.
+
         """
         # 1. Get score from BackendScorer
         self._run_dependency_scorer(
@@ -180,7 +190,7 @@ class SbomProcessor:
             name (str): The name of the SBOM to look up.
 
         Returns:
-            list[dict]: The list of the SBOMs with the same name.
+            list[Sbom]: The list of the SBOMs with the same name.
         """
         self._set_event_start_state(SbomProcessorStates.FETCH_DATABASE)
         sboms = self.backend_communication.get_sboms_by_name(name)

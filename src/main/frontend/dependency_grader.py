@@ -1,5 +1,5 @@
 """
-This module contains the function to calculate the final scores for the 
+This module contains the function to calculate the final scores for the
 dependencies in the SBOM.
 """
 import copy

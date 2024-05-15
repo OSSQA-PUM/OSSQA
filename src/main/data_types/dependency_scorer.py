@@ -40,6 +40,16 @@ class StepResponse:
 class DependencyScorer(ABC):
     """
     Represents a dependency scorer.
+
+    This class is an abstract base class based on the Strategy design pattern.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: An abstract function that intends to score a list of
+        dependencies.
     """
     on_step_complete: Event[StepResponse]
     _scored_dependencies: list[Dependency]
@@ -86,7 +96,17 @@ class DependencyScorer(ABC):
 
 class SSFAPIFetcher(DependencyScorer):
     """
-    Represents a SSF API fetcher
+    Represents a SSF API fetcher.
+
+    This class fetches dependencies with scores from the OpenSSF Scorecard API.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: Scores a list of dependencies by fetching stored scores with
+        the OpenSSF Scorecard API.
     """
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
@@ -150,6 +170,9 @@ class SSFAPIFetcher(DependencyScorer):
 
         Returns:
             Dependency: The dependency with an SSF score.
+
+        Raises:
+            TokenLimitExceededError: If the GitHub token limit is exceeded.
         """
 
         assert isinstance(dependency, Dependency), \
@@ -208,6 +231,10 @@ class SSFAPIFetcher(DependencyScorer):
 
         Returns:
             Scorecard: The scorecard of the dependency.
+
+        Raises:
+            requests.exceptions.RequestException: If the scorecard failed to
+            be retrieved.
         """
         try:
             score = requests.get(
@@ -233,7 +260,18 @@ class SSFAPIFetcher(DependencyScorer):
 
 class ScorecardAnalyzer(DependencyScorer):
     """
-    Represents a scorecard analyzer
+    Represents a Scorecard Analyzer.
+
+    This class scores dependencies by analyzing the scores of the OpenSSF
+    Scorecard.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: Scores a list of dependencies by analyzing the scores of the
+        OpenSSF Scorecard.
     """
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
@@ -302,6 +340,7 @@ class ScorecardAnalyzer(DependencyScorer):
 
         Args:
             dependency (Dependency): The dependency to analyze.
+            timeout (float): Time for requests to timeout
 
         Returns:
             Dependency: A deepcopy the dependency with an analyzed score.
@@ -315,6 +354,7 @@ class ScorecardAnalyzer(DependencyScorer):
                                            executed.
             json.JSONDecodeError: If the scorecard output could not be parsed.
             TimeoutError: If the scorecard execution timed out.
+            TokenLimitExceededError: If the GitHub token limit is exceeded.
         """
         assert isinstance(dependency, Dependency), \
             f"dependency: {dependency} is not a Dependency object"
@@ -366,7 +406,9 @@ class ScorecardAnalyzer(DependencyScorer):
             except (AssertionError,
                     subprocess.CalledProcessError,
                     TimeoutError,
-                    json.JSONDecodeError, ValueError) as e:
+                    json.JSONDecodeError,
+                    ValueError,
+                    requests.ConnectionError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)  # Wait before retrying

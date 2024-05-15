@@ -8,10 +8,8 @@ Functions:
 import re
 import os
 import datetime
-from time import time
 from math import inf
-
-
+from time import time
 import requests
 
 
@@ -47,8 +45,8 @@ class TokenLimitExceededError(Exception):
 
 class Sha1NotFoundError(Exception):
     """
-    Exception raised when the SHA1 hash for
-    a version of a dependency is not found.
+    Exception raised when the SHA1 hash for a version of a dependency is not
+    found.
     """
 
     message: str
@@ -61,8 +59,12 @@ def get_token_data() -> dict:
     """
     Returns:
         dict: A dictionary containing the user's GitHub API token data
+
+    Raises:
+        requests.ConnectionError: If the request to the GitHub API is
+        unsuccessful.
     """
-    token = os.environ.get('GITHUB_AUTH_TOKEN')
+    token = get_github_token()
     url = 'https://api.github.com/rate_limit'
 
     # Make a GET request to the GitHub API with your token for authentication
@@ -80,8 +82,9 @@ def get_token_data() -> dict:
             "reset_time": int(user_data["X-RateLimit-Reset"])
         }
 
-    print(f"Failed to authenticate. Status code: {response.status_code}")
-    return None
+    raise requests.ConnectionError(
+        f"Failed to authenticate token. Status code: {response.status_code}"
+        )
 
 
 def get_git_sha1(git_url: str, version: str) -> str:
@@ -111,11 +114,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
     """
 
     # Get the GitHub authentication token
-    token = os.environ.get('GITHUB_AUTH_TOKEN')
-    if not token:
-        raise ValueError(
-            "GitHub authentication token not found in environment"
-            )
+    token = get_github_token()
     headers = {'Authorization': f'token {token}'} if token else {}
 
     # Check that the release version exists
@@ -217,6 +216,10 @@ def get_github_token() -> str:
 
     Returns:
         str: The GitHub authentication token.
+
+    Raises:
+        ValueError: If the GitHub authentication token is not found in the
+        environment.
     """
     token = os.environ.get('GITHUB_AUTH_TOKEN')
     if not token:
