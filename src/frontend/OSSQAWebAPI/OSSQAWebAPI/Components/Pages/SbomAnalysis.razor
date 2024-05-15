@@ -48,7 +48,7 @@ else
 }
 @* show failed dependencies and reason, not working at the moment*@
 
-
+<p>@fullSBOM</p>
 
 
 @code {
@@ -85,7 +85,7 @@ else
             {
                 SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
-
+                fullSBOM = SBOMString;
                 try
                 {
                     Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);

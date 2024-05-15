@@ -16,7 +16,6 @@
             <MatTab Label="Home">
                 <SbomAnalysis SbomResult="SbomResult" Analyzing="Analyzing" StateHasChangedCallback="StateHasChangedCallback" />
             </MatTab>
-
         <ResultTabs SbomResult="SbomResult" StateHasChangedCallback="StateHasChangedCallback" Requirements="Requirements" FailedComponents="FailedComponents" />
     </MatTabGroup>
 }
@@ -25,7 +24,7 @@ else if(!ready)
 {
     if (viewOld)
     {
-            <OldSBOMS StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" Analyzing="Analyzing" />
+        <OldSBOMS StateHasChangedCallback="StateHasChangedCallback" PostData="PostData" Analyzing="Analyzing" />
     }
     else
     {
