@@ -123,4 +123,4 @@ This command prints out details of all SBOMs in the database that have a specifi
 
 ## License
 
-This project is licensed under the GPLv3 License - see the LICENSE.md file for details
+This project is licensed under the GPLv3 License - see the [LICENSE.md](https://github.com/OSSQA-PUM/OSSQA/blob/main/LICENSE) file for details
