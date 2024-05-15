@@ -33,27 +33,46 @@ def analyze():
     try:
         user_reqs_param = data['user_reqs']
     except (KeyError, TypeError):
-        user_reqs_param = "[10, 10, 10, 10, 10,10, 10, 10, 10, 10,10, 10, 10, 10, 10, 10, 10, 10]"
+        user_reqs_param = "[10, 10, 10, 10, 10, 10,\
+              10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]"
     user_reqs_param = json.loads(user_reqs_param)
     user_reqs_dict = {
-        RequirementsType.VULNERABILITIES: user_reqs_param["Vulnerabilities"],
-        RequirementsType.DEPENDENCY_UPDATE_TOOL: user_reqs_param["Dependency Update Tool"],
-        RequirementsType.MAINTAINED: user_reqs_param["Maintained"],
-        RequirementsType.SECURITY_POLICY: user_reqs_param["Security Policy"],
-        RequirementsType.LICENSE: user_reqs_param["License"],
-        RequirementsType.CII_BEST_PRACTICES: user_reqs_param["CII Best Practices"],
-        RequirementsType.CI_TESTS: user_reqs_param["CI Tests"],
-        RequirementsType.FUZZING: user_reqs_param["Fuzzing"],
-        RequirementsType.SAST: user_reqs_param["SAST"],
-        RequirementsType.BINARY_ARTIFACTS: user_reqs_param["Binary Artifacts"],
-        RequirementsType.BRANCH_PROTECTION: user_reqs_param["Branch Protection"],
-        RequirementsType.DANGEROUS_WORKFLOW: user_reqs_param["Dangerous Workflow"],
-        RequirementsType.CODE_REVIEW: user_reqs_param["Code Review"],
-        RequirementsType.CONTRIBUTORS: user_reqs_param["Contributors"],
-        RequirementsType.PINNED_DEPENDENCIES: user_reqs_param["Pinned Dependencies"],
-        RequirementsType.TOKEN_PERMISSIONS: user_reqs_param["Token Permissions"],
-        RequirementsType.PACKAGING: user_reqs_param["Packaging"],
-        RequirementsType.SIGNED_RELEASES: user_reqs_param["Signed Releases"]
+        RequirementsType.VULNERABILITIES:
+            user_reqs_param["Vulnerabilities"],
+        RequirementsType.DEPENDENCY_UPDATE_TOOL:
+            user_reqs_param["Dependency Update Tool"],
+        RequirementsType.MAINTAINED:
+            user_reqs_param["Maintained"],
+        RequirementsType.SECURITY_POLICY:
+            user_reqs_param["Security Policy"],
+        RequirementsType.LICENSE:
+            user_reqs_param["License"],
+        RequirementsType.CII_BEST_PRACTICES:
+            user_reqs_param["CII Best Practices"],
+        RequirementsType.CI_TESTS:
+            user_reqs_param["CI Tests"],
+        RequirementsType.FUZZING:
+            user_reqs_param["Fuzzing"],
+        RequirementsType.SAST:
+            user_reqs_param["SAST"],
+        RequirementsType.BINARY_ARTIFACTS:
+            user_reqs_param["Binary Artifacts"],
+        RequirementsType.BRANCH_PROTECTION:
+            user_reqs_param["Branch Protection"],
+        RequirementsType.DANGEROUS_WORKFLOW:
+            user_reqs_param["Dangerous Workflow"],
+        RequirementsType.CODE_REVIEW:
+            user_reqs_param["Code Review"],
+        RequirementsType.CONTRIBUTORS:
+            user_reqs_param["Contributors"],
+        RequirementsType.PINNED_DEPENDENCIES:
+            user_reqs_param["Pinned Dependencies"],
+        RequirementsType.TOKEN_PERMISSIONS:
+            user_reqs_param["Token Permissions"],
+        RequirementsType.PACKAGING:
+            user_reqs_param["Packaging"],
+        RequirementsType.SIGNED_RELEASES:
+            user_reqs_param["Signed Releases"]
         }
 
     try:
@@ -96,4 +115,12 @@ def get_previous_sboms(repo_name: str):
 
 
 def run():
+    """
+    Runs the web API.
+
+    This function starts the web API-
+    and listens for incoming requests on port 98.
+    The API runs in debug mode.
+
+    """
     app.run(port=98, debug=True, host='0.0.0.0')
