@@ -285,15 +285,18 @@ def print_analysis_summary(step_response: StepResponse):
     print(f"Failed count: {step_response.failed_items}")
 
 
-def on_status_change(current_status: SbomProcessorStatus):
+def on_analysis_status_change(current_status: SbomProcessorStatus):
     """
     Callback function for the status change event.
     """
-    if current_status.current_state == SbomProcessorStates.COMPLETED:
-        print_analysis_summary(current_status.step_response)
-        return
-
     global _progress_bar
+
+    if current_status.current_state == SbomProcessorStates.COMPLETED:
+        if _progress_bar:
+            _progress_bar.refresh()
+            _progress_bar.close()
+            _progress_bar = None
+        return
     step_response: StepResponse = current_status.step_response
 
     if (step_response and step_response.message and
@@ -420,14 +423,14 @@ def analyze(path: Path, git_token: str, backend: str, output: str, verbose, **kw
 
     front_end_api = FrontEndAPI(backend)
     if verbose:
-        on_status_change(front_end_api.sbom_processor.sbom_processor_status)
-        front_end_api.on_sbom_processor_status_update.subscribe(on_status_change)
+        on_analysis_status_change(front_end_api.sbom_processor.sbom_processor_status)
+        front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
     scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
 
-    if _progress_bar:
-        _progress_bar.refresh()
-        _progress_bar.close()
-        _progress_bar = None
+    if verbose:
+        print_analysis_summary(
+            front_end_api.sbom_processor.sbom_processor_status.step_response
+            )
 
     match output:
         case "table":
@@ -453,7 +456,11 @@ def sboms(backend: str, output: str, verbose: str):
     Executes the command that fetches all SBOM names from the backend.
     """
     front_end_api = FrontEndAPI(backend)
+    front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
     sbom_names = front_end_api.lookup_stored_sboms()
+
+    if verbose:
+        print(f"Found {len(sbom_names)} SBOMs in the database.")
 
     if output == "table":
         table = tabulate([sbom_names], headers=["Repository Names"])
@@ -478,8 +485,16 @@ def lookup(name: str, backend: str, output: str, verbose: str):
     Executes the command that fetches all SBOMs of a specific name
     from the backend.
     """
+    global _progress_bar
+
     front_end_api = FrontEndAPI(backend)
+    if verbose:
+        on_analysis_status_change(front_end_api.sbom_processor.sbom_processor_status)
+        front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
     found_sboms = front_end_api.lookup_previous_sboms(name)
+
+    if verbose:
+        print(f"Found {len(found_sboms)} SBOMs with the name '{name}'.")
 
     if output == "table":
         table_data = []
