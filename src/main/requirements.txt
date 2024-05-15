@@ -1,6 +1,5 @@
 requests
 flask
 tabulate
-packaging
 click
 validators

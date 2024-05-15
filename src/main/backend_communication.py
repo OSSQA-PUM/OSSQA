@@ -20,6 +20,14 @@ class BackendCommunication:
     Represents backend communication.
     Can add SBOMs to the database and get SBOMs from the database.
     Will also inform user about the status of the operation.
+
+    Attributes:
+        on_status_changed (Event[StepResponse]): The event for status changes.
+        backend_fetcher (DependencyScorer): The backend fetcher.
+
+    Args:
+        callback (Callable[[StepResponse], Any]): The callback function.
+        host (str): The host of the backend.
     """
     on_status_changed: Event[StepResponse]
     backend_fetcher: DependencyScorer
@@ -116,6 +124,13 @@ class BackendFetcher(DependencyScorer):
     """
     def __init__(self, callback: Callable[[StepResponse], Any], host: str) \
             -> None:
+        """
+        Initializes the backend fetcher.
+
+        Args:
+            callback (Callable[[StepResponse], Any]): The callback function.
+            host (str): The host of the backend.
+        """
         super().__init__(callback)
         self.host = host.rstrip("/")
 

@@ -1,3 +1,4 @@
+
 import json
 from dataclasses import asdict
 
@@ -7,7 +8,6 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import (UserRequirements,
                                                RequirementsType)
 from main.sbom_processor import SbomProcessorStatus
-
 import main.constants as constants
 
 app = Flask(__name__)
@@ -17,6 +17,12 @@ status: SbomProcessorStatus = SbomProcessorStatus("Initializing")
 
 @app.errorhandler(415)
 def page_not_found(error):
+    """
+    Handles the error when the request is not found.
+
+    Args:
+        error: The error that occurred.
+    """
     print("Error:", error)
     return "Not found", 415
 
@@ -24,9 +30,10 @@ def page_not_found(error):
 @app.route("/analyze", methods=['POST'])
 def analyze():
     """
-    Analyzes an SBOM.
+    Analyzes the SBOM and returns the result.
+
     Returns:
-        str: The analyzed SBOM.
+        str: The result of the analysis.
     """
     print("Request received")
     data = request.get_json()
@@ -94,6 +101,9 @@ def analyze():
 def update_current_status(update: SbomProcessorStatus):
     """
     Updates the current status of the request.
+
+    Args:
+        update (SbomProcessorStatus): The updated status.
     """
     global status
     status = update
@@ -101,6 +111,12 @@ def update_current_status(update: SbomProcessorStatus):
 
 @app.route("/get_current_status", methods=['GET'])
 def get_current_status():
+    """
+    Gets the current status of the request.
+
+    Returns:
+        str: The current status of the request.
+    """
     global status
     print(f"Status updated: {asdict(status)}")
     return json.dumps(asdict(status))
@@ -121,6 +137,5 @@ def run():
     This function starts the web API-
     and listens for incoming requests on port 98.
     The API runs in debug mode.
-
     """
     app.run(port=98, debug=True, host='0.0.0.0')

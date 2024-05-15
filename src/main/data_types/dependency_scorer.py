@@ -366,7 +366,9 @@ class ScorecardAnalyzer(DependencyScorer):
             except (AssertionError,
                     subprocess.CalledProcessError,
                     TimeoutError,
-                    json.JSONDecodeError, ValueError) as e:
+                    json.JSONDecodeError,
+                    ValueError,
+                    requests.ConnectionError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)  # Wait before retrying
