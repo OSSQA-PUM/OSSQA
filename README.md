@@ -25,6 +25,7 @@ docker compose build ossqa-cli
 docker compose run ossqa-cli [COMMAND] [ARGUMENTS…]
 ```
 
+
 ## Analyze Command
 This command analyzes an SBOM and scores its components. The components are scored with OpenSSF Scorecard which runs many tests of five different categories. Scorecard requires a GitHub Personal Access Token which can be created according to [these instructions](https://github.com/ossf/scorecard?tab=readme-ov-file#authentication)
 
@@ -69,6 +70,7 @@ This command analyzes an SBOM and scores its components. The components are scor
 | -v \| --verbose   | Print the output verbosely.        |
 | --help   | Show the help page for the analyze command.        |
 
+
 ## SBOMs Command
 This command prints out the names of all SBOMs in the database.
 
@@ -89,6 +91,31 @@ This command prints out the names of all SBOMs in the database.
 | -v \| --verbose   | Print the output verbosely.        |
 | --help   | Show the help page for the SBOMs command        |
 
+
+## Lookup Command
+This command prints out details of all SBOMs in the database that have a specified name.
+
+* Usage:
+  ```
+  docker compose run ossqa-cli lookup [OPTIONS…] NAME
+  ```
+* Example:
+  ```
+  docker compose run ossqa-cli lookup -o table sysman
+  ```
+
+### Prepositionals
+| Positionals      | Description |
+| ----------- | ----------- |
+| NAME      | Name of the SBOMs to print the details of.       |
+
+### Options
+| Option      | Description |
+| ----------- | ----------- |
+| -b \| --backend   | URL of the backend server. Defaults to internal docker backend.        |
+| -o \| --output   | Format of the output. Can be table or json. Defaults to table.        |
+| -v \| --verbose   | Print the output verbosely.        |
+| --help   | Show the help page for the lookup command        |
 
 ## Contribute
 
