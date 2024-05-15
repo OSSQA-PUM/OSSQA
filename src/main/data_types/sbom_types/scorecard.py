@@ -1,10 +1,12 @@
 """
-This module contains the classes for the scorecards created from SSFScorecards.
+This module contains classes that represent data from OpenSSF Scorecard
+results.
 
 Classes:
-- Check: Represents a check on a dependency.
-- Scorecard: Represents a scorecard for a dependency.
-- ScorecardChecks: Represents the checks that can be performed on a dependency.
+- Check: Represents a scorecard check.
+- Scorecard: Represents the results of OpenSSF Scorecard.
+- ScorecardChecks: Represents the checks that can be performed by OpenSSF
+Scorecard on a dependency.
 """
 
 from dataclasses import dataclass, asdict
@@ -13,7 +15,8 @@ from enum import StrEnum
 
 class ScorecardChecks(StrEnum):
     """
-    Represents the checks that can be performed on a dependency.
+    Represents the checks that can be performed by OpenSSF Scorecard
+    on a dependency.
     https://securityscorecards.dev/#the-checks
     """
     BINARY_ARTIFACTS = "Binary-Artifacts"
@@ -42,7 +45,7 @@ class ScorecardChecks(StrEnum):
         Get all checks.
 
         Returns:
-            list: A list of all checks.
+            list[ScorecardChecks]: The list of all checks.
         """
         return list(ScorecardChecks)
 
@@ -63,7 +66,7 @@ class ScorecardChecks(StrEnum):
 @dataclass(frozen=True, eq=True)
 class Check:
     """
-    Represents a check on a dependency.
+    Represents a scorecard check.
 
     Attributes:
         name (str): The name of the check.
@@ -80,7 +83,7 @@ class Check:
 @dataclass
 class Scorecard:
     """
-    Represents a scorecard for a dependency.
+    Represents the results of OpenSSF Scorecard.
     https://securityscorecards.dev/#the-checks
     """
     date: str
@@ -113,7 +116,7 @@ class Scorecard:
         Initializes the scorecard.
 
         Args:
-            ssf_scorecard (dict): The SSF scorecard.
+            ssf_scorecard (dict): The OpenSSF Scorecard results.
         """
         self._validate(ssf_scorecard)
         self.date = ssf_scorecard["date"]
@@ -135,7 +138,7 @@ class Scorecard:
         Validates the scorecard.
 
         Args:
-            ssf_scorecard (dict): The SSF scorecard.
+            ssf_scorecard (dict): The OpenSSF Scorecard results.
 
         Returns:
             bool: True if the scorecard is valid, False otherwise.
@@ -176,7 +179,7 @@ class Scorecard:
 
     def to_dict(self) -> dict:
         """
-        Converts the scorecard to a dictionary.
+        Creates a dictionary representing the scorecard.
 
         Returns:
             dict: The scorecard as a dictionary.
