@@ -15,9 +15,8 @@ from main.frontend.dependency_grader import grade_dependencies
 class FrontEndAPI:
     """
     Represents a front-end API for interacting with the SBOM processor and
-    performing various operations such as analyzing SBOMs,
-    looking up stored SBOMs,
-    and retrieving previous SBOMs by name.
+    performing various operations such as analyzing SBOMs, looking up stored
+    SBOMs, and retrieving previous SBOMs by name.
     """
     sbom_processor: SbomProcessor
     on_sbom_processor_status_update: Event[SbomProcessorStatus]
@@ -67,7 +66,7 @@ class FrontEndAPI:
             user_requirements (UserRequirements): The user requirements.
 
         Returns:
-            Sbom: The analyzed SBOM.
+            Sbom: The analyzed SBOM
         """
         assert isinstance(sbom, Sbom), "sbom must be of type Sbom"
         assert isinstance(user_requirements, UserRequirements), \
@@ -99,5 +98,4 @@ class FrontEndAPI:
         Returns:
             list[Sbom]: The list of SBOMs with the specified name.
         """
-        print("frontend api lookup_previous_sboms")
         return self.sbom_processor.lookup_previous_sboms(name)

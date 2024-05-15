@@ -21,7 +21,7 @@ RUN chmod +x /usr/local/bin/scorecard
 RUN python -m venv /app/venv
 
 # Add the virtual environment binaries to the PATH for subsequent commands
-ENV PATH="app/venv/bin:$PATH"
+ENV PATH="/app/venv/bin:$PATH"
 
 # Install the Python packages listed in requirements.txt
 RUN python -m pip install -r requirements.txt
