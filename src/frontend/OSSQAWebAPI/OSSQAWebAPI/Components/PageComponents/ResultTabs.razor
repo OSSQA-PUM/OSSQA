@@ -1,20 +1,9 @@
 ﻿@using OSSQAWebAPI.Components.Pages
 
-<MatTab Label="Code Vulnerabilities">
-    <ViewResults SbomResult="SbomResult" Tests='["Vulnerabilities"]' Requirements="Requirements" />
+<MatTab Label="Components">
+    <ViewResults SbomResult="SbomResult" Requirements="Requirements" />
 </MatTab>
-<MatTab Label="Maintenance">
-    <ViewResults SbomResult="SbomResult" Tests='["CII-Best-Practices", "Dependency-Update-Tool", "License", "Maintained", "Security-Policy"]' Requirements="Requirements" />
-</MatTab>
-<MatTab Label="Continuous Testing">
-    <ViewResults SbomResult="SbomResult" Tests='["CI-Tests", "Fuzzing", "SAST"]' Requirements="Requirements" />
-</MatTab>
-<MatTab Label="Source Risk Assessment">
-    <ViewResults SbomResult="SbomResult" Tests='["Binary-Artifacts", "Branch-Protection", "Code-Review", "Contributors", "Dangerous-Workflow"]' Requirements="Requirements" />
-</MatTab>
-<MatTab Label="Build Risk Assessment">
-    <ViewResults SbomResult="SbomResult" Tests='["Packaging", "Pinned-Dependencies", "Signed-Releases", "Token-Permissions"]' Requirements="Requirements" />
-</MatTab>
+
 @if(FailedComponents is not null && FailedComponents.Count > 0)
 {
     <MatTab Label="Failed Components">
@@ -25,7 +14,7 @@
 
 @code {
     [Parameter]
-    public Dictionary<string, List<SbomAnalysis.Check>> SbomResult { get; set; }
+    public List<SbomAnalysis.Sbom> SbomResult { get; set; }
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
     [Parameter]

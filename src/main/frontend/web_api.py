@@ -97,7 +97,7 @@ def get_current_status():
 def get_previous_sboms(repo_name: str):
     print(f"Looking up previous SBOMs for {repo_name}")
     sboms = frontend_api.lookup_previous_sboms(repo_name)
-    sbom_dicts = [sbom.to_dict() for sbom in sboms]
+    sbom_dicts = [sbom.to_dict_web() for sbom in sboms]
     return json.dumps(sbom_dicts)
 
 

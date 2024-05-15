@@ -6,18 +6,17 @@
 @inject HttpClient httpClient
 @using static SbomAnalysis.Sbom
 
-<MatButton Style="font-size:1em; width:20vw;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
-
-
 
 @if (viewOld == true)
 {
     <MatTabGroup Style="margin-bottom:2em;">
         <ResultTabs SbomResult="SbomResult" StateHasChangedCallback="StateHasChangedCallback" Requirements="null" FailedComponents="null" />
     </MatTabGroup>
+    <MatButton Style="font-size:1em; width:20vw;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
 }
 else if(Analyzing.CurrentCount == 1 && sboms is not null && sboms.Count > 0)
 {
+    <MatButton Style="font-size:1em; width:20vw;" OnClick='()=> _navigationManager.NavigateTo("/", true)'>Return to Home</MatButton>
     <div class="d-flex flex-column justify-content-evenly justify-content-center align-items-center">
         <h4>Select SBOM to view</h4>
         <MatRadioGroup @bind-Value="@OldSbom" TValue="SbomAnalysis.Sbom">
@@ -32,6 +31,7 @@ else if(Analyzing.CurrentCount == 1 && sboms is not null && sboms.Count > 0)
     </div>
 }
 
+
 else
 {
     <div class="d-flex flex-column justify-content-center align-items-center">
@@ -44,7 +44,6 @@ else
         </div>
     </div>
 }
-<p>@resultOld</p>
 @code {
     [Parameter]
     public Action StateHasChangedCallback { get; set; }
@@ -57,8 +56,8 @@ else
     private SbomAnalysis.Sbom OldSbom;
     private bool viewOld = false;
     private List<bool> Selected = new();
-    private Dictionary<string, List<SbomAnalysis.Check>> SbomResult = new();
     private SortedDictionary<string, int> Requirements = new();
+    private List<SbomAnalysis.Sbom> SbomResult = new();
     private string resultOld = "";
 
     private Action UpdateSelected => () =>
@@ -120,9 +119,6 @@ else
                 try
                 {
                     sboms = JsonSerializer.Deserialize<List<SbomAnalysis.Sbom>>(previousSboms);
-
-                    SbomAnalysis.Sbom test = new SbomAnalysis.Sbom("test",0,"test","test",null,null,null);
-                    sboms.Add(test);
                 }
                 catch (Exception e)
                 {
@@ -141,8 +137,7 @@ else
 
     private void LoadOldSbom()
     {
-
-        SbomAnalysis.AddToDict(OldSbom, SbomResult);
+        SbomResult.Add(OldSbom);
         viewOld = true;
     }
 

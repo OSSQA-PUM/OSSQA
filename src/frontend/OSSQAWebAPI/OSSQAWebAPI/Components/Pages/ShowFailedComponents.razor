@@ -8,7 +8,15 @@
     {
         string url = "https://" + failedDependency.name;
         <MatListItem>
-            <p>Component URL: <a href="@url"> @failedDependency.name</a></p>
+            @if(failedDependency.name == null || failedDependency.name == "")
+            {
+                    <p>Component URL: <a href="@url"> non-git URL</a></p>
+            }
+            else
+            {
+                    <p>Component URL: <a href="@url"> @failedDependency.name</a></p>
+            }
+            
         </MatListItem>
         <MatListItem>
             <p>Reason: @failedDependency.failure_reason</p>

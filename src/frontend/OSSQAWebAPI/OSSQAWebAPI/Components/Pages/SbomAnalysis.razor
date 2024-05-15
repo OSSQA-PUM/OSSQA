@@ -15,7 +15,6 @@
     if (statusObj.step_response is not null)
     {
         <div class="d-flex flex-column align-items-center justify-content-center " style="height:50vh;">
-            <h3 >@statusObj.current_state</h3>
             <h3>@statusObj.step_response.message</h3>
             <h5>Batch Size: @statusObj.step_response.batch_size</h5>
             <h5>Completed Items: @statusObj.step_response.completed_items</h5>
@@ -48,19 +47,15 @@ else
 }
 @* show failed dependencies and reason, not working at the moment*@
 
-<p>@fullSBOM</p>
-
 
 @code {
-    private float score = 0;
     Dictionary<string, string> statusInfo = new();
     string status = "";
-    private string fullSBOM = "full sbom";
     private Status statusObj;
     [Parameter]
     public SemaphoreSlim Analyzing { get; set; }
     [Parameter]
-    public Dictionary<string, List<Check>> SbomResult { get; set; }
+    public List<Sbom> SbomResult { get; set; }
     [Parameter]
     public Dictionary<string, string> PostData { get; set; }
     [Parameter]
@@ -83,14 +78,12 @@ else
             HttpResponseMessage result = await t;
             if (result.IsSuccessStatusCode)
             {
-                SbomResult.Clear();
                 var SBOMString = await result.Content.ReadAsStringAsync();
-                fullSBOM = SBOMString;
                 try
                 {
-                    Sbom sbom = JsonSerializer.Deserialize<Sbom>(SBOMString);
-                    AddToDict(sbom, SbomResult);
-                    AddFailed(sbom);
+                    SbomResult.Add(JsonSerializer.Deserialize<Sbom>(SBOMString));
+
+                    AddFailed(SbomResult[0]);
 
                 }
                 catch (Exception e)
@@ -102,30 +95,6 @@ else
             }
         });
         _ = PollStatus(Analyzing);
-    }
-
-    public static void AddToDict(Sbom sbom, Dictionary<string, List<Check>> SbomResult)
-    {
-        foreach (Dependency dependency in sbom.scored_dependencies)
-        {
-            if (dependency.dependency_score.checks is null)
-            {
-                continue;
-            }
-            foreach (Check check in dependency.dependency_score.checks)
-            {
-                check.dependency = dependency;
-                if (SbomResult.ContainsKey(check.name))
-                {
-                    SbomResult[check.name].Add(check);
-                }
-                else
-                {
-                    SbomResult.Add(check.name, new List<Check> { check });
-                }
-            }
-        }
-        int count = SbomResult.Count;
     }
 
     private void AddFailed(Sbom sbom)
@@ -190,7 +159,6 @@ else
         public DependencyScore dependency_score { get; set; }
         public string failure_reason { get; set; }
         public string reach_requirement { get; set; }
-
         public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason, string reach_requirement)
         {
             this.name = name;

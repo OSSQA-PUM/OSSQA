@@ -3,17 +3,18 @@
 @using PageComponents
 
 @* this component handles user requirement inputs*@
-
+<div class="d-flex">
+    <a href="https://securityscorecards.dev/#the-checks" style="margin-top:3em; margin-bottom:2em;"> What do these categories test?</a>
+</div>
 
 <div class="d-flex justify-content-center align-items-center flex-column">
-    <h3 style="margin-bottom:1em;margin-top:1em;">Specify minimum score to pass</h3>
+        <h4 style="margin-bottom:1em;margin-top:1em;">Specify minimum score to pass</h4>
+    
 
     <MatDivider></MatDivider>
     @foreach (var req in Requirements)
     {
-
         <PassingGradeSlider Requirements="Requirements" Req="req" ></PassingGradeSlider>
-
     }
     <MatButton Raised="true" Style="font-size:1.5em; width:20vw;margin-top:2em;" @onclick="()=>{ValidateReqs();}">Analyze</MatButton>
 </div>
@@ -30,6 +31,23 @@
     public Dictionary<string, string> PostData { get; set; }
     [Parameter]
     public SortedDictionary<string, int> Requirements { get; set; }
+
+    private int Score = -1;
+    private void SetRequirement()
+    {
+        if (Score > 10)
+        {
+            Score = 10;
+        }
+        if (Score < -1)
+        {
+            Score = -1;
+        }
+        for(int i = 0; i < Requirements.Count; i++)
+        {
+            Requirements[Requirements.ElementAt(i).Key] = Score;
+        }
+    }
 
 
     private void ValidateReqs()

@@ -40,7 +40,7 @@ else if(!ready)
             </MatTab>
         </MatTabGroup>
         <div class="d-flex flex-column justify-content-center align-items-center">
-            <MatButton Style="font-size:1em; width:20vw;margin-top:25em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
+            <MatButton Style="font-size:1em; width:20vw;margin-top:10em;" @onclick="()=> viewOld=true">View Previous Results</MatButton>
         </div>
     }
 }
@@ -57,7 +57,7 @@ else
 
 
 @code {
-    private Dictionary<string, List<Check>> SbomResult = new();
+    private List<SbomAnalysis.Sbom> SbomResult = new();
     StringBuilder ChosenSbom = new StringBuilder();
     private SemaphoreSlim Analyzing = new(1, 1);
     private List<Dependency> FailedComponents = new();
