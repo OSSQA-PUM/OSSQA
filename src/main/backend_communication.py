@@ -7,11 +7,9 @@ Functions:
 - get_sbom_names: Returns the names of all the SBOMs in the database.
 - get_existing_dependencies: Gets saved dependencies from the database.
 """
-import json
 from typing import Any, Callable
 import requests
 from main.data_types.sbom_types.dependency import Dependency
-from main.data_types.sbom_types.scorecard import Scorecard
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.dependency_scorer import DependencyScorer, StepResponse
 from main.data_types.event import Event

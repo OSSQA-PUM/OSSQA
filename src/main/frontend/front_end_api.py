@@ -15,7 +15,8 @@ from main.frontend.dependency_grader import grade_dependencies
 class FrontEndAPI:
     """
     Represents a front-end API for interacting with the SBOM processor and
-    performing various operations such as analyzing SBOMs, looking up stored SBOMs,
+    performing various operations such as analyzing SBOMs,
+    looking up stored SBOMs,
     and retrieving previous SBOMs by name.
     """
     sbom_processor: SbomProcessor
@@ -27,18 +28,27 @@ class FrontEndAPI:
         """
         self.sbom_processor = SbomProcessor(backend_host)
         self.on_sbom_processor_status_update = Event[SbomProcessorStatus]()
-        self.sbom_processor.on_status_update.subscribe(self._update_sbom_processor_status)
+        self.sbom_processor.on_status_update.subscribe(
+                                        self._update_sbom_processor_status)
 
-    def _update_sbom_processor_status(self, sbom_processor_status: SbomProcessorStatus) -> None:
+    def _update_sbom_processor_status(
+            self,
+            sbom_processor_status: SbomProcessorStatus
+            ) -> None:
         """
-        Invokes the SBOM processor status update event when the SBOM processor status is updated.
+        Invokes the SBOM processor status update event when the -
+        SBOM processor status is updated.
 
         Args:
-            sbom_processor_status (SbomProcessorStatus): The SBOM processor status.
+            sbom_processor_status (SbomProcessorStatus):
+                 The SBOM processor status.
         """
         self.on_sbom_processor_status_update.invoke(sbom_processor_status)
 
-    def subscribe_to_state_change(self, callback: Callable[[SbomProcessorStatus], Any]) -> None:
+    def subscribe_to_state_change(
+            self,
+            callback: Callable[[SbomProcessorStatus], Any]
+            ) -> None:
         """
         Subscribes to state change events.
 
@@ -47,7 +57,8 @@ class FrontEndAPI:
         """
         self.on_sbom_processor_status_update.subscribe(callback)
 
-    def analyze_sbom(self, sbom: Sbom, user_requirements: UserRequirements) -> Sbom:
+    def analyze_sbom(self, sbom: Sbom,
+                     user_requirements: UserRequirements) -> Sbom:
         """
         Analyzes an SBOM.
 
@@ -60,7 +71,7 @@ class FrontEndAPI:
         """
         assert isinstance(sbom, Sbom), "sbom must be of type Sbom"
         assert isinstance(user_requirements, UserRequirements), \
-        "user_requirements must be of type UserRequirements"
+            "user_requirements must be of type UserRequirements"
 
         sbom_copy: Sbom = copy.deepcopy(sbom)
         sbom_copy = self.sbom_processor.analyze_sbom(sbom_copy)

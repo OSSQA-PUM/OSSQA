@@ -7,7 +7,7 @@ from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import (UserRequirements,
                                                RequirementsType)
 from main.sbom_processor import SbomProcessorStatus
-import requests
+
 import main.constants as constants
 
 app = Flask(__name__)
@@ -70,12 +70,6 @@ def analyze():
 
     result_json = result_sbom.to_dict_web()
     return json.dumps(result_json)
-
-
-@app.route("/hello", methods=['GET'])
-def hello():
-    """test function"""
-    return "Hello World!"
 
 
 def update_current_status(update: SbomProcessorStatus):

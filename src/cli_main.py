@@ -1,10 +1,8 @@
 """
 The entry point of the CLI.
-
-Example usage: 
-    python cli_main.py -a -p tests/main/unit/sboms/example-SBOM.json -g [YOUR_GIT_TOKEN]
 """
 from main.frontend.cli import ossqa_cli
+
 
 def main():
     """
