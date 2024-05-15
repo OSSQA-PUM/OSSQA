@@ -1,7 +1,7 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.2",
-  "serialNumber": "urn:uuid:d7a0ac67-e0f8-4342-86c6-801a02437636",
+  "serialNumber": "urn:uuid:d7a0ac67-e0f8-4342-86c6-801a02437638",
   "version": 1,
   "metadata": {
     "timestamp": "2021-05-16T17:10:53+02:00",
@@ -31,14 +31,14 @@
       }
     ],
     "component": {
-      "bom-ref": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
+      "bom-ref": "example-SBOM",
       "type": "application",
-      "name": "github.com/ProtonMail/proton-bridge",
+      "name": "example-SBOM",
       "version": "v1.8.0",
-      "purl": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
+      "purl": "example-SBOM:example-SBOM@v1.8.0",
       "externalReferences": [
         {
-          "url": "https://github.com/ProtonMail/proton-bridge",
+          "url": "no-url-available",
           "type": "vcs"
         }
       ]

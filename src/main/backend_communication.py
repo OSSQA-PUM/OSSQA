@@ -191,9 +191,6 @@ class BackendFetcher(DependencyScorer):
             return new_dependencies
 
         for dependency_component in response.json():
-            # TODO Fix the name of Dependency.
-            # Should perhaps store name of CycloneDX component
-            # in database and git_url separately.
             dep_obj = Dependency(dependency_component)
             new_dependencies.append(dep_obj)
         return new_dependencies
