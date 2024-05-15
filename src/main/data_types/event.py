@@ -1,5 +1,5 @@
 """
-This module defines the Event class, which allows subscribing to and invoking 
+This module defines the Event class, which allows subscribing to and invoking
 callback functions.
 
 Example usage:
@@ -19,7 +19,7 @@ class Event(Generic[T]):
     Represents an event that can be subscribed to and invoked.
 
     Attributes:
-        _callbacks (list[Callable[[T], Any]]): A list of callback functions 
+        _callbacks (list[Callable[[T], Any]]): A list of callback functions
         subscribed to the event.
     """
 
@@ -45,7 +45,7 @@ class Event(Generic[T]):
         Unsubscribes from the event.
 
         Args:
-            callback (Callable[[T], Any]): The callback function to 
+            callback (Callable[[T], Any]): The callback function to
                                            unsubscribe.
         """
         try:
@@ -58,7 +58,7 @@ class Event(Generic[T]):
         Invokes the callback functions of subscribers.
 
         Args:
-            event_data (T): The value to pass as an argument to the 
+            event_data (T): The value to pass as an argument to the
             callback functions.
         """
         for callback in self._callbacks:

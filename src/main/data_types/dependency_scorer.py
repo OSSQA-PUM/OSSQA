@@ -40,6 +40,16 @@ class StepResponse:
 class DependencyScorer(ABC):
     """
     Represents a dependency scorer.
+
+    This class is an abstract base class based on the Strategy design pattern.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: An abstract function that intends to score a list of
+        dependencies.
     """
     on_step_complete: Event[StepResponse]
     _scored_dependencies: list[Dependency]
@@ -78,7 +88,7 @@ class DependencyScorer(ABC):
             if (dependency.git_url == scored_dep.git_url and
                     dependency.component_version ==
                     scored_dep.component_version):
-                dependency.dependency_score = scored_dep.dependency_score
+                dependency.scorecard = scored_dep.scorecard
                 dependency.failure_reason = scored_dep.failure_reason
                 return True
         return False
@@ -86,7 +96,17 @@ class DependencyScorer(ABC):
 
 class SSFAPIFetcher(DependencyScorer):
     """
-    Represents a SSF API fetcher
+    Represents a SSF API fetcher.
+
+    This class fetches dependencies with scores from the OpenSSF Scorecard API.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: Scores a list of dependencies by fetching stored scores with
+        the OpenSSF Scorecard API.
     """
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
@@ -103,13 +123,13 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        remaining_dependencies: list[Dependency] = dependencies
+        remaining_dependencies: list[Dependency] = copy.deepcopy(dependencies)
         try:
             with Pool() as pool:
                 for index, dependency in enumerate(
                         pool.imap(self._request_ssf_api, dependencies)
                         ):
-                    if dependency.dependency_score:
+                    if dependency.scorecard:
                         successful_items += 1
                     else:
                         failed_items += 1
@@ -119,20 +139,20 @@ class SSFAPIFetcher(DependencyScorer):
                     self.on_step_complete.invoke(
                         StepResponse(
                             batch_size,
-                            index + 1,
+                            successful_items + failed_items,
                             successful_items,
                             failed_items
                         )
                     )
         except TokenLimitExceededError as e:
-            time_to_wait:int = e.time_to_wait + 10
+            time_to_wait: int = e.time_to_wait + 10
             self.on_step_complete.invoke(
                 StepResponse(
                     batch_size,
-                    index,
+                    successful_items + failed_items,
                     successful_items,
                     failed_items,
-                    f"Token limit reached. Until {e.reset_datetime}" + \
+                    f"Token limit reached. Until {e.reset_datetime}" +
                     "for token reset."
                 )
             )
@@ -150,6 +170,9 @@ class SSFAPIFetcher(DependencyScorer):
 
         Returns:
             Dependency: The dependency with an SSF score.
+
+        Raises:
+            TokenLimitExceededError: If the GitHub token limit is exceeded.
         """
 
         assert isinstance(dependency, Dependency), \
@@ -182,14 +205,14 @@ class SSFAPIFetcher(DependencyScorer):
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
         except TokenLimitExceededError as e:
-            raise e from e
+            raise TokenLimitExceededError(e.reset_time) from e
 
         try:
             score = self._lookup_ssf_api(
                 dependency.git_url.lstrip("htps:/"),
                 sha1
                 )
-            new_dependency.dependency_score = score
+            new_dependency.scorecard = score
             self._scored_dependencies.append(new_dependency)
             new_dependency.failure_reason = None
             return new_dependency
@@ -208,6 +231,10 @@ class SSFAPIFetcher(DependencyScorer):
 
         Returns:
             Scorecard: The scorecard of the dependency.
+
+        Raises:
+            requests.exceptions.RequestException: If the scorecard failed to
+            be retrieved.
         """
         try:
             score = requests.get(
@@ -215,9 +242,6 @@ class SSFAPIFetcher(DependencyScorer):
                     f"{git_url}/?commit={sha1}"),
                 timeout=10
                 )
-            # TODO: Currently not checking version or commit
-            # Should add a message to the dependency
-            # that the version used was not the version entered.
             if score.status_code != 200:
                 score = requests.get(
                     (f"https://api.securityscorecards.dev"
@@ -236,7 +260,18 @@ class SSFAPIFetcher(DependencyScorer):
 
 class ScorecardAnalyzer(DependencyScorer):
     """
-    Represents a scorecard analyzer
+    Represents a Scorecard Analyzer.
+
+    This class scores dependencies by analyzing the scores of the OpenSSF
+    Scorecard.
+
+    Attributes:
+        on_step_complete (Event[StepResponse]): An event that triggers when a
+        step in the scoring process is completed.
+
+    Methods:
+        score: Scores a list of dependencies by analyzing the scores of the
+        OpenSSF Scorecard.
     """
     def score(self, dependencies: list[Dependency]) -> list[Dependency]:
         """
@@ -258,16 +293,7 @@ class ScorecardAnalyzer(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        remaining_dependencies: list[Dependency] = dependencies
-
-        start_step: StepResponse = StepResponse(
-                        batch_size,
-                        0,
-                        successful_items,
-                        failed_items,
-                        "Starting to score dependencies."
-                    )
-        self.on_step_complete.invoke(start_step)
+        remaining_dependencies: list[Dependency] = copy.deepcopy(dependencies)
 
         with Pool() as pool:
             try:
@@ -275,7 +301,7 @@ class ScorecardAnalyzer(DependencyScorer):
                         pool.imap(self._analyze_scorecard, dependencies)
                         ):
 
-                    if scored_dependency.dependency_score:
+                    if scored_dependency.scorecard:
                         successful_items += 1
                     else:
                         failed_items += 1
@@ -291,15 +317,15 @@ class ScorecardAnalyzer(DependencyScorer):
                         )
                     )
             except TokenLimitExceededError as e:
-                time_to_wait:int = e.time_to_wait + 10
+                time_to_wait: int = e.time_to_wait + 10
                 self.on_step_complete.invoke(
                     StepResponse(
                         batch_size,
-                        index,
+                        successful_items + failed_items,
                         successful_items,
                         failed_items,
-                        f"Token limit reached. Until {e.reset_datetime}" + \
-                        "for token reset."
+                        "Token limit reached. Waiting until " +
+                        f"{e.reset_datetime} for token reset."
                     )
                 )
                 sleep(time_to_wait)
@@ -308,12 +334,13 @@ class ScorecardAnalyzer(DependencyScorer):
         return new_dependencies
 
     def _analyze_scorecard(self, dependency: Dependency, timeout: float = 120)\
-                                                                -> Dependency:
+            -> Dependency:
         """
         Analyzes the score for a dependency.
 
         Args:
             dependency (Dependency): The dependency to analyze.
+            timeout (float): Time for requests to timeout
 
         Returns:
             Dependency: A deepcopy the dependency with an analyzed score.
@@ -327,6 +354,7 @@ class ScorecardAnalyzer(DependencyScorer):
                                            executed.
             json.JSONDecodeError: If the scorecard output could not be parsed.
             TimeoutError: If the scorecard execution timed out.
+            TokenLimitExceededError: If the GitHub token limit is exceeded.
         """
         assert isinstance(dependency, Dependency), \
             f"dependency: {dependency} is not a Dependency object"
@@ -345,7 +373,6 @@ class ScorecardAnalyzer(DependencyScorer):
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
 
-
         try:
             version_git_sha1: str = get_git_sha1(
                 repo_path, component_version
@@ -360,7 +387,7 @@ class ScorecardAnalyzer(DependencyScorer):
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
         except TokenLimitExceededError as e:
-            raise e from e
+            raise TokenLimitExceededError(e.reset_time) from e
 
         remaining_tries: int = 3
         retry_interval: int = 3
@@ -372,23 +399,25 @@ class ScorecardAnalyzer(DependencyScorer):
                     new_dependency.git_url, version_git_sha1, timeout
                     )
 
-                new_dependency.dependency_score = scorecard
+                new_dependency.scorecard = scorecard
                 self._scored_dependencies.append(new_dependency)
 
                 success = True
             except (AssertionError,
                     subprocess.CalledProcessError,
                     TimeoutError,
-                    json.JSONDecodeError, ValueError) as e:
+                    json.JSONDecodeError,
+                    ValueError,
+                    requests.ConnectionError) as e:
                 error_message = f"Failed to execute scorecard due to: {e}"
                 new_dependency.failure_reason = type(e)(error_message)
                 sleep(retry_interval)  # Wait before retrying
                 continue
             except TokenLimitExceededError as e:
-                raise e from e
+                raise TokenLimitExceededError(e.reset_time) from e
 
         # Successful execution of scorecard
-        if new_dependency.dependency_score:
+        if new_dependency.scorecard:
             new_dependency.failure_reason = None
         return new_dependency
 
@@ -446,7 +475,7 @@ class ScorecardAnalyzer(DependencyScorer):
             token_data: dict = get_token_data()
             if token_data.get("remaining") == 0:
                 raise TokenLimitExceededError(
-                    token_data.get("reset_time")) from e
+                    token_data.get("reset_time"))
             raise TimeoutError(e.timeout,
                                "Scorecard execution timed out") from e
 

@@ -14,32 +14,39 @@ class Dependency:
     Represents a dependency for a project.
 
     Attributes:
-        component_name (str): The name of the component.
-        name (str): The name of the dependency, corresponds to the URL in
-                    CycloneDX format.
-        version (str): The version of the dependency.
-        dependency_score (Scorecard): The scorecard related to the dependency.
+        scorecard (Scorecard): The scorecard related to the dependency.
         failure_reason (Exception): The reason for any failure
                                     related to the dependency.
+        reach_requirement (str): The grade of the dependency.
     """
 
-    dependency_score: Scorecard = None
+    scorecard: Scorecard = None
     failure_reason: Exception = None
     reach_requirement: str = None
 
     def __init__(self, dependency: dict):
-        for dependency_attr in dependency:
-            setattr(self, dependency_attr, dependency[dependency_attr])
-        self.dependency_score = None
+        """
+        Initializes the dependency.
+
+        Args:
+            dependency (dict): The component counterpart of the dependency in
+            the SBOM.
+        """
+        self.scorecard = None
         self.failure_reason = None
         self.reach_requirement = None
+        for dependency_attr in dependency.keys():
+            if dependency_attr == "scorecard":
+                self.scorecard = Scorecard(dependency[dependency_attr])
+            else:
+                setattr(self, dependency_attr, dependency[dependency_attr])
 
     def __eq__(self, other):
         """
         Check if two dependencies are equal.
 
         Args:
-            other (Dependency): The other dependency to compare with.
+            other (Dependency): The dependency to compare with.
 
         Returns:
             bool: True if the dependencies are equal, False otherwise.
@@ -61,7 +68,7 @@ class Dependency:
     @property
     def component(self) -> dict:
         """
-        Get the all the SBOM linked attributes of the dependency.
+        Get all the attributes from the SBOM of the dependency.
 
         Returns:
             dict: The attributes from the SBOM of the dependency.
@@ -69,7 +76,7 @@ class Dependency:
         res = {}
         for attr in self.__dict__:
             if attr not in (
-                    "dependency_score", "failure_reason", "reach_requirement"):
+                    "scorecard", "failure_reason", "reach_requirement"):
                 res.update({attr: getattr(self, attr)})
         return res
 
@@ -91,10 +98,10 @@ class Dependency:
     @property
     def component_version(self) -> str:
         """
-        Get the version of the dependency.
+        Get the version of the component.
 
         Returns:
-            str: The version of the dependency.
+            str: The version of the component.
 
         Raises:
             KeyError: If the version is not found in the component.
@@ -136,20 +143,31 @@ class Dependency:
     @property
     def git_url(self) -> str:
         """
-        Get the URL of the dependency.
+        Get the git URL of the dependency.
 
         Returns:
-            str: The URL of the dependency.
+            str: The git URL of the dependency.
 
         Raises:
-            KeyError: If the URL is not found in the component external
-                      references.
-            ValueError: If the URL is not a valid URL.
+            ValueError: If no git URL could be found in externalReferences
+                        of the component.
+            KeyError: If the component has no externalReferences field.
         """
         git_url = self._get_git_url()
         return f"https://{git_url}"
 
     def _get_git_url(self) -> str:
+        """
+        Get the git URL of the dependency.
+
+        Returns:
+            str: The git URL of the dependency.
+
+        Raises:
+            ValueError: If no git URL could be found in externalReferences
+                        of the component.
+            KeyError: If the component has no externalReferences field.
+        """
         if "externalReferences" not in dir(self):
             raise KeyError("externalReferences not found in component")
         external_ref = getattr(self, "externalReferences")
@@ -168,13 +186,17 @@ class Dependency:
 
     def _parse_github_url(self, url: str) -> str:
         """
-        Parse the git URL from a URL.
+        Parse the GitHub URL from a URL.
 
         Args:
             url (str): The URL to parse.
 
         Returns:
-            str: The git URL.
+            str: The GitHub URL.
+
+        Raises:
+            ValueError: If the URL is not a github.com URL or if the URL could
+                        not be parsed.
         """
         url_split = urlparse(url)
         platform = url_split.netloc
@@ -192,20 +214,20 @@ class Dependency:
 
     def to_dict(self) -> dict:
         """
-        Convert the dependency to a dictionary.
+        Create a dictionary representing the dependency.
 
         Returns:
-            dict: The dictionary representation of the dependency.
+            dict: The dependency as a dictionary.
         """
         dependency_dict = {}
         for attr in self.__dict__:
-            if attr not in ("dependency_score", "failure_reason"):
+            if attr not in ("scorecard", "failure_reason"):
                 dependency_dict.update({attr: getattr(self, attr)})
-            if attr == "dependency_score":
+            if attr == "scorecard":
                 dependency_dict.update(
-                        {"dependency_score":
-                         self.dependency_score.to_dict()
-                         if self.dependency_score else None
+                        {"scorecard":
+                         self.scorecard.to_dict()
+                         if self.scorecard else None
                          }
                 )
             if attr == "failure_reason":
@@ -225,3 +247,26 @@ class Dependency:
 
         dependency_dict.update({"platform_path": platform + repo_path})
         return dependency_dict
+
+    def to_dict_web(self) -> dict:
+        """
+        Creates a dictionary representing the dependency to use in the web
+        interface.
+
+        Returns:
+            dict: The dependency as a dictionary.
+        """
+        res = {}
+        res["dependency_score"] = self.scorecard.to_dict() \
+            if self.scorecard else None
+        res["failure_reason"] = str(self.failure_reason) \
+            if self.failure_reason else ""
+        res["reach_requirement"] = self.reach_requirement
+        try:
+            platform = self.platform
+            repo_path = self.repo_path
+            res["name"] = f"{platform}/{repo_path}"
+        except (KeyError, ValueError):
+            res["name"] = ""
+        res["version"] = self.component_version
+        return res

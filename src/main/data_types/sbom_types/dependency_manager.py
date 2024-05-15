@@ -1,5 +1,10 @@
 """
-Represents a dependency manager that manages dependencies for a project.
+This module contains the DependencyManager class, which manages the
+dependencies (components) of an SBOM.
+
+Classes:
+- DependencyManager: Represents a dependency manager that manages dependencies
+    for a project.
 """
 from typing import Callable
 from main.data_types.sbom_types.dependency import Dependency
@@ -33,7 +38,7 @@ class DependencyManager:
         for dependency in dependencies:
             try:
                 index = self._dependencies.index(dependency)
-                if dependency.dependency_score or dependency.failure_reason:
+                if dependency.scorecard or dependency.failure_reason:
                     # We only want scored or failed dependencies
                     self._dependencies[index] = dependency
             except ValueError:
@@ -48,7 +53,7 @@ class DependencyManager:
         """
         return list(
             filter(
-                    lambda dependency: dependency.dependency_score
+                    lambda dependency: dependency.scorecard
                     and not dependency.failure_reason,
                     self._dependencies
                 )
@@ -63,7 +68,7 @@ class DependencyManager:
         """
         return list(
             filter(
-                    lambda dependency: not dependency.dependency_score
+                    lambda dependency: not dependency.scorecard
                     and not dependency.failure_reason,
                     self._dependencies
                 )
@@ -86,25 +91,22 @@ class DependencyManager:
     def get_dependencies_by_filter(self, dependency_filter: Callable) \
             -> list[Dependency]:
         """
-        Get the dependencies by filter.
+        Get the dependencies with a filter.
 
         Args:
             dependency_filter (Callable): The filter to apply.
 
         Returns:
-            list[Dependency]: The dependencies that satisfy the filter.
+            list[Dependency]: The filtered dependencies.
         """
         return list(filter(dependency_filter, self._dependencies))
 
     def to_dict(self) -> dict:
         """
-        Convert the object to a dictionary.
+        Create a dictionary representing the dependency manager.
 
         Returns:
-            dict: A dictionary containing
-                scored_dependencies: list[dict],
-                unscored_dependencies: list[dict],
-                failed_dependencies: list[dict].
+            dict: The dependency manager as a dictionary.
         """
         return {
             'scored_dependencies':
@@ -115,5 +117,25 @@ class DependencyManager:
                     in self.get_unscored_dependencies()],
             'failed_dependencies':
                 [dependency.to_dict() for dependency
+                    in self.get_failed_dependencies()]
+        }
+
+    def to_dict_web(self) -> dict:
+        """
+        Create a dictionary representing the dependency manager to use in the
+        web interface.
+
+        Returns:
+            dict: The dependency manager as a dictionary.
+        """
+        return {
+            'scored_dependencies':
+                [dependency.to_dict_web() for dependency
+                    in self.get_scored_dependencies()],
+            'unscored_dependencies':
+                [dependency.to_dict_web() for dependency
+                    in self.get_unscored_dependencies()],
+            'failed_dependencies':
+                [dependency.to_dict_web() for dependency
                     in self.get_failed_dependencies()]
         }

@@ -39,7 +39,8 @@ class UserRequirements:
             vulnerabilities (int): The vulnerabilities of the project.
         maintenance (int): The maintenance of the project.
         includes:
-            dependency_update_tool (int): The dependency update tool of the project.
+            dependency_update_tool (int): The dependency update tool of the
+                                          project.
             maintained (int): The maintenance of the project.
             security_policy (int): The security policy of the project.
             license (int): The license of the project.
@@ -188,14 +189,23 @@ class UserRequirements:
         Returns:
             list[str]: The list of requirements.
         """
-        return [["Vulnerabilities", self.vulnerabilities],["Dependency-Update-Tool", self.dependency_update_tool],
-                ["Maintained", self.maintained],["Security-Policy", self.security_policy],
-                ["License", self.license],["CII-Best-Practices", self.cii_best_practices],
-                ["CI-Tests", self.ci_tests],["Fuzzing", self.fuzzing],["SAST", self.sast],
-                ["Binary-Artifacts", self.binary_artifacts],["Branch-Protection", self.branch_protection],
-                ["Dangerous-Workflow", self.dangerous_workflow],["Code-Review", self.code_review],
-                ["Contributors", self.contributors],["Pinned-Dependencies", self.pinned_dependencies],
-                ["Token-Permissions", self.token_permissions],["Packaging", self.packaging],
+        return [["Vulnerabilities", self.vulnerabilities],
+                ["Dependency-Update-Tool", self.dependency_update_tool],
+                ["Maintained", self.maintained],
+                ["Security-Policy", self.security_policy],
+                ["License", self.license],
+                ["CII-Best-Practices", self.cii_best_practices],
+                ["CI-Tests", self.ci_tests],
+                ["Fuzzing", self.fuzzing],
+                ["SAST", self.sast],
+                ["Binary-Artifacts", self.binary_artifacts],
+                ["Branch-Protection", self.branch_protection],
+                ["Dangerous-Workflow", self.dangerous_workflow],
+                ["Code-Review", self.code_review],
+                ["Contributors", self.contributors],
+                ["Pinned-Dependencies", self.pinned_dependencies],
+                ["Token-Permissions", self.token_permissions],
+                ["Packaging", self.packaging],
                 ["Signed-Releases", self.signed_releases]]
 
     def to_dict(self) -> dict:

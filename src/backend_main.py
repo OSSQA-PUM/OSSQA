@@ -1,5 +1,12 @@
 """
-The entry point of the backend.
+This is the main entry point for the backend of the application.
+
+It creates an instance of the Flask app using the `create_app()` function
+from the `backend.server` module, and then runs the app on port 5090,
+allowing connections from any host.
+
+Usage:
+    python backend_main.py
 """
 import backend.server as server
 

@@ -1,0 +1,34 @@
+﻿@using static SbomAnalysis
+
+
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <h4 style="margin-top:1em;margin-bottom:1em;">These components failed to be analyzed:</h4>
+    <MatList>
+    @foreach (var failedDependency in FailedComponents)
+    {
+        string url = "https://" + failedDependency.name;
+        <MatListItem>
+            @if(failedDependency.name == null || failedDependency.name == "")
+            {
+                    <p>Component URL: <a href="@url"> non-git URL</a></p>
+            }
+            else
+            {
+                    <p>Component URL: <a href="@url"> @failedDependency.name</a></p>
+            }
+            
+        </MatListItem>
+        <MatListItem>
+            <p>Reason: @failedDependency.failure_reason</p>
+        </MatListItem>
+        <MatListDivider></MatListDivider>
+        
+    }
+    </MatList>
+
+</div>
+@code {
+    [Parameter]
+    public List<Dependency> FailedComponents { get; set; }
+}
+

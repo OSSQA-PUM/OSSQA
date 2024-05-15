@@ -19,15 +19,17 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         db (SQLAlchemy): The database.
     """
 
-    # TODO add proper error-handling methods
-
     @app.route("/sbom", methods=["POST"])
     def add_sbom():
         """
         Adds an SBOM to the database.
 
         Args:
-             json (object): Object containing the SBOM data.
+            json (object): A JSON object containing the SBOM data.
+
+        Status codes:
+            400: If the request is not of type JSON.
+            201: If the SBOM could be added to the database.
         """
         if not request.is_json:
             return "", 400
@@ -59,12 +61,12 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
             for k, v in dep_json.items():
                 if k not in (
                         "platform_path",
-                        "dependency_score",
+                        "scorecard",
                         "failure_reason",
                         "reach_requirement"):
                     dep_component[k] = v
 
-            scorecard_json = dep_json["dependency_score"]
+            scorecard_json = dep_json["scorecard"]
 
             if dep:
                 scorecard: Scorecard = dep.scorecard
@@ -76,7 +78,7 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
                     platform_path=dep_json["platform_path"],
                     name=dep_json["name"],
                     version=dep_json["version"],
-                    raw_component=json.dumps(dep_component),
+                    component=json.dumps(dep_component),
                 )
                 sbom.dependencies.append(dep)
                 db.session.add(dep)
@@ -103,10 +105,13 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
     @app.route("/sbom", methods=["GET"])
     def get_sbom_names():
         """
-        Gets the name of every SBOM in the database.
+        Fetches the name of every SBOM in the database.
 
         Returns:
             json (array): The list of SBOM names.
+
+        Status codes:
+            200: If the list of SBOM names could be created.
         """
         names = set()
         for sbom in SBOM.query.all():
@@ -116,13 +121,16 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
     @app.route("/sbom/<path:repo_name>", methods=["GET"])
     def get_sboms_by_name(repo_name: str):
         """
-        Gets a list of SBOMs with a specific name.
+        Fetches a list of SBOMs with a specific name.
 
         Args:
-            name (str): The name to query the database with.
+            repo_name (str): The name to query the database with.
 
         Returns:
             json (array): The list of SBOMs.
+
+        Status codes:
+            200: If the list of SBOMs could be created.
         """
         sboms = SBOM.query.filter_by(repo_name=repo_name).all()
         sbom_dicts = [sbom.to_dict() for sbom in sboms]
@@ -131,15 +139,19 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
     @app.route("/dependency/existing", methods=["GET"])
     def get_existing_dependencies():
         """
-        Gets a list of dependencies, based on the specified primary
-        keys.
+        Fetches all dependencies that have an existing match in
+        the database.
 
         Args:
-            json (array): A list containing tuples with the name and version
-                of each dependency.
+            json (array): The list of dependency dictionaries, containing
+                containing the name, version, and platform_path.
 
         Returns:
             json (array): The list of dependecies.
+
+        Status codes:
+            400: If the request is not of type JSON.
+            200: If the list of dependencies could be created.
         """
         if not request.is_json:
             return jsonify([]), 400
@@ -164,12 +176,18 @@ def register_test_endpoints(app: Flask, db: SQLAlchemy):
     Registers all test endpoints with a flask app and its database.
 
     Args:
-        app (Flask): The flask app.
-        db (SQLAlchemy): The database.
+        app (Flask): A flask app.
+        db (SQLAlchemy): A database.
     """
 
     @app.route("/test/reset", methods=["POST"])
     def reset_database():
+        """
+        Drops and recreates the database.
+
+        Status codes:
+            200: If the datebase could be dropped and recreated.
+        """
         db.drop_all()
         db.create_all()
         return "", 200

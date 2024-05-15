@@ -8,16 +8,17 @@ Functions:
 import re
 import os
 import datetime
+from math import inf
 from time import time
 import requests
-from math import inf
-from packaging import version as version_parser
+
 
 class TokenLimitExceededError(Exception):
     """
     Exception raised when the GitHub API rate limit is exceeded.
     """
     reset_time: int
+    message: str
 
     @property
     def reset_datetime(self) -> str:
@@ -38,14 +39,28 @@ class TokenLimitExceededError(Exception):
         return self.reset_time - time()
 
     def __init__(self, reset_time: str):
-        self.reset_time = reset_time
-        super().__init__(f"GitHub API rate limit exceeded. Try again later. "
+        """
+        Initializes the TokenLimitExceededError.
+
+        Args:
+            reset_time (str): The time at which the rate limit will be reset.
+
+        Raises:
+            ValueError: If the reset time is not a valid integer.
+        """
+        self.reset_time = int(reset_time)
+        self.message = (f"GitHub API rate limit exceeded. Try again later. "
                          f"Rate limit resets at {reset_time}.")
+        super().__init__(reset_time)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class Sha1NotFoundError(Exception):
     """
-    Exception raised when the SHA1 hash for a version of a dependency is not found.
+    Exception raised when the SHA1 hash for a version of a dependency is not
+    found.
     """
 
     message: str
@@ -57,9 +72,13 @@ class Sha1NotFoundError(Exception):
 def get_token_data() -> dict:
     """
     Returns:
-        dict: A dictionary containing the user's GitHub API token data 
+        dict: A dictionary containing the user's GitHub API token data
+
+    Raises:
+        requests.ConnectionError: If the request to the GitHub API is
+        unsuccessful.
     """
-    token = os.environ.get('GITHUB_AUTH_TOKEN')
+    token = get_github_token()
     url = 'https://api.github.com/rate_limit'
 
     # Make a GET request to the GitHub API with your token for authentication
@@ -77,8 +96,10 @@ def get_token_data() -> dict:
             "reset_time": int(user_data["X-RateLimit-Reset"])
         }
 
-    print(f"Failed to authenticate. Status code: {response.status_code}")
-    return None
+    raise requests.ConnectionError(
+        f"Failed to authenticate token. Status code: {response.status_code}"
+        )
+
 
 def get_git_sha1(git_url: str, version: str) -> str:
     """
@@ -92,26 +113,22 @@ def get_git_sha1(git_url: str, version: str) -> str:
         str: The SHA1 hash of the dependency version.
 
     Raises:
-        ValueError: If the GitHub authentication token is not found in the 
+        ValueError: If the GitHub authentication token is not found in the
         environment.
 
-        ConnectionRefusedError: If the request to the GitHub API is 
+        ConnectionRefusedError: If the request to the GitHub API is
         unsuccessful.
 
         TokenLimitExceededError: If the GitHub API rate limit is exceeded.
 
         AssertionError: If the found SHA1 hash is not valid.
 
-        Sha1NotFoundError: If the SHA1 hash for the dependency version is not 
+        Sha1NotFoundError: If the SHA1 hash for the dependency version is not
         found.
     """
 
     # Get the GitHub authentication token
-    token = os.environ.get('GITHUB_AUTH_TOKEN')
-    if not token:
-        raise ValueError(
-            "GitHub authentication token not found in environment"
-            )
+    token = get_github_token()
     headers = {'Authorization': f'token {token}'} if token else {}
 
     # Check that the release version exists
@@ -120,7 +137,8 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
     # Check if token is depleted
     if response.status_code == 403:
-        raise TokenLimitExceededError(response.headers['X-RateLimit-Reset'])
+        token_data = get_token_data()
+        raise TokenLimitExceededError(token_data["reset_time"])
 
     # Check if the request was successful
     if response.status_code != 200:
@@ -154,7 +172,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
         tag["tag_digits"] = tag_digits
 
-    response_content = sorted(response_content, 
+    response_content = sorted(response_content,
                               key=lambda x: x["tag_digits"], reverse=True)
 
     # Get the SHA1 hash for the version
@@ -191,6 +209,7 @@ def get_git_sha1(git_url: str, version: str) -> str:
     raise Sha1NotFoundError(
         f"SHA1 hash not found for version {original_version}.")
 
+
 def is_valid_sha1(sha1_str: str) -> bool:
     """
     Check the validity of a sha1 string.
@@ -212,6 +231,10 @@ def get_github_token() -> str:
 
     Returns:
         str: The GitHub authentication token.
+
+    Raises:
+        ValueError: If the GitHub authentication token is not found in the
+        environment.
     """
     token = os.environ.get('GITHUB_AUTH_TOKEN')
     if not token:

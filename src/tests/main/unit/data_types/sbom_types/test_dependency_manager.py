@@ -45,8 +45,8 @@ def dependency_manager_with_score():
     deps = dependency_manager.get_unscored_dependencies()
     new_dep1 = copy.deepcopy(deps[0])
     new_dep2 = copy.deepcopy(deps[1])
-    new_dep1.dependency_score = scorecard
-    new_dep2.dependency_score = scorecard
+    new_dep1.scorecard = scorecard
+    new_dep2.scorecard = scorecard
     dependency_manager.update([new_dep1, new_dep2])
     return dependency_manager
 
@@ -74,7 +74,7 @@ def dep_mangr_with_distict_deps():
     dep3 = deps[2]
     with (open(PATHS[1], "r", encoding="utf-8")) as file:
         scorecard = Scorecard(json.load(file))
-    dep1.dependency_score = scorecard
+    dep1.scorecard = scorecard
     dep2.failure_reason = Exception("Failed to fetch dependency")
     dependency_manager.update([dep1, dep2, dep3])
     return dependency_manager
@@ -185,11 +185,11 @@ def test_dependency_manager_to_dict_filled(
         expected = json.load(file)
     dep_dict = dependency_manager.to_dict()
     print(dep_dict)
-    assert dep_dict["scored_dependencies"][0]["dependency_score"] == expected
+    assert dep_dict["scored_dependencies"][0]["scorecard"] == expected
     for dep in dep_dict["unscored_dependencies"]:
         for attr in dep:
             if attr not in (
-                    "dependency_score",
+                    "scorecard",
                     "failure_reason",
                     "reach_requirement",
                     "platform_path"):
@@ -199,7 +199,7 @@ def test_dependency_manager_to_dict_filled(
     for dep in dep_dict["failed_dependencies"]:
         for attr in dep:
             if attr not in (
-                    "dependency_score",
+                    "scorecard",
                     "failure_reason",
                     "reach_requirement",
                     "platform_path"):
@@ -217,10 +217,10 @@ def test_dependency_manager_get_by_filter(dep_mangr_with_distict_deps):
     dependency_manager = dep_mangr_with_distict_deps
 
     scored_deps = dependency_manager.get_dependencies_by_filter(
-        lambda dep: dep.dependency_score
+        lambda dep: dep.scorecard
     )
     unscored_deps = dependency_manager.get_dependencies_by_filter(
-        lambda dep: not dep.dependency_score
+        lambda dep: not dep.scorecard
     )
     failed_deps = dependency_manager.get_dependencies_by_filter(
         lambda dep: dep.failure_reason

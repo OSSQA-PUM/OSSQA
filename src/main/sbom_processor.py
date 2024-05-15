@@ -10,6 +10,7 @@ Classes:
 from enum import StrEnum
 from dataclasses import dataclass
 from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.event import Event
 from main.data_types.dependency_scorer import StepResponse
 from main.data_types.dependency_scorer import (SSFAPIFetcher,
@@ -55,6 +56,9 @@ class SbomProcessor:
     def __init__(self, backend_host: str):
         """
         Initializes an SBOM processor.
+
+        Args:
+            backend_host (str): The host of the backend.
         """
         self.on_status_update = Event[SbomProcessorStatus]()
         self.sbom_processor_status = SbomProcessorStatus(
@@ -71,21 +75,37 @@ class SbomProcessor:
         Args:
             step_response (StepResponse): The response from the step.
         """
+        if step_response == self.sbom_processor_status.step_response:
+            return
+
         self.sbom_processor_status.step_response = step_response
         self.on_status_update.invoke(self.sbom_processor_status)
 
-    def _set_event_state(self, state: SbomProcessorStates) -> None:
+    def _set_event_start_state(self,
+                               state: SbomProcessorStates,
+                               step_response: StepResponse = None) -> None:
         """
-        Sets the event state.
+        Sets the event start state.
 
         Args:
             state (SbomProcessorStates): The state to set.
+            step_response (StepResponse): The response from the step.
         """
+        if (state == self.sbom_processor_status.current_state and
+            step_response == self.sbom_processor_status.step_response):
+            return
+
+        if step_response is None:
+            step_response = StepResponse(0, 0, 0, 0, state.value)
+
+        self.sbom_processor_status.step_response = step_response
         self.sbom_processor_status.current_state = state
         self.on_status_update.invoke(self.sbom_processor_status)
 
     def _run_dependency_scorer(
-            self, sbom: Sbom, dependency_scorer: DependencyScorer
+            self, sbom: Sbom,
+            dependency_scorer: DependencyScorer,
+            state: SbomProcessorStates
             ) -> None:
         """
         Runs a dependency scorer.
@@ -93,42 +113,77 @@ class SbomProcessor:
         Args:
             sbom (Sbom): The SBOM to analyze.
             dependency_scorer (DependencyScorer): The dependency scorer to run.
+            state (SbomProcessorStates): The state to set.
         """
-        current_unscored_dependencies = \
-            sbom.dependency_manager.get_dependencies_by_filter(
-                lambda dependency: not dependency.dependency_score
+        unscored: list[Dependency] = sbom.get_dependencies_by_filter(
+                lambda dependency: not dependency.scorecard
+            )
+        if not unscored:
+            return
+
+        self._set_event_start_state(
+            state,
+            StepResponse(
+                len(unscored), 0, 0, 0, state.value)
             )
         new_dependencies = dependency_scorer.score(
-            current_unscored_dependencies
+            unscored
             )
         sbom.dependency_manager.update(new_dependencies)
 
+        step_response = self.sbom_processor_status.step_response
+        if step_response.batch_size != step_response.completed_items:
+            step_response.completed_items = step_response.batch_size
+            self._set_event_start_state(state, step_response)
+
     def analyze_sbom(self, sbom: Sbom) -> Sbom:
         """
-        Analyzes an SBOM and scores its dependencies.
+        Analyzes the given SBOM (Software Bill of Materials) by running
+        various dependency scorers and updating the scores in the database.
 
-        Args:
-            sbom (Sbom): The SBOM to analyze.
+        Parameters:
+        sbom (Sbom): The SBOM to be analyzed.
+
+        Returns:
+        Sbom: The analyzed SBOM with updated scores.
+
         """
         # 1. Get score from BackendScorer
-        self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
         self._run_dependency_scorer(
-            sbom, self.backend_communication.backend_fetcher
+            sbom,
+            self.backend_communication.backend_fetcher,
+            SbomProcessorStates.FETCH_DATABASE
             )
         # 2. Get score from SSFAPIScorer
-        self._set_event_state(SbomProcessorStates.SSF_LOOKUP)
         self._run_dependency_scorer(
-            sbom, SSFAPIFetcher(self._event_callback)
+            sbom,
+            SSFAPIFetcher(self._event_callback),
+            SbomProcessorStates.SSF_LOOKUP
             )
         # 3. Get score from ScorecardAnalyzer
-        self._set_event_state(SbomProcessorStates.ANALYZING_SCORE)
         self._run_dependency_scorer(
-            sbom, ScorecardAnalyzer(self._event_callback)
+            sbom,
+            ScorecardAnalyzer(self._event_callback),
+            SbomProcessorStates.ANALYZING_SCORE
             )
         # 4. Update database with new scores
-        self._set_event_state(SbomProcessorStates.UPLOADING_SCORES)
+        self._set_event_start_state(
+            SbomProcessorStates.UPLOADING_SCORES
+            )
         self.backend_communication.add_sbom(sbom)
-        self._set_event_state(SbomProcessorStates.COMPLETED)
+        # 5. Return the analyzed SBOM
+        batch_size = len(sbom.get_dependencies_by_filter(lambda x: True))
+        completed_items = batch_size
+        success_count = len(sbom.get_scored_dependencies())
+        failed_count = batch_size - success_count
+
+        self._set_event_start_state(
+            SbomProcessorStates.COMPLETED,
+            StepResponse(
+                batch_size, completed_items, success_count, failed_count,
+                SbomProcessorStates.COMPLETED.value
+                )
+            )
         return sbom
 
     def lookup_stored_sboms(self) -> list[str]:
@@ -139,9 +194,9 @@ class SbomProcessor:
             list[str]: The list of the SBOM names
         """
         # Look up stored SBOMs
-        self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
+        self._set_event_start_state(SbomProcessorStates.FETCH_DATABASE)
         sbom_names = self.backend_communication.get_sbom_names()
-        self._set_event_state(SbomProcessorStates.COMPLETED)
+        self._set_event_start_state(SbomProcessorStates.COMPLETED)
         return sbom_names
 
     def lookup_previous_sboms(self, name: str) -> list[Sbom]:
@@ -152,9 +207,9 @@ class SbomProcessor:
             name (str): The name of the SBOM to look up.
 
         Returns:
-            list[dict]: The list of the SBOMs with the same name.
+            list[Sbom]: The list of the SBOMs with the same name.
         """
-        self._set_event_state(SbomProcessorStates.FETCH_DATABASE)
+        self._set_event_start_state(SbomProcessorStates.FETCH_DATABASE)
         sboms = self.backend_communication.get_sboms_by_name(name)
-        self._set_event_state(SbomProcessorStates.COMPLETED)
+        self._set_event_start_state(SbomProcessorStates.COMPLETED)
         return sboms

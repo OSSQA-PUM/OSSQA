@@ -1,0 +1,24 @@
+﻿@using OSSQAWebAPI.Components.Pages
+
+<MatTab Label="Components">
+    <ViewResults SbomResult="SbomResult" Requirements="Requirements" />
+</MatTab>
+
+@if(FailedComponents is not null && FailedComponents.Count > 0)
+{
+    <MatTab Label="Failed Components">
+        <ShowFailedComponents FailedComponents="FailedComponents" />
+    </MatTab>
+}
+
+
+@code {
+    [Parameter]
+    public List<SbomAnalysis.Sbom> SbomResult { get; set; }
+    [Parameter]
+    public Action StateHasChangedCallback { get; set; }
+    [Parameter]
+    public SortedDictionary<string, int> Requirements { get; set; }
+    [Parameter]
+    public List<SbomAnalysis.Dependency> FailedComponents { get; set; }
+}

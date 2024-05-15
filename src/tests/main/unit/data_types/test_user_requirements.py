@@ -1,6 +1,7 @@
 import pytest
 
-from main.data_types.user_requirements import UserRequirements, RequirementsType
+from main.data_types.user_requirements import (UserRequirements,
+                                               RequirementsType)
 
 REQ_TYPES = [req_type.value for req_type in RequirementsType]
 
@@ -13,23 +14,23 @@ def valid_empty_reqs_fixture() -> dict:
 @pytest.fixture(name="valid_filled_reqs")
 def valid_filled_reqs_fixture() -> dict:
     return {
-        RequirementsType.VULNERABILITIES : 4,
-        RequirementsType.DEPENDENCY_UPDATE_TOOL : 7,
-        RequirementsType.MAINTAINED : 5,
-        RequirementsType.SECURITY_POLICY : 10,
-        RequirementsType.LICENSE : -1,
-        RequirementsType.CI_TESTS : 7,
-        RequirementsType.FUZZING : 0,
-        RequirementsType.SAST : 2,
-        RequirementsType.BINARY_ARTIFACTS : 3,
-        RequirementsType.BRANCH_PROTECTION : 9,
-        RequirementsType.DANGEROUS_WORKFLOW : 5,
-        RequirementsType.CODE_REVIEW : 6,
-        RequirementsType.CONTRIBUTORS : 3,
-        RequirementsType.PINNED_DEPENDENCIES : 1,
-        RequirementsType.TOKEN_PERMISSIONS : 1,
-        RequirementsType.PACKAGING : 5,
-        RequirementsType.SIGNED_RELEASES : 8
+        RequirementsType.VULNERABILITIES: 4,
+        RequirementsType.DEPENDENCY_UPDATE_TOOL: 7,
+        RequirementsType.MAINTAINED: 5,
+        RequirementsType.SECURITY_POLICY: 10,
+        RequirementsType.LICENSE: -1,
+        RequirementsType.CI_TESTS: 7,
+        RequirementsType.FUZZING: 0,
+        RequirementsType.SAST: 2,
+        RequirementsType.BINARY_ARTIFACTS: 3,
+        RequirementsType.BRANCH_PROTECTION: 9,
+        RequirementsType.DANGEROUS_WORKFLOW: 5,
+        RequirementsType.CODE_REVIEW: 6,
+        RequirementsType.CONTRIBUTORS: 3,
+        RequirementsType.PINNED_DEPENDENCIES: 1,
+        RequirementsType.TOKEN_PERMISSIONS: 1,
+        RequirementsType.PACKAGING: 5,
+        RequirementsType.SIGNED_RELEASES: 8
     }
 
 

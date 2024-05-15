@@ -1,10 +1,8 @@
-import pytest
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.scorecard import Scorecard, ScorecardChecks
 from main.frontend.dependency_grader import grade_dependencies
 from main.data_types.user_requirements import UserRequirements
-from main.data_types.sbom_types.dependency_manager import DependencyManager
 
 minimal_sbom_dict = {
     "bomFormat": "CycloneDX",
@@ -15,18 +13,18 @@ minimal_sbom_dict = {
         "timestamp": "2021-05-16T17:10:53+02:00",
         "tools": [
             ],
-            "component": {
-                "bom-ref": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
-                "type": "application",
-                "name": "github.com/ProtonMail/proton-bridge",
-                "version": "v1.8.0",
-                "purl": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
-                "externalReferences": [
-                    {
-                        "url": "https://github.com/ProtonMail/proton-bridge",
-                        "type": "vcs"
-                    }
-                ]
+        "component": {
+            "bom-ref": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
+            "type": "application",
+            "name": "github.com/ProtonMail/proton-bridge",
+            "version": "v1.8.0",
+            "purl": "pkg:golang/github.com/ProtonMail/proton-bridge@v1.8.0",
+            "externalReferences": [
+                {
+                    "url": "https://github.com/ProtonMail/proton-bridge",
+                    "type": "vcs"
+                }
+            ]
             }
         },
     "components": [
@@ -59,10 +57,10 @@ scorecard_1: Scorecard = Scorecard({
     })
 dep_one = Dependency(
         {
-            "name" : "component1",
+            "name": "component1",
         }
     )
-dep_one.dependency_score = scorecard_1
+dep_one.scorecard = scorecard_1
 
 
 scorecard_2: Scorecard = Scorecard({
@@ -91,10 +89,10 @@ scorecard_2: Scorecard = Scorecard({
 })
 dep_two = Dependency(
         {
-            "name" : "component2",
+            "name": "component2",
         }
     )
-dep_two.dependency_score = scorecard_2
+dep_two.scorecard = scorecard_2
 
 scorecard_3: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -116,10 +114,10 @@ scorecard_3: Scorecard = Scorecard({
 })
 dep_three = Dependency(
         {
-            "name" : "component3",
+            "name": "component3",
         }
     )
-dep_three.dependency_score = scorecard_3
+dep_three.scorecard = scorecard_3
 
 scorecard_4: Scorecard = Scorecard({
     "date": "2021-05-16T17:10:53+02:00",
@@ -165,10 +163,10 @@ scorecard_4: Scorecard = Scorecard({
 })
 dep_four = Dependency(
         {
-            "name" : "component4",
+            "name": "component4",
         }
     )
-dep_four.dependency_score = scorecard_4
+dep_four.scorecard = scorecard_4
 
 
 def test_single_pass():
@@ -199,7 +197,7 @@ def test_single_fail():
     """
     sbom: Sbom = Sbom(minimal_sbom_dict)
     sbom.dependency_manager.update([dep_one])
-    
+
     user_requirements_fail:  UserRequirements = UserRequirements(
         {
             "dependency_update_tool": 8,
@@ -214,8 +212,8 @@ def test_single_fail():
 
 def test_single_not_found():
     """
-    Test that the reach_requirement field is set to "Test 
-    result not found" when the dependency does not have a scorecard
+    Test that the reach_requirement field is set to "Test result not found"
+    when the dependency does not have a scorecard
     """
     sbom: Sbom = Sbom(minimal_sbom_dict)
     sbom.dependency_manager.update([dep_one])
@@ -286,6 +284,7 @@ def test_single_edge_case():
     graded_sbom = grade_dependencies(sbom, user_requirements)
     scored_dependencies = graded_sbom.get_scored_dependencies()
     assert scored_dependencies[0].reach_requirement == "Test result not found"
+
 
 def test_multiple():
     """
