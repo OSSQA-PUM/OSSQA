@@ -110,17 +110,19 @@ class SbomProcessor:
             sbom (Sbom): The SBOM to analyze.
             dependency_scorer (DependencyScorer): The dependency scorer to run.
         """
-        unscored_dependencies: list[Dependency] = sbom.get_unscored_dependencies()
-        if not unscored_dependencies:
+        unscored: list[Dependency] = sbom.get_dependencies_by_filter(
+                lambda dependency: not dependency.scorecard
+            )
+        if not unscored:
             return
 
         self._set_event_start_state(
             state,
             StepResponse(
-                len(unscored_dependencies), 0, 0, 0, state.value)
+                len(unscored), 0, 0, 0, state.value)
             )
         new_dependencies = dependency_scorer.score(
-            unscored_dependencies
+            unscored
             )
         sbom.dependency_manager.update(new_dependencies)
 
