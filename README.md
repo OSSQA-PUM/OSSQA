@@ -9,26 +9,30 @@ OSSQA is a project for determining the quality of a software projekt using a Sof
 
 ### Installing
 
-To install OSSQA, clone this repository
+To install OSSQA, clone this repository.
 ```
 git clone https://github.com/OSSQA-PUM/OSSQA.git
 ```
 
+### Inserting SBOMs
+To analyze your SBOMs, the SBOM in CycloneDX-format needs to be added to the `/sboms` directory.
+
+
 ### Executing program
 
-1. Build the Docker image
+1. Build the Docker image.
 ```
 docker compose build ossqa-cli
 ```
 
-2. Run a container of the image
+2. Run a container of the image.
 ```
 docker compose run ossqa-cli [COMMAND] [ARGUMENTS…]
 ```
 
 
 ## Analyze Command
-This command analyzes an SBOM and scores its components. The components are scored with OpenSSF Scorecard which runs many tests of five different categories. Scorecard requires a GitHub Personal Access Token which can be created according to [these instructions](https://github.com/ossf/scorecard?tab=readme-ov-file#authentication)
+This command analyzes an SBOM and scores its components. The components are scored with OpenSSF Scorecard which runs many tests of five different categories. Scorecard requires a GitHub Personal Access Token which can be created according to [these instructions](https://github.com/ossf/scorecard?tab=readme-ov-file#authentication).
 
 * Usage:
   ```
@@ -48,7 +52,7 @@ This command analyzes an SBOM and scores its components. The components are scor
 | Option      | Description |
 | ----------- | ----------- |
 | -g \| --git-token      | A GitHub Personal Access Token. Defaults to the GITHUB_AUTH_TOKEN environment variable in the docker image.       |
-| -v \| --vulnerabilities   | Requirement for vulnerabilities from -1 to 10.        |
+| -vu \| --vulnerabilities   | Requirement for vulnerabilities from -1 to 10.        |
 | -dut \| –dependency-update-tool   | Requirement for dependency update tool from -1 to 10.        |
 | -m \| --maintained   | Requirement for maintained from -1 to 10.        |
 | -sp \| --security-policy   | Requirement for security policy from -1 to 10.        |
