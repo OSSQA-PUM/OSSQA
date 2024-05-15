@@ -25,6 +25,7 @@ else if(Analyzing.CurrentCount == 1 && sboms is not null && sboms.Count > 0)
         {
             <MatRadioButton Value="@sbom" TValue="SbomAnalysis.Sbom">@sbom.repo_name</MatRadioButton>
 
+
         }
         </MatRadioGroup>
         <MatButton @onclick="()=> LoadOldSbom()">View</MatButton>
