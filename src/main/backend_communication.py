@@ -190,14 +190,10 @@ class BackendFetcher(DependencyScorer):
         if not response or response.status_code != 200:
             return new_dependencies
 
-        for dependency in response.json():
-            scorecard = Scorecard(dependency["scorecard"])
+        for dependency_component in response.json():
             # TODO Fix the name of Dependency.
             # Should perhaps store name of CycloneDX component
             # in database and git_url separately.
-            raw_component = json.loads(dependency["raw_component"])
-            raw_component = dict(raw_component)
-            dep_obj = Dependency(raw_component)
-            dep_obj.dependency_score = scorecard
+            dep_obj = Dependency(dependency_component)
             new_dependencies.append(dep_obj)
         return new_dependencies

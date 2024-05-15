@@ -33,7 +33,7 @@ class DependencyManager:
         for dependency in dependencies:
             try:
                 index = self._dependencies.index(dependency)
-                if dependency.dependency_score or dependency.failure_reason:
+                if dependency.scorecard or dependency.failure_reason:
                     # We only want scored or failed dependencies
                     self._dependencies[index] = dependency
             except ValueError:
@@ -48,7 +48,7 @@ class DependencyManager:
         """
         return list(
             filter(
-                    lambda dependency: dependency.dependency_score
+                    lambda dependency: dependency.scorecard
                     and not dependency.failure_reason,
                     self._dependencies
                 )
@@ -63,7 +63,7 @@ class DependencyManager:
         """
         return list(
             filter(
-                    lambda dependency: not dependency.dependency_score
+                    lambda dependency: not dependency.scorecard
                     and not dependency.failure_reason,
                     self._dependencies
                 )

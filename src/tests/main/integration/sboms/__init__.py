@@ -205,6 +205,6 @@ def create_scored_sbom() -> Sbom:
     for dep in sbom.get_unscored_dependencies():
         dep_dict = dep.to_dict()
         if "platform_path" in dep_dict.keys():
-            dep.dependency_score = SCORECARD
+            dep.scorecard = SCORECARD
     sbom.update_dependencies(dependencies)
     return sbom

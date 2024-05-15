@@ -78,7 +78,7 @@ class DependencyScorer(ABC):
             if (dependency.git_url == scored_dep.git_url and
                     dependency.component_version ==
                     scored_dep.component_version):
-                dependency.dependency_score = scored_dep.dependency_score
+                dependency.scorecard = scored_dep.scorecard
                 dependency.failure_reason = scored_dep.failure_reason
                 return True
         return False
@@ -109,7 +109,7 @@ class SSFAPIFetcher(DependencyScorer):
                 for index, dependency in enumerate(
                         pool.imap(self._request_ssf_api, dependencies)
                         ):
-                    if dependency.dependency_score:
+                    if dependency.scorecard:
                         successful_items += 1
                     else:
                         failed_items += 1
@@ -189,7 +189,7 @@ class SSFAPIFetcher(DependencyScorer):
                 dependency.git_url.lstrip("htps:/"),
                 sha1
                 )
-            new_dependency.dependency_score = score
+            new_dependency.scorecard = score
             self._scored_dependencies.append(new_dependency)
             new_dependency.failure_reason = None
             return new_dependency
@@ -266,7 +266,7 @@ class ScorecardAnalyzer(DependencyScorer):
                         pool.imap(self._analyze_scorecard, dependencies)
                         ):
 
-                    if scored_dependency.dependency_score:
+                    if scored_dependency.scorecard:
                         successful_items += 1
                     else:
                         failed_items += 1
@@ -362,7 +362,7 @@ class ScorecardAnalyzer(DependencyScorer):
                     new_dependency.git_url, version_git_sha1, timeout
                     )
 
-                new_dependency.dependency_score = scorecard
+                new_dependency.scorecard = scorecard
                 self._scored_dependencies.append(new_dependency)
 
                 success = True
@@ -378,7 +378,7 @@ class ScorecardAnalyzer(DependencyScorer):
                 raise e from e
 
         # Successful execution of scorecard
-        if new_dependency.dependency_score:
+        if new_dependency.scorecard:
             new_dependency.failure_reason = None
         return new_dependency
 
