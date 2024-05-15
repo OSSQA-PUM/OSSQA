@@ -116,13 +116,16 @@ This command prints out details of all SBOMs in the database that have a specifi
 | -b \| --backend   | URL of the backend server. Defaults to internal docker backend.        |
 | -o \| --output   | Format of the output. Can be table or json. Defaults to table.        |
 | -v \| --verbose   | Print the output verbosely.        |
-| --help   | Show the help page for the lookup command        |
+| --help   | Show the help page for the lookup command.        |
 
 ## Contribute
+
 This project is open source, contributions are appreciated. 
 
 ## Help
 
+Open an issue or create a post in our [discussions page](https://github.com/OSSQA-PUM/OSSQA/discussions).
+
 ## License
 
-This project is licensed under the GPLv3 License - see the [LICENSE.md](https://github.com/OSSQA-PUM/OSSQA/blob/main/LICENSE) file for details
+This project is licensed under the GPLv3 License - see the [LICENSE.md](https://github.com/OSSQA-PUM/OSSQA/blob/main/LICENSE) file for details.
