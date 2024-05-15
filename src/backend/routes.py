@@ -19,8 +19,6 @@ def register_endpoints(app: Flask, db: SQLAlchemy):
         db (SQLAlchemy): The database.
     """
 
-    # TODO add proper error-handling methods
-
     @app.route("/sbom", methods=["POST"])
     def add_sbom():
         """
