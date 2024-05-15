@@ -117,3 +117,25 @@ class DependencyManager:
                 [dependency.to_dict() for dependency
                     in self.get_failed_dependencies()]
         }
+    
+    def to_dict_web(self) -> dict:
+        """
+        Convert the object to a dictionary.
+
+        Returns:
+            dict: A dictionary containing
+                scored_dependencies: list[dict],
+                unscored_dependencies: list[dict],
+                failed_dependencies: list[dict].
+        """
+        return {
+            'scored_dependencies':
+                [dependency.to_dict_web() for dependency
+                    in self.get_scored_dependencies()],
+            'unscored_dependencies':
+                [dependency.to_dict_web() for dependency
+                    in self.get_unscored_dependencies()],
+            'failed_dependencies':
+                [dependency.to_dict_web() for dependency
+                    in self.get_failed_dependencies()]
+        }

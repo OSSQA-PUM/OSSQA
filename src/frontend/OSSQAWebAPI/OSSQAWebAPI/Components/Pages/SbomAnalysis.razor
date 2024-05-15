@@ -189,13 +189,15 @@ else
         public string version { get; set; }
         public DependencyScore dependency_score { get; set; }
         public string failure_reason { get; set; }
+        public string reach_requirement { get; set; }
 
-        public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason)
+        public Dependency(string name, string version, DependencyScore dependency_score, string failure_reason, string reach_requirement)
         {
             this.name = name;
             this.version = version;
             this.dependency_score = dependency_score;
             this.failure_reason = failure_reason;
+            this.reach_requirement = reach_requirement;
         }
     }
 

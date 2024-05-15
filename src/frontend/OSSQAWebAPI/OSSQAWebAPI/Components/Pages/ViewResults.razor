@@ -26,14 +26,7 @@
                             var url = $"https://{check.dependency.name}";
 
                             <MatListItem>
-                                    @if (passFail(check) == "PASS")
-                                    {
-                                        <h5 style="margin-right:1em; color:green;"> PASS </h5>
-                                    }
-                                    else
-                                    {
-                                        <h5 style="margin-right:1em; color:red;"> FAIL </h5>
-                                    }
+                                    <h5 style="margin-right:1em; color:green;"> @check.dependency.reach_requirement </h5>
 
                             </MatListItem>
                             <MatListItem>

@@ -62,6 +62,26 @@ class Sbom:
             res[key] = value
 
         return res
+    
+    def to_dict_web(self) -> dict:
+        """
+        Converts the SBOM object to a dictionary.
+
+        Returns:
+            dict: The SBOM object as a dictionary.
+        """
+        res = {}
+        res["serialNumber"] = self.serial_number
+        res["version"] = self.version
+        res["repo_name"] = self.repo_name
+        res["repo_version"] = self.repo_version
+
+        # Add dependencies to the dictionary
+        dependencies = self.dependency_manager.to_dict_web()
+        for key, value in dependencies.items():
+            res[key] = value
+
+        return res
 
     def get_scored_dependencies(self) -> list[Dependency]:
         """
