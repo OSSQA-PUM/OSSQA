@@ -15,19 +15,24 @@ The script also includes helper functions to parse and validate the arguments.
 import json
 import os
 from pathlib import Path
+from time import sleep
 
 import click
 import requests
 import validators
+import tqdm
 from tabulate import tabulate
 
-import main.constants as constants
+from main import constants
 from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.sbom_types.sbom import Sbom
 from main.data_types.user_requirements import (RequirementsType,
                                                UserRequirements)
 from main.frontend.front_end_api import FrontEndAPI
+from main.sbom_processor import SbomProcessorStatus, SbomProcessorStates
+from main.data_types.dependency_scorer import StepResponse
 
+_progress_bar: tqdm.tqdm = None  # Disable tqdm progress bar
 
 def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
     """
@@ -188,7 +193,7 @@ def table_output(scored_sbom: Sbom):
     ]
     print(
         tabulate(
-            mean_scores, 
+            mean_scores,
             headers=[
                 "Successful Dependencies", 
                 "Average Score", 
@@ -225,10 +230,10 @@ def simplified_output(scored_sbom: Sbom):
     failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
     mean_scores = calculate_mean_scores(scored_deps)
     mean_scores = sorted(mean_scores, key=lambda x: x[1])
-    failed_deps = [[dep.component_name, dep.failure_reason] 
+    failed_deps = [[dep.component_name, dep.failure_reason]
                    for dep in failed_deps]
 
-    print("Successfull dependencies:")
+    print("Successful dependencies:")
     for dep in mean_scores:
         print(f"{dep[0]},{dep[1]},{dep[2]}")
 
@@ -270,11 +275,62 @@ def validate_git_token(_ctx, _param, value: str):
             return value
 
 
+def print_analysis_summary(step_response: StepResponse):
+    """
+    Print the analysis summary.
+    """
+    print("Analysis summary:")
+    print(f"Completed items: {step_response.completed_items}")
+    print(f"Success count: {step_response.successful_items}")
+    print(f"Failed count: {step_response.failed_items}")
+
+
+def on_status_change(current_status: SbomProcessorStatus):
+    """
+    Callback function for the status change event.
+    """
+    if current_status.current_state == SbomProcessorStates.COMPLETED:
+        print_analysis_summary(current_status.step_response)
+        return
+
+    global _progress_bar
+    step_response: StepResponse = current_status.step_response
+
+    if (step_response and step_response.message and
+        "Token limit reached" in step_response.message):
+        _progress_bar.close()
+        _progress_bar = None
+        print(step_response.message)
+
+    if (_progress_bar and
+        (_progress_bar.desc != current_status.current_state or
+        step_response is None)):
+        _progress_bar.close()
+        _progress_bar = None
+
+    if (step_response is None or
+        step_response.batch_size == 0):
+        print(f"{current_status.current_state}...")
+        return
+
+    if _progress_bar is None:
+        _progress_bar = tqdm.tqdm(total=step_response.batch_size,
+                                  desc=current_status.current_state)
+
+    _progress_bar.n = step_response.completed_items
+    _progress_bar.refresh()
+
+    if step_response.completed_items == step_response.batch_size:
+        _progress_bar.close()
+        _progress_bar = None
+
+
 @click.group(context_settings={"max_content_width": 120, "show_default": True})
 def ossqa_cli():
     """
     The entry point of the program.
     """
+    pass
 
 
 @ossqa_cli.command(help="Analyze the given SBOM.")
@@ -295,10 +351,10 @@ def ossqa_cli():
               help="Requirement for maintained.")
 @click.option("-sp", "--security-policy", type=click.IntRange(-1, 10),
               required=False, default=-1,
-              help="Reuirement for security policy.")
+              help="Requirement for security policy.")
 @click.option("-l", "--license", type=click.IntRange(-1, 10),
               required=False, default=-1,
-              help="Reuirement for license.")
+              help="Requirements for license.")
 @click.option("-cbp", "--cii-best-practices", type=click.IntRange(-1, 10),
               required=False, default=-1,
               help="Requirement for CII best practices.")
@@ -348,10 +404,12 @@ def ossqa_cli():
               help="Output format.")
 @click.option("-v", "--verbose", is_flag=True, default=False, required=False,
               help="Verbose output.")
-def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
+def analyze(path: Path, git_token: str, backend: str, output: str, verbose, **kwargs):
     """
     Executes the command that analyzes an SBOM.
     """
+    global _progress_bar
+
     requirements = parse_requirements(**kwargs)
     with open(path, "r", encoding="utf-8") as file:
         unscored_sbom = Sbom(json.load(file))
@@ -361,7 +419,15 @@ def analyze(path: Path, git_token: str, backend: str, output: str, **kwargs):
     os.environ["GITHUB_AUTH_TOKEN"] = git_token
 
     front_end_api = FrontEndAPI(backend)
+    if verbose:
+        on_status_change(front_end_api.sbom_processor.sbom_processor_status)
+        front_end_api.on_sbom_processor_status_update.subscribe(on_status_change)
     scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
+
+    if _progress_bar:
+        _progress_bar.refresh()
+        _progress_bar.close()
+        _progress_bar = None
 
     match output:
         case "table":

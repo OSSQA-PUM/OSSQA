@@ -130,11 +130,6 @@ class BackendFetcher(DependencyScorer):
             list[Dependency]: The scored dependencies.
         """
         new_dependencies = self._get_existing_dependencies(dependencies)
-        step_response: StepResponse = StepResponse(
-            len(dependencies), len(dependencies),
-            len(new_dependencies), len(dependencies) - len(new_dependencies)
-        )
-        self.on_step_complete.invoke(step_response)
         return new_dependencies
 
     def _get_existing_dependencies(self, dependencies: list[Dependency]) \
@@ -150,15 +145,27 @@ class BackendFetcher(DependencyScorer):
         """
         batch_size = len(dependencies)
         failed_count = 0
+        success_count = 0
         dep_dicts = []
+
+        current_step = StepResponse(
+            batch_size, 0, 0, 0, "Fetching existing dependencies")
+        self.on_step_complete.invoke(current_step)
+
         for dependency in dependencies:
             try:
                 dep_dict = dependency.to_dict()
             except (KeyError, ValueError):
                 failed_count += 1
+                current_step = StepResponse(
+                    batch_size, len(dep_dicts) + failed_count,
+                    success_count, failed_count,
+                    "Failed to convert dependency to dictionary")
+                self.on_step_complete.invoke(current_step)
                 continue
             dep_dicts.append(dep_dict)
 
+        failure_message: str = ""
         try:
             response = requests.get(self.host + "/dependency/existing",
                                     json=dep_dicts,
@@ -166,29 +173,43 @@ class BackendFetcher(DependencyScorer):
                                     )
         except requests.exceptions.Timeout:
             # Tell the user that the request timed out
-            self.on_step_complete.invoke(
-                StepResponse(
-                    batch_size, 0, 0, failed_count, "The request timed out")
-                )
-            return []
+            failure_message = "The request timed out"
         except TypeError:
             # Tell the user that the response was not JSON
-            self.on_step_complete.invoke(
-                StepResponse(
-                    batch_size, 0, 0, failed_count,
-                    "The response was not JSON")
-                )
-            return []
-        except requests.exceptions.ConnectionError as e:
+            failure_message = "The response was not JSON"
+        except requests.exceptions.ConnectionError:
             # Tell the user that the connection was refused
-            self.on_step_complete.invoke(
-                StepResponse(batch_size, 0, 0, failed_count, str(e))
-                )
-            return []
+            failure_message = "The connection was refused"
 
         new_dependencies = []
-        if not response or response.status_code != 200:
+        if failure_message:
+            failed_count = batch_size
+            current_step = StepResponse(
+                batch_size, batch_size,
+                success_count, failed_count,
+                failure_message)
+            self.on_step_complete.invoke(current_step)
             return new_dependencies
+
+        if not response or response.status_code != 200:
+            failed_count = batch_size
+            current_step = StepResponse(
+                batch_size, batch_size,
+                success_count, failed_count,
+                "Failed to fetch existing dependencies")
+            self.on_step_complete.invoke(current_step)
+            return new_dependencies
+
+        if not response.json():
+            failed_count = batch_size
+            current_step = StepResponse(
+                batch_size, batch_size,
+                success_count, failed_count,
+                "No existing dependencies found")
+            self.on_step_complete.invoke(current_step)
+            return new_dependencies
+
+        failed_count = batch_size - len(response.json())
 
         for dependency_component in response.json():
             # TODO Fix the name of Dependency.
@@ -196,4 +217,11 @@ class BackendFetcher(DependencyScorer):
             # in database and git_url separately.
             dep_obj = Dependency(dependency_component)
             new_dependencies.append(dep_obj)
+            success_count += 1
+            current_step = StepResponse(
+                batch_size, success_count + failed_count,
+                success_count, failed_count,
+                "Found existing dependency")
+            self.on_step_complete.invoke(current_step)
+
         return new_dependencies

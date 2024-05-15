@@ -4,3 +4,4 @@ tabulate
 packaging
 click
 validators
+tqdm

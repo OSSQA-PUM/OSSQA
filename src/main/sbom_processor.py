@@ -10,6 +10,7 @@ Classes:
 from enum import StrEnum
 from dataclasses import dataclass
 from main.data_types.sbom_types.sbom import Sbom
+from main.data_types.sbom_types.dependency import Dependency
 from main.data_types.event import Event
 from main.data_types.dependency_scorer import StepResponse
 from main.data_types.dependency_scorer import (SSFAPIFetcher,
@@ -71,6 +72,9 @@ class SbomProcessor:
         Args:
             step_response (StepResponse): The response from the step.
         """
+        if step_response == self.sbom_processor_status.step_response:
+            return
+
         self.sbom_processor_status.step_response = step_response
         self.on_status_update.invoke(self.sbom_processor_status)
 
@@ -83,8 +87,14 @@ class SbomProcessor:
         Args:
             state (SbomProcessorStates): The state to set.
         """
-        if step_response:
-            self.sbom_processor_status.step_response = step_response
+        if (state == self.sbom_processor_status.current_state and
+            step_response == self.sbom_processor_status.step_response):
+            return
+
+        if step_response is None:
+            step_response = StepResponse(0, 0, 0, 0, state.value)
+
+        self.sbom_processor_status.step_response = step_response
         self.sbom_processor_status.current_state = state
         self.on_status_update.invoke(self.sbom_processor_status)
 
@@ -100,19 +110,24 @@ class SbomProcessor:
             sbom (Sbom): The SBOM to analyze.
             dependency_scorer (DependencyScorer): The dependency scorer to run.
         """
-        current_unscored_dependencies = \
-            sbom.dependency_manager.get_dependencies_by_filter(
-                lambda dependency: not dependency.scorecard
-            )
+        unscored_dependencies: list[Dependency] = sbom.get_unscored_dependencies()
+        if not unscored_dependencies:
+            return
+
         self._set_event_start_state(
             state,
             StepResponse(
-                len(current_unscored_dependencies), 0, 0, 0, state.value)
+                len(unscored_dependencies), 0, 0, 0, state.value)
             )
         new_dependencies = dependency_scorer.score(
-            current_unscored_dependencies
+            unscored_dependencies
             )
         sbom.dependency_manager.update(new_dependencies)
+
+        step_response = self.sbom_processor_status.step_response
+        if step_response.batch_size != step_response.completed_items:
+            step_response.completed_items = step_response.batch_size
+            self._set_event_start_state(state, step_response)
 
     def analyze_sbom(self, sbom: Sbom) -> Sbom:
         """
@@ -141,21 +156,21 @@ class SbomProcessor:
             )
         # 4. Update database with new scores
         self._set_event_start_state(
-            SbomProcessorStates.UPLOADING_SCORES,
-            StepResponse(
-                len(sbom.get_scored_dependencies()),
-                0, 0, 0, SbomProcessorStates.UPLOADING_SCORES.value)
+            SbomProcessorStates.UPLOADING_SCORES
             )
         self.backend_communication.add_sbom(sbom)
-        all_deps = len(sbom.get_dependencies_by_filter(lambda x: True))
+        # 5. Return the analyzed SBOM
+        batch_size = len(sbom.get_dependencies_by_filter(lambda x: True))
+        completed_items = batch_size
+        success_count = len(sbom.get_scored_dependencies())
+        failed_count = batch_size - success_count
+
         self._set_event_start_state(
             SbomProcessorStates.COMPLETED,
             StepResponse(
-                all_deps,
-                all_deps,
-                len(sbom.get_scored_dependencies()),
-                len(sbom.get_failed_dependencies()),
-                SbomProcessorStates.COMPLETED.value)
+                batch_size, completed_items, success_count, failed_count,
+                SbomProcessorStates.COMPLETED.value
+                )
             )
         return sbom
 
