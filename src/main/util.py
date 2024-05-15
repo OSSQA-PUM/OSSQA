@@ -18,6 +18,7 @@ class TokenLimitExceededError(Exception):
     Exception raised when the GitHub API rate limit is exceeded.
     """
     reset_time: int
+    message: str
 
     @property
     def reset_datetime(self) -> str:
@@ -38,9 +39,22 @@ class TokenLimitExceededError(Exception):
         return self.reset_time - time()
 
     def __init__(self, reset_time: str):
-        self.reset_time = reset_time
-        super().__init__(f"GitHub API rate limit exceeded. Try again later. "
+        """
+        Initializes the TokenLimitExceededError.
+
+        Args:
+            reset_time (str): The time at which the rate limit will be reset.
+
+        Raises:
+            ValueError: If the reset time is not a valid integer.
+        """
+        self.reset_time = int(reset_time)
+        self.message = (f"GitHub API rate limit exceeded. Try again later. "
                          f"Rate limit resets at {reset_time}.")
+        super().__init__(reset_time)
+
+    def __str__(self) -> str:
+        return self.message
 
 
 class Sha1NotFoundError(Exception):
@@ -123,7 +137,8 @@ def get_git_sha1(git_url: str, version: str) -> str:
 
     # Check if token is depleted
     if response.status_code == 403:
-        raise TokenLimitExceededError(response.headers['X-RateLimit-Reset'])
+        token_data = get_token_data()
+        raise TokenLimitExceededError(token_data["reset_time"])
 
     # Check if the request was successful
     if response.status_code != 200:

@@ -123,7 +123,7 @@ class SSFAPIFetcher(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        remaining_dependencies: list[Dependency] = dependencies
+        remaining_dependencies: list[Dependency] = copy.deepcopy(dependencies)
         try:
             with Pool() as pool:
                 for index, dependency in enumerate(
@@ -139,7 +139,7 @@ class SSFAPIFetcher(DependencyScorer):
                     self.on_step_complete.invoke(
                         StepResponse(
                             batch_size,
-                            index + 1,
+                            successful_items + failed_items,
                             successful_items,
                             failed_items
                         )
@@ -149,7 +149,7 @@ class SSFAPIFetcher(DependencyScorer):
             self.on_step_complete.invoke(
                 StepResponse(
                     batch_size,
-                    index,
+                    successful_items + failed_items,
                     successful_items,
                     failed_items,
                     f"Token limit reached. Until {e.reset_datetime}" +
@@ -205,7 +205,7 @@ class SSFAPIFetcher(DependencyScorer):
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
         except TokenLimitExceededError as e:
-            raise e from e
+            raise TokenLimitExceededError(e.reset_time) from e
 
         try:
             score = self._lookup_ssf_api(
@@ -293,7 +293,7 @@ class ScorecardAnalyzer(DependencyScorer):
         failed_items = 0
         successful_items = 0
         new_dependencies = []
-        remaining_dependencies: list[Dependency] = dependencies
+        remaining_dependencies: list[Dependency] = copy.deepcopy(dependencies)
 
         with Pool() as pool:
             try:
@@ -321,11 +321,11 @@ class ScorecardAnalyzer(DependencyScorer):
                 self.on_step_complete.invoke(
                     StepResponse(
                         batch_size,
-                        index,
+                        successful_items + failed_items,
                         successful_items,
                         failed_items,
-                        f"Token limit reached. Until {e.reset_datetime}" +
-                        "for token reset."
+                        "Token limit reached. Waiting until " +
+                        f"{e.reset_datetime} for token reset."
                     )
                 )
                 sleep(time_to_wait)
@@ -387,7 +387,7 @@ class ScorecardAnalyzer(DependencyScorer):
             new_dependency.failure_reason = type(e)(error_message)
             return new_dependency
         except TokenLimitExceededError as e:
-            raise e from e
+            raise TokenLimitExceededError(e.reset_time) from e
 
         remaining_tries: int = 3
         retry_interval: int = 3
@@ -414,7 +414,7 @@ class ScorecardAnalyzer(DependencyScorer):
                 sleep(retry_interval)  # Wait before retrying
                 continue
             except TokenLimitExceededError as e:
-                raise e from e
+                raise TokenLimitExceededError(e.reset_time) from e
 
         # Successful execution of scorecard
         if new_dependency.scorecard:
@@ -475,7 +475,7 @@ class ScorecardAnalyzer(DependencyScorer):
             token_data: dict = get_token_data()
             if token_data.get("remaining") == 0:
                 raise TokenLimitExceededError(
-                    token_data.get("reset_time")) from e
+                    token_data.get("reset_time"))
             raise TimeoutError(e.timeout,
                                "Scorecard execution timed out") from e
 
