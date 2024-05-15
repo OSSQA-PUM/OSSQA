@@ -284,7 +284,7 @@ def ossqa_cli():
               callback=validate_git_token,
               help=("GitHub Personal Access Token."
                     "  [default: GITHUB_AUTH_TOKEN env variable]"))
-@click.option("-v", "--vulnerabilities", type=click.IntRange(-1, 10),
+@click.option("-vu", "--vulnerabilities", type=click.IntRange(-1, 10),
               required=False, default=-1,
               help="Requirement for vulnerabilities.")
 @click.option("-dut", "--dependency-update-tool", type=click.IntRange(-1, 10),
