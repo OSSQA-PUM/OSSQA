@@ -177,7 +177,7 @@ def table_output(scored_sbom: Sbom):
             mean_scores,
             headers=[
                 "Successful Dependencies",
-                "Average Score",
+                "SSF Aggregate Score",
                 "Meet requirements?"
             ]
         )
