@@ -15,7 +15,6 @@ The script also includes helper functions to parse and validate the arguments.
 import json
 import os
 from pathlib import Path
-from time import sleep
 
 import click
 import requests
@@ -32,32 +31,12 @@ from main.frontend.front_end_api import FrontEndAPI
 from main.sbom_processor import SbomProcessorStatus, SbomProcessorStates
 from main.data_types.dependency_scorer import StepResponse
 
+
 _progress_bar: tqdm.tqdm = None  # Disable tqdm progress bar
 
-def calculate_mean_score(dependency: Dependency, decimals: int = 1) -> float:
-    """
-    Calculate the mean score of a dependency.
 
-    Args:
-        dependency (Dependency): The dependency to calculate the
-        mean score for.
-
-        decimals (int): The number of decimals to round the mean score to.
-
-    Returns:
-        float: The mean score of the dependency.
-    """
-    mean_score = 0
-    for dep_score in dependency.scorecard.checks:
-        mean_score += dep_score.score
-    mean_score /= len(dependency.scorecard.checks)
-    mean_score = round(mean_score, decimals)
-
-    return mean_score
-
-
-def calculate_mean_scores(dependencies: list[Dependency]) -> \
-                                                list[list[Dependency, float]]:
+def format_output(dependencies: list[Dependency]) -> \
+        list[list[Dependency, float]]:
     """
     Calculate the mean scores of the dependencies.
 
@@ -72,14 +51,15 @@ def calculate_mean_scores(dependencies: list[Dependency]) -> \
     mean_scores: list = []
 
     for dependency in dependencies:
-        mean_score = calculate_mean_score(dependency)
-        dep_result = [dependency.component_name, mean_score, dependency.reach_requirement]
+        dep_result = [dependency.component_name,
+                      dependency.scorecard.score,
+                      dependency.reach_requirement]
         mean_scores.append(dep_result)
     return mean_scores
 
 
 def color_score(name: str, score: float, requirement: str) -> \
-                                                        list[str, str, str]:
+        list[str, str, str]:
     """
     Color the score based on the value.
 
@@ -108,7 +88,7 @@ def color_score(name: str, score: float, requirement: str) -> \
 
 
 def color_scores(scores: list[list[Dependency, float, str]]) -> \
-                                                        list[list[str, str, str]]:
+        list[list[str, str, str]]:
     """
     Color the scores based on the values.
 
@@ -177,6 +157,7 @@ def parse_requirements(**kwargs) -> UserRequirements:
         RequirementsType.SIGNED_RELEASES: signed_releases
     })
 
+
 def table_output(scored_sbom: Sbom):
     """
     Print the output in a table format.
@@ -185,7 +166,7 @@ def table_output(scored_sbom: Sbom):
     """
     scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
     failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
-    mean_scores = calculate_mean_scores(scored_deps)
+    mean_scores = format_output(scored_deps)
     mean_scores = sorted(mean_scores, key=lambda x: x[1])
     mean_scores = color_scores(mean_scores)
     failed_deps = [
@@ -195,15 +176,15 @@ def table_output(scored_sbom: Sbom):
         tabulate(
             mean_scores,
             headers=[
-                "Successful Dependencies", 
-                "Average Score", 
+                "Successful Dependencies",
+                "SSF Aggregate Score",
                 "Meet requirements?"
             ]
         )
     )
     print(
         tabulate(
-            failed_deps, 
+            failed_deps,
             headers=["Failed Dependencies", "Failure Reason"]
         )
     )
@@ -222,13 +203,13 @@ def json_output(scored_sbom: Sbom):
 def simplified_output(scored_sbom: Sbom):
     """
     Print the output in a simplified format.
-    
+
     Args:
         scored_sbom (Sbom): The scored SBOM.
     """
     scored_deps = scored_sbom.dependency_manager.get_scored_dependencies()
     failed_deps = scored_sbom.dependency_manager.get_failed_dependencies()
-    mean_scores = calculate_mean_scores(scored_deps)
+    mean_scores = format_output(scored_deps)
     mean_scores = sorted(mean_scores, key=lambda x: x[1])
     failed_deps = [[dep.component_name, dep.failure_reason]
                    for dep in failed_deps]
@@ -240,6 +221,7 @@ def simplified_output(scored_sbom: Sbom):
     print("\nFailed dependencies:")
     for dep in failed_deps:
         print(f"{dep[0]},{dep[1]}")
+
 
 def validate_backend(_ctx, _param, value: str):
     """
@@ -300,19 +282,19 @@ def on_analysis_status_change(current_status: SbomProcessorStatus):
     step_response: StepResponse = current_status.step_response
 
     if (step_response and step_response.message and
-        "Token limit reached" in step_response.message):
+            "Token limit reached" in step_response.message):
         _progress_bar.close()
         _progress_bar = None
         print(step_response.message)
 
     if (_progress_bar and
         (_progress_bar.desc != current_status.current_state or
-        step_response is None)):
+            step_response is None)):
         _progress_bar.close()
         _progress_bar = None
 
     if (step_response is None or
-        step_response.batch_size == 0):
+            step_response.batch_size == 0):
         print(f"{current_status.current_state}...")
         return
 
@@ -333,7 +315,6 @@ def ossqa_cli():
     """
     The entry point of the program.
     """
-    pass
 
 
 @ossqa_cli.command(help="Analyze the given SBOM.")
@@ -397,7 +378,6 @@ def ossqa_cli():
 @click.option("-sr", "--signed-releases", type=click.IntRange(-1, 10),
               required=False, default=-1,
               help="Requirement for signed releases.")
-
 @click.option("-b", "--backend", type=str, callback=validate_backend,
               default=constants.HOST, help="URL of the database server.")
 @click.option("-o", "--output", type=click.Choice(["table",
@@ -407,7 +387,12 @@ def ossqa_cli():
               help="Output format.")
 @click.option("-v", "--verbose", is_flag=True, default=False, required=False,
               help="Verbose output.")
-def analyze(path: Path, git_token: str, backend: str, output: str, verbose, **kwargs):
+def analyze(path: Path,
+            git_token: str,
+            backend: str,
+            output: str,
+            verbose,
+            **kwargs) -> None:
     """
     Executes the command that analyzes an SBOM.
     """
@@ -423,8 +408,12 @@ def analyze(path: Path, git_token: str, backend: str, output: str, verbose, **kw
 
     front_end_api = FrontEndAPI(backend)
     if verbose:
-        on_analysis_status_change(front_end_api.sbom_processor.sbom_processor_status)
-        front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
+        on_analysis_status_change(
+            front_end_api.sbom_processor.sbom_processor_status
+        )
+        front_end_api.on_sbom_processor_status_update.subscribe(
+            on_analysis_status_change
+        )
     scored_sbom = front_end_api.analyze_sbom(unscored_sbom, requirements)
 
     if verbose:
@@ -456,7 +445,9 @@ def sboms(backend: str, output: str, verbose: str):
     Executes the command that fetches all SBOM names from the backend.
     """
     front_end_api = FrontEndAPI(backend)
-    front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
+    front_end_api.on_sbom_processor_status_update.subscribe(
+        on_analysis_status_change
+    )
     sbom_names = front_end_api.lookup_stored_sboms()
 
     if verbose:
@@ -489,8 +480,12 @@ def lookup(name: str, backend: str, output: str, verbose: str):
 
     front_end_api = FrontEndAPI(backend)
     if verbose:
-        on_analysis_status_change(front_end_api.sbom_processor.sbom_processor_status)
-        front_end_api.on_sbom_processor_status_update.subscribe(on_analysis_status_change)
+        on_analysis_status_change(
+            front_end_api.sbom_processor.sbom_processor_status
+        )
+        front_end_api.on_sbom_processor_status_update.subscribe(
+            on_analysis_status_change
+        )
     found_sboms = front_end_api.lookup_previous_sboms(name)
 
     if verbose:
